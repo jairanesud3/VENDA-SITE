@@ -61,10 +61,10 @@ function App() {
             <div className="w-12 h-12 border-4 border-slate-700 border-t-purple-500 rounded-full animate-spin"></div>
             <div className="absolute inset-0 flex items-center justify-center">
                {/* Google G Icon simplified */}
-               <span className="text-sm font-bold text-white">G</span>
+               <span className="text-xl font-bold text-white">G</span>
             </div>
           </div>
-          <p className="text-slate-300 font-medium">Autenticando com Google...</p>
+          <p className="text-slate-300 font-medium">Sincronizando Conta Google...</p>
         </div>
       </div>
     );
