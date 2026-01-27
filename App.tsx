@@ -16,7 +16,7 @@ function App() {
 
   const handleLogin = () => {
     setIsLoading(true);
-    // Simulate Google Login Delay
+    // Simulate Google Login Delay (1.5 seconds)
     setTimeout(() => {
       setIsLoading(false);
       setIsLoggedIn(true);
@@ -52,24 +52,30 @@ function App() {
     };
   }, [isLoggedIn]);
 
+  // Loading Screen (Simulating Google Auth)
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center z-50">
-        <div className="relative">
-          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-          <div className="absolute inset-0 flex items-center justify-center">
-             <span className="text-xs font-bold text-white">G</span>
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center z-50 fixed inset-0">
+        <div className="bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-2xl flex flex-col items-center animate-pulse">
+          <div className="relative mb-4">
+            <div className="w-12 h-12 border-4 border-slate-700 border-t-purple-500 rounded-full animate-spin"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+               {/* Google G Icon simplified */}
+               <span className="text-sm font-bold text-white">G</span>
+            </div>
           </div>
+          <p className="text-slate-300 font-medium">Autenticando com Google...</p>
         </div>
-        <p className="mt-4 text-slate-400 font-medium animate-pulse">Conectando Conta Google...</p>
       </div>
     );
   }
 
+  // Dashboard View (Logged In)
   if (isLoggedIn) {
     return <Dashboard onLogout={handleLogout} />;
   }
 
+  // Landing Page View (Logged Out)
   return (
     <div className="min-h-screen bg-slate-950 text-white selection:bg-purple-500 selection:text-white overflow-hidden">
       <Header onLogin={handleLogin} />
