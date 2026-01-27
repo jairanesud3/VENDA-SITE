@@ -1,11 +1,11 @@
 import React from 'react';
 import { ArrowRight, Sparkles, Zap, MousePointerClick } from 'lucide-react';
 
-export const Hero: React.FC = () => {
-  const scrollToPricing = () => {
-    document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
-  };
+interface HeroProps {
+  onLogin: () => void;
+}
 
+export const Hero: React.FC<HeroProps> = ({ onLogin }) => {
   return (
     <section className="relative pt-36 pb-20 md:pt-48 md:pb-32 overflow-hidden">
       {/* Background Effects */}
@@ -39,7 +39,7 @@ export const Hero: React.FC = () => {
 
         <div className="reveal delay-300 flex flex-col md:flex-row items-center justify-center gap-6">
           <button 
-            onClick={scrollToPricing}
+            onClick={onLogin}
             className="group relative w-full md:w-auto inline-flex items-center justify-center gap-3 bg-green-500 hover:bg-green-400 text-slate-950 text-lg font-bold px-8 py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_40px_rgba(34,197,94,0.6)] transform hover:-translate-y-1 active:translate-y-0 active:scale-95"
           >
             Quero Vender Mais Agora
