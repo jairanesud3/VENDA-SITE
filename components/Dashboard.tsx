@@ -5,7 +5,7 @@ import {
   Search, Users, Calculator, Target, Megaphone, TrendingUp, 
   ShieldAlert, Menu, X, PlayCircle, MessageSquare, UserCircle,
   BarChart3, Check, MousePointerClick, Globe, Camera, Save,
-  CreditCard, Bell, Lock, ChevronRight
+  CreditCard, Bell, Lock, ChevronRight, HelpCircle
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 
@@ -16,9 +16,9 @@ interface DashboardProps {
 // --- TIPOS ---
 type ModuleId = 
   | 'generator' | 'video_script' | 'product_desc' | 'email_seq' 
-  | 'persona' | 'objections' | 'competitor' | 'studio' // A "Camera"
+  | 'persona' | 'objections' | 'competitor' | 'studio'
   | 'upsell' | 'roas_analyzer' 
-  | 'my_products' | 'settings'; // Páginas do Sistema
+  | 'my_products' | 'settings';
 
 interface ModuleConfig {
   id: ModuleId;
@@ -26,10 +26,11 @@ interface ModuleConfig {
   icon: any;
   color: string;
   bgColor: string;
+  borderColor: string;
   description: string;
   placeholder: string;
   promptTemplate: (input: string) => string;
-  isTool?: boolean; // Se é uma ferramenta de IA ou uma página
+  isTool?: boolean;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
@@ -39,27 +40,31 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [result, setResult] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [savedItems, setSavedItems] = useState<number>(12); // Mock count
+  const [savedItems, setSavedItems] = useState<number>(12);
 
   // --- CONFIGURAÇÃO DOS MÓDULOS ---
   const modules: Record<string, ModuleConfig> = {
-    // FERRAMENTAS DE CRIAÇÃO
+    // === CRIAÇÃO ===
     generator: {
       id: 'generator',
       label: 'Campanha 360º',
       icon: Sparkles,
       color: 'text-purple-400',
       bgColor: 'bg-purple-500/10',
+      borderColor: 'border-purple-500/20',
       description: 'Gera headlines, copy AIDA e estrutura completa de anúncio.',
-      placeholder: 'Ex: Corretor Postural, Tênis de Corrida...',
+      placeholder: 'Ex: Corretor Postural, Tênis de Corrida, Fone Bluetooth...',
       isTool: true,
       promptTemplate: (input) => `
-        Atue como um copywriter expert nível A-List. Crie uma campanha para: "${input}".
-        Retorne APENAS um JSON válido (sem markdown, sem \`\`\`) com esta estrutura exata:
+        CONTEXTO: Você é o maior copywriter de resposta direta do mundo.
+        TAREFA: Crie uma campanha de marketing agressiva e profissional para: "${input}".
+        REGRAS: Seja criativo, não use clichês, foque em dor e desejo.
+        
+        FORMATO DE RESPOSTA (JSON OBRIGATÓRIO):
         {
           "headlines": ["Headline Curta e Impactante 1", "Headline Curta 2", "Headline Curta 3"],
-          "adCopy": "Texto persuasivo completo usando framework AIDA (Atenção, Interesse, Desejo, Ação). Use quebras de linha \\n.",
-          "creativeIdeas": ["Descrição visual detalhada para imagem 1", "Descrição visual 2"]
+          "adCopy": "Texto persuasivo completo usando framework AIDA (Atenção, Interesse, Desejo, Ação). Use quebras de linha \\n para formatar.",
+          "creativeIdeas": ["Descrição visual detalhada para imagem 1 (cenário, iluminação, ação)", "Descrição visual 2"]
         }`
     },
     studio: {
@@ -68,18 +73,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       icon: Camera,
       color: 'text-pink-500',
       bgColor: 'bg-pink-500/10',
+      borderColor: 'border-pink-500/20',
       description: 'Direção de arte e prompts técnicos para Midjourney/DALL-E.',
-      placeholder: 'Ex: Garrafa Térmica futurista...',
+      placeholder: 'Ex: Garrafa Térmica futurista, Tênis Urbano...',
       isTool: true,
       promptTemplate: (input) => `
-        Atue como um Diretor de Arte Sênior. Crie 3 conceitos visuais para vender: "${input}".
-        Retorne APENAS um JSON válido com:
+        CONTEXTO: Você é um Diretor de Arte Sênior especializado em Midjourney v6.
+        TAREFA: Crie 3 conceitos visuais de alta conversão para: "${input}".
+        
+        FORMATO DE RESPOSTA (JSON OBRIGATÓRIO):
         {
           "concepts": [
             {
-              "style": "Fotorealista / 3D / Minimalista",
-              "midjourneyPrompt": "/imagine prompt: [descrição técnica em inglês com iluminação, lente, estilo]",
-              "explanation": "Por que esse visual converte?"
+              "style": "Nome do Estilo (ex: Fotorealista, 3D Render, Lifestyle)",
+              "midjourneyPrompt": "/imagine prompt: [descrição técnica em inglês com iluminação, lente, estilo, --ar 4:5 --v 6.0]",
+              "explanation": "Explicação curta de por que esse visual converte."
             },
             { "style": "...", "midjourneyPrompt": "...", "explanation": "..." },
             { "style": "...", "midjourneyPrompt": "...", "explanation": "..." }
@@ -92,42 +100,71 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       icon: Video,
       color: 'text-cyan-400',
       bgColor: 'bg-cyan-500/10',
+      borderColor: 'border-cyan-500/20',
       description: 'Scripts de 60s focados em retenção e viralidade.',
-      placeholder: 'Ex: Escova Alisadora...',
+      placeholder: 'Ex: Escova Alisadora, Kit de Maquiagem...',
       isTool: true,
       promptTemplate: (input) => `
-        Crie um roteiro de TikTok para "${input}".
-        Retorne APENAS um JSON válido com:
+        CONTEXTO: Você é um roteirista viral do TikTok.
+        TAREFA: Crie um roteiro de alta retenção para "${input}".
+        
+        FORMATO DE RESPOSTA (JSON OBRIGATÓRIO):
         {
-          "title": "Título Gancho",
+          "title": "Título Gancho (Hook)",
           "scenes": [
-            { "time": "0-3s", "visual": "O que aparece", "audio": "Hook falado" },
-            { "time": "3-15s", "visual": "Demonstração do problema", "audio": "Narração" },
-            { "time": "15-45s", "visual": "Solução/Produto", "audio": "Benefícios" },
-            { "time": "45-60s", "visual": "CTA Claro", "audio": "Chamada para ação" }
+            { "time": "0-3s", "visual": "O que aparece na tela (Hook Visual)", "audio": "O que é falado/narração" },
+            { "time": "3-15s", "visual": "Demonstração do problema/dor", "audio": "Narração agitando o problema" },
+            { "time": "15-45s", "visual": "Revelação da solução/produto em uso", "audio": "Benefícios e transformação" },
+            { "time": "45-60s", "visual": "CTA Claro e Oferta", "audio": "Chamada para ação urgente" }
           ]
         }`
     },
-    // ESTRATÉGIA
+    product_desc: {
+      id: 'product_desc',
+      label: 'SEO E-commerce',
+      icon: Search,
+      color: 'text-green-400',
+      bgColor: 'bg-green-500/10',
+      borderColor: 'border-green-500/20',
+      description: 'Descrições que ranqueiam no Google e convertem.',
+      placeholder: 'Ex: Garrafa Térmica Inteligente...',
+      isTool: true,
+      promptTemplate: (input) => `
+        CONTEXTO: Especialista em SEO e Neuromarketing.
+        TAREFA: Descrição de produto otimizada para "${input}".
+        
+        FORMATO DE RESPOSTA (JSON OBRIGATÓRIO):
+        {
+          "seoTitle": "Título SEO (Meta Title) - Máx 60 chars",
+          "metaDescription": "Meta Description persuasiva - Máx 160 chars",
+          "features": ["Benefício Chave 1", "Benefício Chave 2", "Benefício Chave 3"],
+          "descriptionBody": "Descrição completa e envolvente do produto. Use tags HTML simples como <p>, <b>, <br> para formatar."
+        }`
+    },
+
+    // === ESTRATÉGIA ===
     persona: {
       id: 'persona',
       label: 'Raio-X da Persona',
       icon: Users,
       color: 'text-blue-400',
       bgColor: 'bg-blue-500/10',
+      borderColor: 'border-blue-500/20',
       description: 'Psicografia profunda do seu comprador ideal.',
-      placeholder: 'Ex: Kit de Ferramentas...',
+      placeholder: 'Ex: Kit de Ferramentas, Cinta Modeladora...',
       isTool: true,
       promptTemplate: (input) => `
-        Crie uma Persona Buyer para "${input}".
-        Retorne APENAS um JSON válido com:
+        CONTEXTO: Psicólogo de consumo e Analista de Dados.
+        TAREFA: Análise de Persona Buyer para "${input}".
+        
+        FORMATO DE RESPOSTA (JSON OBRIGATÓRIO):
         {
-          "name": "Nome da Persona",
-          "age": "Idade",
-          "occupation": "Profissão",
+          "name": "Nome Fictício e Arquétipo",
+          "age": "Faixa Etária",
+          "occupation": "Ocupação provável",
           "painPoints": ["Dor latente 1", "Dor 2", "Dor 3"],
           "desires": ["Desejo secreto 1", "Desejo 2"],
-          "behaviors": ["Comportamento de compra 1", "Onde navega"]
+          "behaviors": ["Comportamento de compra", "Redes sociais favoritas"]
         }`
     },
     objections: {
@@ -136,15 +173,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       icon: ShieldAlert,
       color: 'text-red-400',
       bgColor: 'bg-red-500/10',
+      borderColor: 'border-red-500/20',
       description: 'Scripts de resposta para WhatsApp e Direct.',
       placeholder: 'Ex: Smartwatch Ultra...',
       isTool: true,
       promptTemplate: (input) => `
-        Liste 4 objeções comuns para "${input}" e a resposta perfeita.
-        Retorne APENAS um JSON válido com:
+        CONTEXTO: Closer de Vendas de alta performance.
+        TAREFA: Liste 4 objeções para "${input}" e como quebrar cada uma.
+        
+        FORMATO DE RESPOSTA (JSON OBRIGATÓRIO):
         {
           "objections": [
-            { "clientAsks": "Objeção (ex: tá caro)", "sellerAnswers": "Script de quebra de objeção" },
+            { "clientAsks": "Pergunta do cliente (ex: tá caro, frete demorado)", "sellerAnswers": "Script de resposta persuasiva para fechar a venda" },
             { "clientAsks": "...", "sellerAnswers": "..." }
           ]
         }`
@@ -155,37 +195,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       icon: Mail,
       color: 'text-yellow-400',
       bgColor: 'bg-yellow-500/10',
+      borderColor: 'border-yellow-500/20',
       description: 'Recuperação de carrinho e pós-venda.',
       placeholder: 'Ex: Fone Bluetooth...',
       isTool: true,
       promptTemplate: (input) => `
-        Crie 3 emails curtos para recuperação de "${input}".
-        Retorne APENAS um JSON válido com:
+        CONTEXTO: Especialista em Email Marketing e CRM.
+        TAREFA: 3 e-mails para recuperação de carrinho de "${input}".
+        
+        FORMATO DE RESPOSTA (JSON OBRIGATÓRIO):
         {
           "emails": [
-            { "subject": "Assunto instigante 1", "body": "Texto do email 1" },
-            { "subject": "Assunto 2", "body": "Texto do email 2" },
-            { "subject": "Assunto 3", "body": "Texto do email 3" }
+            { "subject": "Assunto instigante (alto open rate)", "body": "Corpo do email 1" },
+            { "subject": "Assunto 2", "body": "Corpo do email 2" },
+            { "subject": "Assunto 3", "body": "Corpo do email 3" }
           ]
-        }`
-    },
-    product_desc: {
-      id: 'product_desc',
-      label: 'SEO E-commerce',
-      icon: Search,
-      color: 'text-green-400',
-      bgColor: 'bg-green-500/10',
-      description: 'Descrições que ranqueiam no Google.',
-      placeholder: 'Ex: Garrafa Térmica...',
-      isTool: true,
-      promptTemplate: (input) => `
-        Crie descrição SEO para "${input}".
-        Retorne APENAS um JSON válido com:
-        {
-          "seoTitle": "Título SEO (50-60 chars)",
-          "metaDescription": "Meta Description persuasiva (150 chars)",
-          "features": ["Benefício 1", "Benefício 2", "Benefício 3"],
-          "descriptionBody": "Descrição completa do produto em HTML simples (apenas <p>, <b>, <br>)"
         }`
     },
     roas_analyzer: {
@@ -194,25 +218,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       icon: Calculator,
       color: 'text-emerald-500',
       bgColor: 'bg-emerald-500/10',
+      borderColor: 'border-emerald-500/20',
       description: 'Auditoria de campanhas e métricas.',
-      placeholder: 'Ex: Gastei 1000, Faturei 1500, CPC 2.50...',
+      placeholder: 'Ex: Gastei 1000, Faturei 1500, CPC 2.50, CTR 1.2%...',
       isTool: true,
       promptTemplate: (input) => `
-        Analise os dados: "${input}".
-        Retorne APENAS um JSON válido com:
+        CONTEXTO: Gestor de Tráfego Sênior com foco em escala.
+        TAREFA: Analise friamente estes dados: "${input}".
+        
+        FORMATO DE RESPOSTA (JSON OBRIGATÓRIO):
         {
           "status": "RUIM" | "MÉDIO" | "BOM" | "EXCELENTE",
-          "summary": "Análise direta em 1 parágrafo",
-          "actions": ["Ação corretiva 1", "Ação 2", "Ação 3"]
+          "summary": "Análise direta e sem rodeios sobre o desempenho.",
+          "actions": ["Ação prática 1 para melhorar", "Ação 2", "Ação 3"]
         }`
     },
-    // PÁGINAS DO SISTEMA (MOCK)
+
+    // === SISTEMA ===
     my_products: {
       id: 'my_products',
       label: 'Meus Produtos',
       icon: Package,
       color: 'text-slate-400',
       bgColor: 'bg-slate-800',
+      borderColor: 'border-slate-800',
       description: 'Gerencie seu catálogo.',
       placeholder: '',
       isTool: false,
@@ -224,11 +253,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       icon: Settings,
       color: 'text-slate-400',
       bgColor: 'bg-slate-800',
+      borderColor: 'border-slate-800',
       description: 'Preferências da conta.',
       placeholder: '',
       isTool: false,
       promptTemplate: () => ''
-    }
+    },
+    competitor: { id: 'competitor', label: '', icon: Target, color: '', bgColor: '', borderColor: '', description: '', placeholder: '', isTool: false, promptTemplate: () => '' }, 
+    upsell: { id: 'upsell', label: '', icon: TrendingUp, color: '', bgColor: '', borderColor: '', description: '', placeholder: '', isTool: false, promptTemplate: () => '' }
   };
 
   const handleGenerate = async () => {
@@ -246,27 +278,48 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       const ai = new GoogleGenAI({ apiKey: apiKey || '' });
       const prompt = config.promptTemplate(inputValue);
       
+      // GEMINI 2.0 FLASH LITE (SLASH LITE) CONFIG
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-latest',
+        model: 'gemini-2.0-flash-lite-preview-02-05', 
         contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          temperature: 0.7, 
+          topK: 40,
+          // Instrução crítica: Proíbe Markdown para evitar erros de parse
+          systemInstruction: "Você é uma IA de Marketing de Elite. Retorne APENAS o JSON solicitado. NÃO use blocos de código Markdown (```json). NÃO inclua texto introdutório. Responda diretamente com o objeto JSON."
+        }
       });
 
       const text = response.text;
       
       if (text) {
+        // PARSER INTELIGENTE: Remove Markdown E texto extra (comum no Flash Lite)
+        // Procura pelo primeiro '{' e último '}' para garantir apenas o JSON válido
+        let cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
+        const firstBrace = cleanJson.indexOf('{');
+        const lastBrace = cleanJson.lastIndexOf('}');
+        
+        if (firstBrace !== -1 && lastBrace !== -1) {
+            cleanJson = cleanJson.substring(firstBrace, lastBrace + 1);
+        }
+        
         try {
-          // Limpeza Extrema para garantir JSON
-          const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
-          const parsed = JSON.parse(jsonString);
+          const parsed = JSON.parse(cleanJson);
           setResult(parsed);
         } catch (e) {
           console.error("JSON Parse Error", e);
+          console.log("Raw Text:", text);
           setResult({ rawText: text, isError: true });
         }
+      } else {
+        throw new Error("Resposta vazia da IA");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError("A IA encontrou um erro. Verifique sua conexão ou tente novamente.");
+      // Mensagem de erro amigável para o usuário
+      const errorMessage = err.message || "Erro desconhecido na conexão.";
+      setError(`Erro na IA: ${errorMessage}`);
     } finally {
       setIsGenerating(false);
     }
@@ -280,28 +333,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   // --- RENDERIZADORES DE UI ---
 
   const RenderStudio = ({ data }: { data: any }) => (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-fade-in">
       <div className="grid gap-6">
         {data.concepts?.map((concept: any, idx: number) => (
-          <div key={idx} className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-pink-500/50 transition-all group">
+          <div key={idx} className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-pink-500/50 transition-all group shadow-lg">
             <div className="bg-slate-950 p-4 border-b border-slate-800 flex justify-between items-center">
               <span className="text-pink-400 font-bold text-sm uppercase tracking-wider flex items-center gap-2">
-                <Camera className="w-4 h-4" /> Conceito {idx + 1}: {concept.style}
+                <Camera className="w-4 h-4" /> Conceito {idx + 1}: <span className="text-white">{concept.style}</span>
               </span>
-              <button onClick={() => copyToClipboard(concept.midjourneyPrompt)} className="text-slate-400 hover:text-white flex gap-1 text-xs items-center transition-colors">
+              <button onClick={() => copyToClipboard(concept.midjourneyPrompt)} className="text-slate-400 hover:text-white flex gap-2 text-xs items-center transition-colors bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800 hover:border-pink-500/50">
                 <Copy size={14} /> Copiar Prompt
               </button>
             </div>
-            <div className="p-5 space-y-4">
+            <div className="p-6 space-y-5">
                <div>
-                 <p className="text-xs text-slate-500 font-bold mb-1 uppercase">Midjourney / DALL-E Prompt</p>
-                 <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 text-slate-300 font-mono text-xs leading-relaxed select-all">
+                 <p className="text-[10px] text-slate-500 font-bold mb-2 uppercase tracking-widest flex items-center gap-1">
+                   <Sparkles className="w-3 h-3"/> Midjourney / DALL-E Prompt
+                 </p>
+                 <div className="bg-[#0f111a] p-4 rounded-xl border border-slate-800/50 text-pink-200/90 font-mono text-xs leading-relaxed select-all hover:bg-slate-950 transition-colors">
                    {concept.midjourneyPrompt}
                  </div>
                </div>
                <div>
-                 <p className="text-xs text-slate-500 font-bold mb-1 uppercase">Por que funciona?</p>
-                 <p className="text-slate-400 text-sm">{concept.explanation}</p>
+                 <p className="text-[10px] text-slate-500 font-bold mb-1 uppercase tracking-widest">Por que converte?</p>
+                 <p className="text-slate-400 text-sm leading-relaxed">{concept.explanation}</p>
                </div>
             </div>
           </div>
@@ -311,7 +366,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   );
 
   const RenderCampaign = ({ data }: { data: any }) => (
-    <div className="grid lg:grid-cols-2 gap-6">
+    <div className="grid lg:grid-cols-2 gap-6 animate-fade-in">
       <div className="space-y-6">
         {/* Headlines */}
         <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-sm">
@@ -320,7 +375,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
           </h3>
           <div className="space-y-3">
             {data.headlines?.map((h: string, i: number) => (
-              <div key={i} className="group flex items-center justify-between p-3 bg-slate-950 border border-slate-800 rounded-lg hover:border-purple-500 transition-colors cursor-pointer" onClick={() => copyToClipboard(h)}>
+              <div key={i} className="group flex items-center justify-between p-3 bg-slate-950 border border-slate-800 rounded-lg hover:border-purple-500 transition-colors cursor-pointer active:scale-[0.99]" onClick={() => copyToClipboard(h)}>
                 <span className="text-white text-sm font-medium">{h}</span>
                 <Copy className="w-3 h-3 text-slate-600 group-hover:text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
@@ -344,57 +399,58 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       </div>
 
       {/* Copy Body */}
-      <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col h-full">
+      <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col h-full shadow-sm">
         <div className="flex justify-between items-center mb-4">
-           <h3 className="text-white font-bold flex items-center gap-2 text-sm uppercase tracking-wider"><MessageSquare size={16}/> Copy (Framework AIDA)</h3>
+           <h3 className="text-white font-bold flex items-center gap-2 text-sm uppercase tracking-wider"><MessageSquare size={16}/> Copy (AIDA)</h3>
            <button onClick={() => copyToClipboard(data.adCopy)} className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors px-2 py-1 rounded hover:bg-slate-800"><Copy size={12}/> Copiar Texto</button>
         </div>
-        <div className="flex-1 bg-slate-950 p-4 rounded-xl border border-slate-800 text-slate-300 text-sm whitespace-pre-wrap leading-relaxed font-sans overflow-y-auto max-h-[500px] custom-scrollbar">
+        <div className="flex-1 bg-slate-950 p-4 rounded-xl border border-slate-800 text-slate-300 text-sm whitespace-pre-wrap leading-relaxed font-sans overflow-y-auto max-h-[600px] custom-scrollbar selection:bg-purple-500/30">
           {data.adCopy}
         </div>
       </div>
     </div>
   );
 
-  // --- PÁGINAS COMPLETAS ---
+  // --- PÁGINAS DO SISTEMA ---
 
   const RenderMyProducts = () => {
     const products = [
-      { id: 1, name: "Corretor Postural Pro", niche: "Saúde", status: "Ativo", roas: "4.2", date: "Há 2 dias" },
-      { id: 2, name: "Smartwatch Ultra 9", niche: "Eletrônicos", status: "Pausado", roas: "1.8", date: "Há 5 dias" },
-      { id: 3, name: "Kit Clareador Dental", niche: "Beleza", status: "Ativo", roas: "3.5", date: "Há 1 semana" },
-      { id: 4, name: "Cinta Modeladora Slim", niche: "Moda", status: "Rascunho", roas: "-", date: "Há 1 semana" },
+      { id: 1, name: "Corretor Postural Pro", niche: "Saúde", status: "Ativo", roas: "4.2", date: "Há 2 dias", color: "text-green-400", bg: "bg-green-900/20" },
+      { id: 2, name: "Smartwatch Ultra 9", niche: "Eletrônicos", status: "Pausado", roas: "1.8", date: "Há 5 dias", color: "text-yellow-400", bg: "bg-yellow-900/20" },
+      { id: 3, name: "Kit Clareador Dental", niche: "Beleza", status: "Ativo", roas: "3.5", date: "Há 1 semana", color: "text-green-400", bg: "bg-green-900/20" },
+      { id: 4, name: "Cinta Modeladora Slim", niche: "Moda", status: "Rascunho", roas: "-", date: "Há 1 semana", color: "text-slate-400", bg: "bg-slate-800" },
+      { id: 5, name: "Lâmpada Led RGB", niche: "Casa", status: "Ativo", roas: "2.1", date: "Há 2 semanas", color: "text-green-400", bg: "bg-green-900/20" },
     ];
 
     return (
       <div className="animate-fade-in space-y-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-white">Meus Produtos</h2>
-          <button className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-white">Meus Produtos</h2>
+            <p className="text-slate-400 text-sm">Gerencie todas as suas campanhas salvas.</p>
+          </div>
+          <button className="bg-purple-600 hover:bg-purple-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors shadow-lg shadow-purple-900/20">
             <Package className="w-4 h-4" /> Novo Produto
           </button>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((p) => (
-            <div key={p.id} className="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-slate-600 transition-all group">
+            <div key={p.id} className="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-slate-600 transition-all group cursor-pointer hover:shadow-xl hover:-translate-y-1">
               <div className="flex justify-between items-start mb-4">
-                <div className="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center text-slate-500 group-hover:bg-purple-900/20 group-hover:text-purple-400 transition-colors">
+                <div className="w-12 h-12 bg-slate-950 border border-slate-800 rounded-xl flex items-center justify-center text-slate-500 group-hover:border-purple-500/50 group-hover:text-purple-400 transition-colors">
                   <Package className="w-6 h-6" />
                 </div>
-                <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded-full ${
-                  p.status === 'Ativo' ? 'bg-green-900/30 text-green-400' : 
-                  p.status === 'Pausado' ? 'bg-yellow-900/30 text-yellow-400' : 'bg-slate-800 text-slate-400'
-                }`}>
+                <span className={`text-[10px] uppercase font-bold px-2 py-1 rounded-full ${p.bg} ${p.color}`}>
                   {p.status}
                 </span>
               </div>
-              <h3 className="text-white font-bold text-lg mb-1">{p.name}</h3>
+              <h3 className="text-white font-bold text-lg mb-1 truncate">{p.name}</h3>
               <p className="text-slate-500 text-xs mb-4">{p.niche} • Criado {p.date}</p>
               
               <div className="pt-4 border-t border-slate-800 flex justify-between items-center">
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-slate-500 uppercase font-bold">ROAS Atual</span>
+                  <span className="text-[10px] text-slate-500 uppercase font-bold">ROAS</span>
                   <span className="text-white font-bold">{p.roas}</span>
                 </div>
                 <button className="text-purple-400 hover:text-white text-sm font-medium flex items-center gap-1 transition-colors">
@@ -404,9 +460,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             </div>
           ))}
           {/* Add Placeholder */}
-          <div className="border-2 border-dashed border-slate-800 rounded-xl p-5 flex flex-col items-center justify-center text-slate-500 hover:border-slate-700 hover:bg-slate-900/50 transition-all cursor-pointer min-h-[200px]">
-            <PlusIcon />
-            <span className="mt-2 text-sm font-medium">Adicionar Produto</span>
+          <div className="border-2 border-dashed border-slate-800 rounded-xl p-5 flex flex-col items-center justify-center text-slate-500 hover:border-slate-700 hover:bg-slate-900/30 hover:text-slate-300 transition-all cursor-pointer min-h-[180px]">
+            <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center mb-2">
+               <PlusIcon />
+            </div>
+            <span className="mt-1 text-sm font-medium">Adicionar Produto</span>
           </div>
         </div>
       </div>
@@ -414,139 +472,157 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   };
 
   const RenderSettings = () => (
-    <div className="animate-fade-in max-w-3xl">
-      <h2 className="text-2xl font-bold text-white mb-6">Configurações da Conta</h2>
+    <div className="animate-fade-in max-w-4xl mx-auto">
+      <h2 className="text-2xl font-bold text-white mb-2">Configurações</h2>
+      <p className="text-slate-400 text-sm mb-8">Gerencie suas preferências e assinatura.</p>
       
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden mb-8">
-        <div className="p-6 border-b border-slate-800 flex items-center gap-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-            J
+      <div className="grid gap-8">
+        {/* Profile Card */}
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+          <div className="p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
+            <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-xl shadow-purple-900/30 ring-4 ring-slate-900">
+              J
+            </div>
+            <div className="text-center md:text-left flex-1">
+              <h3 className="text-xl font-bold text-white">Jair Anesud</h3>
+              <p className="text-slate-400 text-sm mb-3">jair@exemplo.com</p>
+              <div className="flex gap-2 justify-center md:justify-start">
+                 <span className="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">Admin</span>
+                 <span className="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded border border-blue-500/30">Pro</span>
+              </div>
+            </div>
+            <button className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-medium transition-colors border border-slate-700">
+              Editar Perfil
+            </button>
           </div>
-          <div>
-            <h3 className="text-xl font-bold text-white">Jair Anesud</h3>
-            <p className="text-slate-400 text-sm">jair@exemplo.com</p>
+        </div>
+
+        {/* Settings Grid */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <h4 className="text-white font-bold mb-4 flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-purple-400"/> Assinatura
+            </h4>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-3 bg-slate-950 rounded-lg border border-slate-800">
+                <div>
+                   <p className="text-sm font-medium text-white">Plano Escala Pro</p>
+                   <p className="text-xs text-slate-500">R$ 97,00/mês</p>
+                </div>
+                <span className="text-xs font-bold text-green-400 bg-green-900/20 px-2 py-1 rounded">Ativo</span>
+              </div>
+              <button className="text-purple-400 text-sm hover:underline">Gerenciar Cobrança</button>
+            </div>
           </div>
-          <button className="ml-auto px-4 py-2 border border-slate-700 rounded-lg text-sm text-slate-300 hover:bg-slate-800 transition-colors">
-            Editar Perfil
-          </button>
+
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+             <h4 className="text-white font-bold mb-4 flex items-center gap-2">
+              <Bell className="w-4 h-4 text-yellow-400"/> Notificações
+            </h4>
+            <div className="space-y-3">
+               <div className="flex items-center justify-between">
+                 <span className="text-sm text-slate-300">Alertas de E-mail</span>
+                 <div className="w-9 h-5 bg-purple-600 rounded-full relative cursor-pointer"><div className="w-3 h-3 bg-white rounded-full absolute right-1 top-1"></div></div>
+               </div>
+               <div className="flex items-center justify-between">
+                 <span className="text-sm text-slate-300">Novos Recursos</span>
+                 <div className="w-9 h-5 bg-slate-700 rounded-full relative cursor-pointer"><div className="w-3 h-3 bg-white rounded-full absolute left-1 top-1"></div></div>
+               </div>
+            </div>
+          </div>
         </div>
         
-        <div className="p-6 space-y-6">
-          <div className="flex items-center justify-between py-2">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-900/20 rounded text-purple-400"><CreditCard className="w-5 h-5"/></div>
-              <div>
-                <p className="text-white font-medium">Plano Atual</p>
-                <p className="text-slate-400 text-xs">Escala Pro • R$ 97,00/mês</p>
-              </div>
-            </div>
-            <span className="text-green-400 text-sm font-bold bg-green-900/20 px-3 py-1 rounded-full">Ativo</span>
-          </div>
-
-          <div className="flex items-center justify-between py-2 border-t border-slate-800 pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-slate-800 rounded text-slate-400"><Lock className="w-5 h-5"/></div>
-              <div>
-                <p className="text-white font-medium">Senha e Segurança</p>
-                <p className="text-slate-400 text-xs">ltima alteração há 30 dias</p>
-              </div>
-            </div>
-            <button className="text-slate-400 hover:text-white text-sm">Alterar</button>
-          </div>
-
-          <div className="flex items-center justify-between py-2 border-t border-slate-800 pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-slate-800 rounded text-slate-400"><Bell className="w-5 h-5"/></div>
-              <div>
-                <p className="text-white font-medium">Notificações</p>
-                <p className="text-slate-400 text-xs">E-mails de novidades e alertas</p>
-              </div>
-            </div>
-            <div className="w-10 h-5 bg-purple-600 rounded-full relative cursor-pointer">
-              <div className="w-3 h-3 bg-white rounded-full absolute right-1 top-1"></div>
-            </div>
-          </div>
+        <div className="text-center pt-8 border-t border-slate-900">
+          <p className="text-slate-600 text-xs mb-2">ID da Conta: 8493-2938-1029</p>
+          <button className="text-red-500/70 hover:text-red-400 text-xs transition-colors" onClick={onLogout}>Sair da Conta</button>
         </div>
-      </div>
-      
-      <div className="text-right">
-        <button className="text-red-400 text-sm hover:underline">Excluir minha conta permanentemente</button>
       </div>
     </div>
   );
 
   // Helper simples para UI
-  const PlusIcon = () => <svg className="w-8 h-8 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>;
-
-  // Componentes de Renderização de Conteúdo (Reutilizados do anterior com melhorias visuais)
-  const RenderGenericList = ({ data, titleKey, subKey }: any) => (
-    <div className="grid md:grid-cols-3 gap-4">
-      {(data.names || data.angles || []).map((item: any, idx: number) => (
-        <div key={idx} className="bg-slate-900 border border-slate-800 p-5 rounded-xl hover:bg-slate-800 transition-colors">
-          <h3 className="text-base font-bold text-white mb-2">{item[titleKey]}</h3>
-          {subKey && <p className="text-slate-400 text-sm">{item[subKey]}</p>}
-        </div>
-      ))}
-    </div>
-  );
+  const PlusIcon = () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>;
 
   // Controlador de Renderização Principal
   const renderContent = () => {
-    // Páginas Estáticas
     if (activeModule === 'my_products') return <RenderMyProducts />;
     if (activeModule === 'settings') return <RenderSettings />;
 
-    // Estado Vazio
+    // Estado Vazio (Inicial)
     if (!result && !isGenerating && !error) {
       const CurrentIcon = modules[activeModule].icon;
       return (
-        <div className="h-[60vh] flex flex-col items-center justify-center text-center opacity-40 select-none animate-fade-in">
-           <div className={`w-24 h-24 rounded-3xl ${modules[activeModule].bgColor} flex items-center justify-center mb-6`}>
-              <CurrentIcon className={`w-10 h-10 ${modules[activeModule].color}`} />
+        <div className="h-[60vh] flex flex-col items-center justify-center text-center select-none animate-fade-in">
+           <div className={`w-20 h-20 rounded-2xl ${modules[activeModule].bgColor} border ${modules[activeModule].borderColor} flex items-center justify-center mb-6 shadow-lg shadow-black/20`}>
+              <CurrentIcon className={`w-8 h-8 ${modules[activeModule].color}`} />
            </div>
-           <p className="text-slate-300 font-medium text-lg">Pronto para criar.</p>
-           <p className="text-slate-500 max-w-xs mx-auto mt-2 text-sm">Preencha o contexto acima e a IA gerará o conteúdo em segundos.</p>
+           <h3 className="text-white font-bold text-xl mb-2">Pronto para criar</h3>
+           <p className="text-slate-400 max-w-sm mx-auto text-sm leading-relaxed">
+             O assistente está aguardando seu comando. Descreva seu produto acima e a mágica acontecerá.
+           </p>
         </div>
       );
     }
 
-    // Carregando
+    // Estado Carregando
     if (isGenerating) {
       return (
-        <div className="h-[40vh] flex flex-col items-center justify-center animate-pulse">
-           <Loader2 className="w-10 h-10 text-purple-500 animate-spin mb-4" />
-           <p className="text-slate-400 font-medium">Analisando 1M+ de anúncios vencedores...</p>
+        <div className="h-[50vh] flex flex-col items-center justify-center animate-pulse">
+           <div className="relative">
+             <div className="w-16 h-16 border-4 border-slate-800 border-t-purple-500 rounded-full animate-spin"></div>
+             <div className="absolute inset-0 flex items-center justify-center">
+               <Sparkles className="w-6 h-6 text-purple-500" />
+             </div>
+           </div>
+           <p className="text-slate-300 font-medium mt-6">Analisando 1M+ de anúncios vencedores...</p>
+           <p className="text-slate-500 text-sm mt-2">Gerando estratégia personalizada</p>
         </div>
       );
     }
 
-    // Erro
+    // Estado Erro
     if (error || (result && result.isError)) {
       return (
-        <div className="bg-red-950/20 border border-red-500/20 p-6 rounded-xl text-center">
-          <AlertTriangle className="w-10 h-10 text-red-500 mx-auto mb-3" />
-          <h3 className="text-red-400 font-bold mb-2">Ops, algo deu errado.</h3>
-          <p className="text-slate-400 text-sm">{error || result?.rawText || "Erro desconhecido na geração."}</p>
-          <button onClick={handleGenerate} className="mt-4 text-white bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg text-sm font-bold transition-colors">Tentar Novamente</button>
+        <div className="bg-red-950/20 border border-red-500/20 p-8 rounded-2xl text-center max-w-lg mx-auto mt-10">
+          <div className="w-14 h-14 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500">
+            <AlertTriangle className="w-7 h-7" />
+          </div>
+          <h3 className="text-white font-bold text-lg mb-2">Ops, algo deu errado.</h3>
+          <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+            {error || result?.rawText || "A inteligência artificial encontrou um obstáculo. Verifique sua conexão ou tente simplificar o pedido."}
+          </p>
+          <button onClick={handleGenerate} className="bg-red-600 hover:bg-red-500 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-lg shadow-red-900/20">
+            Tentar Novamente
+          </button>
         </div>
       );
     }
 
-    // Resultados
+    // --- RENDERIZADORES DE RESULTADOS ---
     switch (activeModule) {
       case 'generator': return <RenderCampaign data={result} />;
-      case 'studio': return <RenderStudio data={result} />; // NEW
+      case 'studio': return <RenderStudio data={result} />;
       case 'video_script': 
         return (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-fade-in">
+             <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2"><Video className="w-4 h-4 text-cyan-400"/> {result.title}</h3>
+             </div>
              {result.scenes?.map((scene: any, i: number) => (
-                <div key={i} className="flex gap-4 p-4 bg-slate-900 border border-slate-800 rounded-xl">
-                  <div className="w-16 h-16 bg-slate-800 rounded flex items-center justify-center font-bold text-slate-500">{i+1}</div>
-                  <div>
-                    <p className="text-cyan-400 text-xs font-bold uppercase mb-1">Visual ({scene.time})</p>
-                    <p className="text-slate-300 text-sm mb-2">{scene.visual}</p>
-                    <p className="text-pink-400 text-xs font-bold uppercase mb-1">Áudio</p>
-                    <p className="text-white text-sm font-medium">"{scene.audio}"</p>
+                <div key={i} className="flex flex-col md:flex-row gap-4 p-5 bg-slate-900 border border-slate-800 rounded-xl hover:border-cyan-500/30 transition-colors">
+                  <div className="flex items-center gap-3 md:w-24 shrink-0">
+                    <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center font-bold text-slate-400 text-xs">{i+1}</div>
+                    <span className="text-xs font-bold bg-slate-800 px-2 py-1 rounded text-slate-300">{scene.time}</span>
+                  </div>
+                  <div className="flex-1 grid md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-cyan-400 text-[10px] font-bold uppercase tracking-wider mb-1 flex items-center gap-1"><Camera className="w-3 h-3"/> Visual</p>
+                      <p className="text-slate-300 text-sm leading-relaxed">{scene.visual}</p>
+                    </div>
+                    <div className="md:border-l md:border-slate-800 md:pl-4">
+                      <p className="text-pink-400 text-[10px] font-bold uppercase tracking-wider mb-1 flex items-center gap-1"><MessageSquare className="w-3 h-3"/> Áudio</p>
+                      <p className="text-white text-sm font-medium leading-relaxed">"{scene.audio}"</p>
+                    </div>
                   </div>
                 </div>
              ))}
@@ -554,64 +630,140 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
         );
       case 'persona':
         return (
-           <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl">
-             <div className="flex items-center gap-4 mb-6">
-               <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center"><UserCircle className="text-white w-8 h-8"/></div>
-               <div><h2 className="text-xl font-bold text-white">{result.name}</h2><p className="text-slate-400">{result.age} • {result.occupation}</p></div>
+           <div className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-2xl animate-fade-in">
+             <div className="flex flex-col md:flex-row items-center gap-6 mb-8 border-b border-slate-800 pb-8">
+               <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-xl shadow-blue-900/20"><UserCircle className="text-white w-10 h-10"/></div>
+               <div className="text-center md:text-left">
+                 <h2 className="text-3xl font-bold text-white mb-1">{result.name}</h2>
+                 <p className="text-slate-400 text-lg">{result.age} • <span className="text-blue-400 font-medium">{result.occupation}</span></p>
+               </div>
              </div>
-             <div className="grid md:grid-cols-2 gap-6">
-                <div><h4 className="text-red-400 font-bold mb-2">Dores</h4><ul className="list-disc pl-4 text-slate-300 text-sm space-y-1">{result.painPoints?.map((p:string, i:number)=><li key={i}>{p}</li>)}</ul></div>
-                <div><h4 className="text-green-400 font-bold mb-2">Desejos</h4><ul className="list-disc pl-4 text-slate-300 text-sm space-y-1">{result.desires?.map((p:string, i:number)=><li key={i}>{p}</li>)}</ul></div>
+             <div className="grid md:grid-cols-2 gap-8">
+                <div className="bg-red-950/10 p-5 rounded-xl border border-red-500/10">
+                  <h4 className="text-red-400 font-bold mb-4 flex items-center gap-2"><AlertTriangle className="w-4 h-4"/> Principais Dores</h4>
+                  <ul className="space-y-3">
+                    {result.painPoints?.map((p:string, i:number)=>(
+                      <li key={i} className="flex items-start gap-2 text-slate-300 text-sm">
+                        <span className="w-1.5 h-1.5 bg-red-500 rounded-full mt-1.5 shrink-0"></span>
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="bg-green-950/10 p-5 rounded-xl border border-green-500/10">
+                  <h4 className="text-green-400 font-bold mb-4 flex items-center gap-2"><Sparkles className="w-4 h-4"/> Desejos Secretos</h4>
+                  <ul className="space-y-3">
+                    {result.desires?.map((p:string, i:number)=>(
+                      <li key={i} className="flex items-start gap-2 text-slate-300 text-sm">
+                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full mt-1.5 shrink-0"></span>
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
              </div>
            </div>
         );
       case 'objections':
          return (
-            <div className="space-y-4 max-w-2xl mx-auto">
+            <div className="space-y-6 max-w-3xl mx-auto animate-fade-in">
                {result.objections?.map((obj: any, i: number) => (
-                 <div key={i} className="space-y-2">
-                    <div className="bg-slate-800 p-3 rounded-t-xl rounded-br-xl rounded-bl-none text-slate-300 text-sm self-start w-fit max-w-[80%]">{obj.clientAsks}</div>
-                    <div className="bg-green-600 p-3 rounded-t-xl rounded-bl-xl rounded-br-none text-white text-sm self-end w-fit max-w-[80%] ml-auto shadow-lg">{obj.sellerAnswers}</div>
+                 <div key={i} className="space-y-2 group">
+                    <div className="bg-slate-800 p-4 rounded-2xl rounded-bl-none text-slate-300 text-sm self-start w-fit max-w-[85%] border border-slate-700 relative">
+                      <span className="absolute -top-5 left-0 text-[10px] text-slate-500 font-bold uppercase">Cliente</span>
+                      {obj.clientAsks}
+                    </div>
+                    <div className="flex justify-end">
+                      <div className="bg-gradient-to-br from-green-600 to-emerald-600 p-4 rounded-2xl rounded-br-none text-white text-sm w-fit max-w-[85%] shadow-lg relative">
+                        <span className="absolute -top-5 right-0 text-[10px] text-slate-500 font-bold uppercase">Melhor Resposta</span>
+                        {obj.sellerAnswers}
+                      </div>
+                    </div>
                  </div>
                ))}
             </div>
          );
       case 'email_seq':
          return (
-           <div className="space-y-4">
+           <div className="space-y-4 animate-fade-in">
              {result.emails?.map((email: any, i: number) => (
-               <div key={i} className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-                 <div className="bg-slate-800 p-3 text-sm font-medium text-white border-b border-slate-700">Assunto: {email.subject}</div>
-                 <div className="p-4 text-slate-300 text-sm whitespace-pre-wrap">{email.body}</div>
+               <div key={i} className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden hover:border-yellow-500/30 transition-colors">
+                 <div className="bg-slate-950 p-3 px-4 text-sm font-medium text-white border-b border-slate-800 flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-yellow-900/20 text-yellow-500 flex items-center justify-center text-xs font-bold border border-yellow-500/20">{i+1}</div>
+                    <span className="text-slate-400">Assunto:</span> {email.subject}
+                 </div>
+                 <div className="p-5 text-slate-300 text-sm whitespace-pre-wrap leading-relaxed font-sans">
+                   {email.body}
+                 </div>
                </div>
              ))}
            </div>
          );
       case 'roas_analyzer':
         return (
-           <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl">
-              <h2 className={`text-4xl font-bold mb-4 ${result.status === 'EXCELENTE' ? 'text-green-500' : 'text-yellow-500'}`}>{result.status}</h2>
-              <p className="text-slate-300 mb-6">{result.summary}</p>
-              <h3 className="text-white font-bold mb-2">Ações Recomendadas:</h3>
-              <ul className="space-y-2">{result.actions?.map((a:string,i:number)=><li key={i} className="flex gap-2 text-sm text-slate-400"><Check className="w-4 h-4 text-green-500"/> {a}</li>)}</ul>
+           <div className="bg-slate-900 border border-slate-800 p-8 rounded-2xl animate-fade-in">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 pb-8 border-b border-slate-800">
+                <div>
+                  <h2 className="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">Diagnóstico da Campanha</h2>
+                  <div className={`text-5xl font-extrabold ${result.status === 'EXCELENTE' || result.status === 'BOM' ? 'text-green-500' : 'text-yellow-500'}`}>{result.status}</div>
+                </div>
+                <div className={`mt-4 md:mt-0 px-4 py-2 rounded-lg font-bold text-sm ${result.status === 'EXCELENTE' || result.status === 'BOM' ? 'bg-green-900/20 text-green-400' : 'bg-yellow-900/20 text-yellow-400'}`}>
+                   Análise Concluída
+                </div>
+              </div>
+              
+              <div className="mb-8">
+                <h3 className="text-white font-bold mb-3 flex items-center gap-2"><Target className="w-4 h-4 text-slate-400"/> Resumo</h3>
+                <p className="text-slate-300 leading-relaxed bg-slate-950 p-4 rounded-xl border border-slate-800">{result.summary}</p>
+              </div>
+
+              <div>
+                <h3 className="text-white font-bold mb-3 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-slate-400"/> Plano de Ação</h3>
+                <ul className="space-y-3">
+                  {result.actions?.map((a:string,i:number)=>(
+                    <li key={i} className="flex gap-3 text-sm text-slate-300 bg-slate-950/50 p-3 rounded-lg border border-slate-800/50">
+                      <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 mt-0.5"><Check className="w-3 h-3 text-green-500"/></div>
+                      {a}
+                    </li>
+                  ))}
+                </ul>
+              </div>
            </div>
         );
       case 'product_desc':
          return (
-            <div className="space-y-6">
-               <div className="bg-white p-4 rounded-xl border border-slate-200">
-                  <p className="text-[#1a0dab] text-lg hover:underline cursor-pointer truncate">{result.seoTitle}</p>
-                  <p className="text-[#006621] text-xs">www.seusite.com.br › produto</p>
-                  <p className="text-[#545454] text-sm">{result.metaDescription}</p>
+            <div className="space-y-8 animate-fade-in">
+               <div className="bg-white p-6 rounded-2xl border border-slate-200 max-w-2xl shadow-xl shadow-black/5">
+                  <h4 className="text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-3">Preview Google</h4>
+                  <p className="text-[#1a0dab] text-xl hover:underline cursor-pointer truncate font-arial mb-1">{result.seoTitle}</p>
+                  <p className="text-[#006621] text-xs mb-2 font-arial">www.seusite.com.br › produto › oferta</p>
+                  <p className="text-[#545454] text-sm leading-snug font-arial">{result.metaDescription}</p>
                </div>
-               <div className="bg-slate-900 p-5 rounded-xl border border-slate-800 text-slate-300 text-sm whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: result.descriptionBody }}></div>
+               
+               <div className="grid md:grid-cols-3 gap-6">
+                 <div className="md:col-span-2 bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                    <h3 className="text-green-400 font-bold mb-4 flex items-center gap-2"><Search className="w-4 h-4"/> Descrição Completa</h3>
+                    <div className="text-slate-300 text-sm whitespace-pre-wrap leading-relaxed" dangerouslySetInnerHTML={{ __html: result.descriptionBody }}></div>
+                 </div>
+                 <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 h-fit">
+                    <h3 className="text-white font-bold mb-4">Destaques</h3>
+                    <ul className="space-y-3">
+                      {result.features?.map((f:string,i:number)=>(
+                        <li key={i} className="flex items-start gap-2 text-xs text-slate-400 border-b border-slate-800 pb-2 last:border-0">
+                          <Check className="w-3 h-3 text-green-500 mt-0.5 shrink-0"/> {f}
+                        </li>
+                      ))}
+                    </ul>
+                 </div>
+               </div>
             </div>
          );
-      case 'naming': return <RenderGenericList data={result} titleKey="name" subKey="slogan" />;
-      case 'competitor': return <RenderGenericList data={result} titleKey="angle" subKey="whyItWorks" />;
-      case 'upsell': 
-         return <div className="p-4 bg-slate-900 rounded border border-slate-800 text-slate-300 whitespace-pre-wrap">{JSON.stringify(result, null, 2)}</div>
-      default: return <div className="text-slate-500">Formato não suportado visualmente.</div>;
+      default: 
+        return (
+          <div className="bg-slate-900 p-6 rounded-xl border border-slate-800 text-slate-300">
+            <pre className="whitespace-pre-wrap font-mono text-xs">{JSON.stringify(result, null, 2)}</pre>
+          </div>
+        );
     }
   };
 
@@ -619,9 +771,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
 
   return (
     <div className="min-h-screen bg-slate-950 flex font-sans overflow-hidden">
-      {/* Mobile Menu */}
+      {/* Mobile Menu Backdrop */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 bg-slate-950/90 z-40 md:hidden backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
+        <div className="fixed inset-0 bg-slate-950/90 z-40 md:hidden backdrop-blur-sm transition-opacity" onClick={() => setMobileMenuOpen(false)} />
       )}
 
       {/* SIDEBAR ENTERPRISE */}
@@ -651,8 +803,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             const m = modules[id];
             return (
               <button key={id} onClick={() => { setActiveModule(id as ModuleId); setResult(null); setInputValue(''); setMobileMenuOpen(false); }}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group ${
-                  activeModule === id ? 'bg-slate-900 text-white shadow-lg shadow-black/20' : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group border border-transparent ${
+                  activeModule === id ? 'bg-slate-900 text-white shadow-lg shadow-black/20 border-slate-800' : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
                 }`}>
                 <m.icon className={`w-4 h-4 transition-colors ${activeModule === id ? m.color : 'text-slate-600 group-hover:text-slate-400'}`} />
                 {m.label}
@@ -665,8 +817,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             const m = modules[id];
             return (
               <button key={id} onClick={() => { setActiveModule(id as ModuleId); setResult(null); setInputValue(''); setMobileMenuOpen(false); }}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group ${
-                  activeModule === id ? 'bg-slate-900 text-white shadow-lg shadow-black/20' : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group border border-transparent ${
+                  activeModule === id ? 'bg-slate-900 text-white shadow-lg shadow-black/20 border-slate-800' : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
                 }`}>
                 <m.icon className={`w-4 h-4 transition-colors ${activeModule === id ? m.color : 'text-slate-600 group-hover:text-slate-400'}`} />
                 {m.label}
@@ -680,8 +832,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             const m = modules[id];
             return (
               <button key={id} onClick={() => { setActiveModule(id as ModuleId); setResult(null); setInputValue(''); setMobileMenuOpen(false); }}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group ${
-                  activeModule === id ? 'bg-slate-900 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all group border border-transparent ${
+                  activeModule === id ? 'bg-slate-900 text-white border-slate-800' : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
                 }`}>
                 <m.icon className={`w-4 h-4 ${activeModule === id ? 'text-white' : 'text-slate-600'}`} />
                 {m.label}
@@ -715,22 +867,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
             <div className="mb-8 animate-fade-in flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-                  <span className={`p-2 rounded-lg ${currentModule.bgColor}`}>
+                  <span className={`p-2.5 rounded-xl ${currentModule.bgColor} border ${currentModule.borderColor}`}>
                     <currentModule.icon className={`w-6 h-6 ${currentModule.color}`} />
                   </span>
                   {currentModule.label}
                 </h1>
-                <p className="text-slate-400 mt-2 ml-1 text-sm">{currentModule.description}</p>
+                <p className="text-slate-400 mt-2 ml-1 text-sm max-w-2xl">{currentModule.description}</p>
               </div>
-              <div className="hidden md:flex items-center gap-2">
-                 <button className="p-2 text-slate-500 hover:text-white transition-colors" title="Limpar"><X size={20}/></button>
-              </div>
+              {inputValue && (
+                <div className="hidden md:flex items-center gap-2">
+                   <button onClick={() => setInputValue('')} className="p-2 text-slate-500 hover:text-white transition-colors bg-slate-900 rounded-lg border border-slate-800" title="Limpar"><X size={18}/></button>
+                </div>
+              )}
             </div>
           ) : null}
 
           {/* INPUT AREA (Apenas para ferramentas) */}
           {currentModule.isTool && (
-            <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-1.5 shadow-2xl mb-8 focus-within:border-slate-700 focus-within:ring-1 focus-within:ring-slate-700 transition-all">
+            <div className={`bg-slate-900/30 border border-slate-800 rounded-2xl p-1.5 shadow-2xl mb-8 focus-within:border-slate-700 focus-within:ring-1 focus-within:ring-slate-700 transition-all ${isGenerating ? 'opacity-50 pointer-events-none' : ''}`}>
               <div className="relative bg-slate-950 rounded-xl overflow-hidden">
                  <textarea
                   value={inputValue}
@@ -738,9 +892,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                   placeholder={currentModule.placeholder}
                   className="w-full bg-transparent px-6 py-5 text-lg text-white placeholder-slate-600 focus:outline-none min-h-[100px] resize-none"
                  />
-                 <div className="px-4 pb-4 flex justify-between items-center bg-slate-950">
-                    <div className="flex gap-2">
-                      {/* Attachments buttons placeholders */}
+                 <div className="px-4 pb-4 flex justify-between items-center bg-slate-950 border-t border-slate-900/50 pt-3">
+                    <div className="flex gap-2 text-xs text-slate-500 font-medium">
+                      <span className="flex items-center gap-1"><Sparkles size={12}/> AI Pro</span>
+                      <span className="hidden md:inline">• Enterprise AI Turbo</span>
                     </div>
                     <button 
                       onClick={handleGenerate}
@@ -752,7 +907,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                       }`}
                     >
                       {isGenerating ? <Loader2 className="w-4 h-4 animate-spin"/> : <Sparkles className="w-4 h-4"/>}
-                      {isGenerating ? 'Criando...' : 'Gerar com IA'}
+                      {isGenerating ? 'Processando...' : 'Gerar com IA'}
                     </button>
                  </div>
               </div>
