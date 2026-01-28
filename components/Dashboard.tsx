@@ -7,7 +7,8 @@ import {
   Search, Users, Calculator, Megaphone, 
   Menu, MousePointerClick, 
   Camera, Home, ChevronRight, Wand2, LucideIcon, Download,
-  Lock, AlertTriangle, X, LayoutTemplate
+  Lock, AlertTriangle, X, LayoutTemplate,
+  Heart, MessageCircle, Send, Bookmark, MoreHorizontal, Star, ShoppingCart, Truck, MapPin
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { generateCopy } from '@/app/actions/generate-copy';
@@ -18,46 +19,6 @@ interface DashboardProps {
   onLogout: () => void;
   userEmail?: string | null;
 }
-
-// --- TRADUÇÃO DE TERMOS TÉCNICOS ---
-const LABEL_MAP: Record<string, string> = {
-  // ADS
-  ad_1: "📢 Variação de Anúncio #01",
-  ad_2: "📢 Variação de Anúncio #02",
-  ad_3: "📢 Variação de Anúncio #03",
-  headline: "Título (Headline)",
-  body: "Texto do Post (Legenda)",
-  cta: "Botão (Chamada para Ação)",
-  
-  // ROTEIROS
-  hook_visual: "👀 Gancho Visual (O que aparece na tela)",
-  hook_audio: "🗣️ Gancho de Áudio (O que é falado)",
-  scenes: "🎬 Passo a Passo das Cenas",
-  visual: "🎥 O que filmar",
-  audio: "🎙️ O que narrar",
-  seconds: "⏱️ Duração",
-
-  // PERSONA
-  avatar_name: "👤 Nome do Avatar",
-  age_range: "🎂 Faixa Etária",
-  interests: "❤️ Interesses",
-  pain_points: "😫 Dores e Problemas",
-  objections: "✋ Objeções de Compra",
-  buying_triggers: "🔥 Gatilhos de Compra",
-
-  // SEO
-  product_title: "🏷️ Título do Produto",
-  meta_description: "🔍 Descrição para Google",
-  description_body: "📄 Descrição Completa",
-  features_list: "✅ Lista de Benefícios",
-
-  // ROAS
-  analysis_summary: "📊 Resumo da Análise",
-  breakeven_cpa: "⚖️ CPA Máximo (Breakeven)",
-  target_roas: "🎯 ROAS Meta",
-  potential_profit: "💰 Lucro Potencial",
-  recommendation: "💡 Veredito da IA"
-};
 
 // --- CONFIGURAÇÃO ---
 type ModuleId = 
@@ -78,7 +39,7 @@ interface ModuleConfig {
 
 const MODULES: Record<string, ModuleConfig> = {
   home: { label: 'Visão Geral', icon: Home, color: 'text-purple-400', desc: 'Resumo da sua conta' },
-  generator: { label: 'Criador de Anúncios', icon: Megaphone, color: 'text-blue-400', desc: 'Textos de alta conversão para FB/Insta', placeholder: 'Ex: Corretor Postural, Tênis de Corrida...' },
+  generator: { label: 'Criador de Anúncios', icon: Megaphone, color: 'text-blue-400', desc: 'Simulador de posts e anúncios reais', placeholder: 'Ex: Fone de Ouvido Bluetooth, Corretor Postural...' },
   product_desc: { label: 'Descrições de Produto', icon: Search, color: 'text-cyan-400', desc: 'SEO para sua loja (Shopify/Nuvem)', placeholder: 'Ex: Fone Bluetooth à prova d\'água...' },
   roas_analyzer: { label: 'Calculadora de Lucro', icon: Calculator, color: 'text-emerald-400', desc: 'Previsão de lucro e viabilidade', placeholder: 'Ex: Custo do Produto R$50, Preço de Venda R$129, Taxa da Maquininha 5%...' },
   
@@ -112,6 +73,227 @@ const CustomSelect = ({ label, value, onChange, options }: any) => {
     </div>
   )
 }
+
+// --- PREVIEW COMPONENTS (SIMULADORES) ---
+
+const SocialStats = () => (
+    <div className="flex items-center gap-4 py-2">
+        <Heart className="w-5 h-5 text-slate-300" />
+        <MessageCircle className="w-5 h-5 text-slate-300" />
+        <Send className="w-5 h-5 text-slate-300" />
+        <div className="flex-1"></div>
+        <Bookmark className="w-5 h-5 text-slate-300" />
+    </div>
+);
+
+// MOCKUP INSTAGRAM
+const InstagramPreview = ({ data }: { data: any }) => (
+    <div className="bg-black text-white rounded-xl border border-slate-800 overflow-hidden max-w-sm mx-auto font-sans shadow-2xl">
+        <div className="flex items-center justify-between p-3 border-b border-white/10">
+            <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600 p-[2px]">
+                    <div className="w-full h-full rounded-full bg-black border-2 border-black"></div>
+                </div>
+                <span className="text-xs font-bold">sua_loja_oficial</span>
+            </div>
+            <MoreHorizontal className="w-5 h-5 text-white" />
+        </div>
+        <div className="bg-slate-900 aspect-square w-full flex items-center justify-center text-slate-600 border-b border-white/10 relative">
+            <ImageIcon className="w-12 h-12 opacity-20" />
+            <span className="absolute bottom-2 right-2 bg-black/60 px-2 py-1 rounded text-[10px] text-white font-bold">Patrocinado</span>
+        </div>
+        <div className="p-3">
+            <div className="flex justify-between items-center mb-2">
+                 <div className="flex gap-4"><Heart /><MessageCircle /><Send /></div>
+                 <Bookmark />
+            </div>
+            <div className="text-xs text-white mb-1 font-bold">2.493 curtidas</div>
+            <p className="text-sm leading-snug">
+                <span className="font-bold mr-2">sua_loja_oficial</span>
+                {data.headline || data.title}
+                <br/><br/>
+                <span className="text-slate-300 text-xs font-normal whitespace-pre-wrap">{data.body || data.description}</span>
+            </p>
+            <div className="mt-2 text-blue-400 text-xs cursor-pointer">#{data.tags || "promoção #oferta #novidade"}</div>
+        </div>
+        <div className="bg-[#262626] p-3 flex justify-between items-center">
+             <span className="text-sm font-bold text-white">{data.cta || "Saiba Mais"}</span>
+             <ChevronRight className="w-4 h-4 text-slate-400"/>
+        </div>
+    </div>
+);
+
+// MOCKUP FACEBOOK
+const FacebookPreview = ({ data }: { data: any }) => (
+    <div className="bg-[#242526] text-white rounded-xl border border-slate-700 overflow-hidden max-w-sm mx-auto font-sans shadow-2xl">
+        <div className="p-3 flex items-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-blue-600"></div>
+            <div>
+                <div className="font-bold text-sm">Sua Loja <span className="text-xs font-normal text-slate-400">• Patrocinado</span></div>
+                <div className="text-[10px] text-slate-400 flex items-center gap-1">Publicado agora <div className="w-3 h-3 rounded-full bg-slate-500"></div></div>
+            </div>
+            <div className="ml-auto"><MoreHorizontal className="text-slate-400"/></div>
+        </div>
+        <div className="px-3 pb-2 text-sm text-slate-200 whitespace-pre-wrap">
+            {data.body || data.description}
+        </div>
+        <div className="bg-slate-800 aspect-video w-full flex items-center justify-center relative">
+             <ImageIcon className="w-12 h-12 text-slate-600 opacity-50" />
+        </div>
+        <div className="bg-[#3A3B3C] p-3 flex items-center justify-between">
+            <div className="flex-1">
+                <div className="text-xs text-slate-400 uppercase">LOJAOFICIAL.COM.BR</div>
+                <div className="font-bold text-sm leading-tight truncate pr-2">{data.headline || data.title}</div>
+            </div>
+            <button className="bg-slate-600 px-4 py-1.5 rounded text-sm font-bold">{data.cta || "Saiba mais"}</button>
+        </div>
+        <div className="p-2 border-t border-slate-700 flex justify-between text-slate-400 text-xs font-medium">
+             <div className="flex gap-2 items-center"><div className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-[8px] text-white">👍</div> 420</div>
+             <div className="flex gap-3"><span>34 Comentários</span><span>12 Compartilhamentos</span></div>
+        </div>
+    </div>
+);
+
+// MOCKUP SHOPEE
+const ShopeePreview = ({ data }: { data: any }) => (
+    <div className="bg-[#F5F5F5] text-slate-800 rounded-xl overflow-hidden max-w-sm mx-auto font-sans shadow-2xl border border-slate-300 relative">
+        <div className="bg-[#EE4D2D] text-white p-3 flex items-center gap-2 text-sm font-bold sticky top-0 z-10">
+            <div className="bg-white text-[#EE4D2D] px-1 rounded text-xs">Mall</div>
+            <span>Shopee</span>
+            <div className="ml-auto flex gap-3"><ShoppingCart size={18}/><MoreHorizontal size={18}/></div>
+        </div>
+        <div className="bg-white aspect-square w-full flex items-center justify-center relative border-b border-slate-100">
+             <ImageIcon className="w-16 h-16 text-slate-300" />
+             <div className="absolute bottom-0 left-0 bg-[#EE4D2D]/90 text-white text-[10px] px-2 py-0.5">Frete Grátis</div>
+             <div className="absolute top-2 right-2 bg-[#FFD424] text-[#EE4D2D] text-xs font-bold px-1 py-0.5 rounded">-40%</div>
+        </div>
+        <div className="p-3 bg-white">
+            <div className="line-clamp-2 text-sm text-[#1d1d1f] font-medium leading-snug mb-2">
+                {data.headline || data.title}
+            </div>
+            <div className="flex items-baseline gap-1 mb-1">
+                <span className="text-xs text-[#EE4D2D]">R$</span>
+                <span className="text-lg font-bold text-[#EE4D2D]">{data.price || "97,90"}</span>
+                <span className="text-xs text-slate-400 line-through ml-2">R$ {((parseFloat((data.price || "97,90").replace(',','.')) || 100) * 1.5).toFixed(2).replace('.',',')}</span>
+            </div>
+            <div className="flex items-center gap-1 mb-2">
+                <div className="flex text-[#FFD424]"><Star size={10} fill="currentColor"/><Star size={10} fill="currentColor"/><Star size={10} fill="currentColor"/><Star size={10} fill="currentColor"/><Star size={10} fill="currentColor"/></div>
+                <span className="text-[10px] text-slate-500 border-l border-slate-300 pl-1 ml-1">1.2k Vendidos</span>
+            </div>
+            <div className="bg-[#FAFAFA] p-2 rounded text-[10px] text-slate-600 line-clamp-3 leading-relaxed border border-slate-100">
+                {data.body || data.description}
+            </div>
+        </div>
+        <div className="p-2 bg-white border-t border-slate-200 flex justify-end gap-2">
+            <button className="flex-1 bg-[#EE4D2D]/10 text-[#EE4D2D] py-2 text-xs border border-[#EE4D2D] rounded">Adicionar ao Carrinho</button>
+            <button className="flex-1 bg-[#EE4D2D] text-white py-2 text-xs rounded font-bold">Comprar Agora</button>
+        </div>
+    </div>
+);
+
+// MOCKUP MERCADO LIVRE
+const MLPreview = ({ data }: { data: any }) => (
+    <div className="bg-[#EDEDED] text-slate-800 rounded-xl overflow-hidden max-w-sm mx-auto font-sans shadow-2xl border border-slate-200">
+        <div className="bg-[#FFF159] p-3 text-sm flex items-center gap-3 text-slate-700 font-medium">
+             <Menu size={18} />
+             <div className="bg-white/50 h-8 rounded-full flex-1 px-3 flex items-center text-xs text-slate-400">Buscar no Mercado Livre</div>
+             <ShoppingCart size={18} />
+        </div>
+        <div className="bg-white p-4">
+             <div className="text-[10px] text-slate-400 mb-1">Novo  |  +1000 vendidos</div>
+             <div className="text-sm font-medium text-slate-900 leading-snug mb-2">{data.headline || data.title}</div>
+             <div className="flex items-center gap-1 mb-3">
+                 <div className="flex text-blue-500"><Star size={12} fill="currentColor"/><Star size={12} fill="currentColor"/><Star size={12} fill="currentColor"/><Star size={12} fill="currentColor"/><Star size={12} fill="currentColor"/></div>
+                 <span className="text-xs text-slate-400">(423)</span>
+             </div>
+             
+             <div className="bg-slate-100 aspect-video rounded w-full flex items-center justify-center mb-4">
+                 <ImageIcon className="text-slate-300 w-10 h-10" />
+             </div>
+
+             <div className="text-2xl font-light text-slate-900 mb-1">R$ {data.price || "129,90"}</div>
+             <div className="text-sm text-green-600 font-medium mb-1">em 12x R$ {((parseFloat((data.price || "129,90").replace(',','.')) || 100) / 12).toFixed(2).replace('.',',')} sem juros</div>
+             
+             <div className="text-green-600 text-xs font-bold mb-1">Chegará grátis amanhã</div>
+             <div className="text-[10px] text-slate-500 mb-4">Vendido por <span className="text-blue-500">Loja Oficial</span></div>
+
+             <button className="w-full bg-[#3483FA] text-white font-bold py-3 rounded-lg text-sm mb-2 hover:bg-[#2968c8] transition-colors">Comprar agora</button>
+             <button className="w-full bg-[#E3EDFB] text-[#3483FA] font-bold py-3 rounded-lg text-sm hover:bg-[#d0e0f8] transition-colors">Adicionar ao carrinho</button>
+        </div>
+        <div className="p-4 bg-white border-t border-slate-100 mt-2">
+            <h4 className="text-sm font-medium mb-2">Descrição</h4>
+            <p className="text-xs text-slate-500 leading-relaxed whitespace-pre-wrap">{data.body || data.description}</p>
+        </div>
+    </div>
+);
+
+// MOCKUP AMAZON
+const AmazonPreview = ({ data }: { data: any }) => (
+    <div className="bg-white text-slate-900 rounded-xl overflow-hidden max-w-sm mx-auto font-sans shadow-2xl border border-slate-300">
+        <div className="bg-[#232f3e] p-3 text-white flex items-center justify-between">
+            <span className="font-bold tracking-tighter">amazon</span>
+            <ShoppingCart size={20} />
+        </div>
+        <div className="p-4">
+            <div className="text-xs text-[#007185] mb-1 hover:underline cursor-pointer">Visite a loja da marca</div>
+            <div className="text-sm font-medium leading-snug mb-1">{data.headline || data.title}</div>
+            <div className="flex items-center gap-1 mb-2">
+                 <div className="flex text-[#F4A41D]"><Star size={12} fill="currentColor"/><Star size={12} fill="currentColor"/><Star size={12} fill="currentColor"/><Star size={12} fill="currentColor"/><Star size={12} fill="currentColor"/></div>
+                 <span className="text-xs text-[#007185]">12.493</span>
+            </div>
+            
+            <div className="bg-slate-50 aspect-square w-full flex items-center justify-center my-2 p-4">
+                 <ImageIcon className="text-slate-300 w-16 h-16" />
+            </div>
+
+            <div className="flex items-start gap-1 mb-1">
+                 <span className="text-xs relative top-1">R$</span>
+                 <span className="text-2xl font-medium">{String(data.price || "149,00").split(',')[0]}</span>
+                 <span className="text-xs relative top-1">{String(data.price || "149,00").split(',')[1] || "00"}</span>
+            </div>
+            <div className="text-xs text-slate-500 mb-2">
+                Entrega GRÁTIS: <span className="font-bold text-slate-800">Quarta-feira, 28 de Jun</span>
+            </div>
+            <div className="text-sm text-[#007185] mb-4 flex items-center gap-1">
+                <div className="text-[#00A8E1] font-bold italic">prime</div>
+            </div>
+
+            <div className="space-y-2">
+                <button className="w-full bg-[#FFD814] text-black text-sm py-2.5 rounded-full border border-[#FCD200] shadow-sm hover:bg-[#F7CA00]">Adicionar ao carrinho</button>
+                <button className="w-full bg-[#FFA41C] text-black text-sm py-2.5 rounded-full border border-[#FF8F00] shadow-sm hover:bg-[#FA8900]">Comprar agora</button>
+            </div>
+        </div>
+    </div>
+);
+
+// MOCKUP OLX
+const OLXPreview = ({ data }: { data: any }) => (
+    <div className="bg-white text-slate-800 rounded-xl overflow-hidden max-w-sm mx-auto font-sans shadow-2xl border border-slate-200">
+        <div className="bg-[#6E0AD6] p-3 flex justify-between items-center text-white">
+            <Menu size={20} />
+            <span className="font-bold text-xl tracking-tight">OLX</span>
+            <Search size={20} />
+        </div>
+        <div className="bg-slate-200 aspect-video w-full flex items-center justify-center relative">
+             <ImageIcon className="text-slate-400 w-12 h-12" />
+             <div className="absolute bottom-2 right-2 bg-black/50 text-white px-2 rounded text-xs">1/4</div>
+        </div>
+        <div className="p-4">
+            <div className="text-2xl font-medium text-slate-900 mb-1">R$ {data.price || "800"}</div>
+            <div className="text-sm text-slate-800 leading-snug mb-2">{data.headline || data.title}</div>
+            <div className="text-[10px] text-slate-400 uppercase font-bold mb-4">Publicado hoje às 14:30</div>
+            
+            <div className="border-t border-slate-100 pt-3">
+                <h4 className="font-bold text-sm text-slate-900 mb-2">Descrição</h4>
+                <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{data.body || data.description}</p>
+            </div>
+        </div>
+        <div className="p-3 border-t border-slate-100 flex gap-2 bg-white sticky bottom-0 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+            <button className="flex-1 bg-[#F78323] hover:bg-[#e07218] text-white font-bold py-2.5 rounded-full text-sm">Chat</button>
+            <button className="bg-[#6E0AD6] hover:bg-[#5b08b3] text-white p-2.5 rounded-full"><MessageCircle/></button>
+        </div>
+    </div>
+);
 
 interface SidebarItemProps {
   id: string;
@@ -153,7 +335,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
   
-  // SEGURANÇA: State inicial sempre 'free'. Só muda se o backend confirmar.
   const [userPlan, setUserPlan] = useState<'free' | 'pro'>('free'); 
   const [isLoadingPlan, setIsLoadingPlan] = useState(true);
 
@@ -165,7 +346,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   
   // Options State
   const [tone, setTone] = useState('Agressivo');
-  const [platform, setPlatform] = useState('FB Ads');
+  const [platform, setPlatform] = useState('Facebook');
   const [videoDuration, setVideoDuration] = useState('30s');
   
   const userName = userEmail ? userEmail.split('@')[0] : null;
@@ -214,37 +395,35 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     try {
         let prompt = "";
         
-        // PROMPTS REFINADOS PARA PORTUGUÊS CLARO
         switch (activeModule) {
             case 'generator':
-                prompt = `Atue como um Copywriter Brasileiro Sênior. Crie 3 variações de texto de anúncio (Ad Copy) para o produto: "${input}". 
-                Tom de voz: ${tone}. Focado na plataforma: ${platform}. Idioma: Português do Brasil.
-                Use gatilhos mentais (Urgência, Escassez, Novidade).
-                Retorne APENAS um JSON válido com esta estrutura exata: 
-                { "ad_1": {"headline": "...", "body": "...", "cta": "..."}, "ad_2": {...}, "ad_3": {...} }`;
+                prompt = `Atue como um Copywriter Brasileiro Especialista em ${platform}. Crie 1 variação PERFEITA de anúncio para o produto: "${input}".
+                
+                REGRAS ESPECÍFICAS PARA ${platform.toUpperCase()}:
+                ${platform === 'Shopee' || platform === 'Mercado Livre' || platform === 'Amazon' || platform === 'OLX'
+                    ? "- Crie um Título SEO otimizado (Headline).\n- Crie uma Descrição técnica mas persuasiva.\n- Estime um preço fictício realista (Price) apenas número ex: 97,90." 
+                    : "- Crie uma Headline curta (para imagem).\n- Crie uma Legenda (Body) engajadora com emojis.\n- Inclua Hashtags.\n- Crie um CTA curto."}
+
+                Retorne APENAS um JSON: 
+                { "title": "...", "body": "...", "price": "...", "cta": "...", "tags": "..." }`;
                 break;
             case 'video_script':
                 prompt = `Crie um roteiro viral de TikTok/Reels de ${videoDuration} para o produto: "${input}". 
                 Idioma: Português do Brasil. Estrutura de Retenção Alta.
-                Retorne APENAS um JSON válido com esta estrutura: 
+                Retorne APENAS um JSON válido: 
                 { "hook_visual": "...", "hook_audio": "...", "scenes": [{"seconds": "0-3s", "visual": "...", "audio": "..."}] }`;
                 break;
             case 'product_desc':
-                prompt = `Especialista em SEO de E-commerce Brasileiro. Descreva o produto: "${input}". 
-                Foque em conversão e palavras-chave.
-                Retorne APENAS um JSON válido: 
-                { "product_title": "...", "meta_description": "...", "description_body": "...", "features_list": ["Benefício 1", "Benefício 2"] }`;
+                prompt = `Especialista em SEO de E-commerce. Descreva: "${input}". 
+                Retorne APENAS JSON: { "product_title": "...", "meta_description": "...", "description_body": "...", "features_list": ["...", "..."] }`;
                 break;
             case 'persona':
-                prompt = `Crie um perfil de comprador (Avatar) brasileiro para: "${input}". 
-                Retorne APENAS um JSON válido: 
-                { "avatar_name": "Nome e Idade", "interests": ["..."], "pain_points": ["..."], "objections": ["..."], "buying_triggers": ["..."] }`;
+                prompt = `Crie um Avatar brasileiro para: "${input}". 
+                Retorne JSON: { "avatar_name": "...", "interests": ["..."], "pain_points": ["..."], "objections": ["..."], "buying_triggers": ["..."] }`;
                 break;
             case 'roas_analyzer':
-                prompt = `Faça uma análise financeira simulada para dropshipping do produto: "${input}". 
-                Moeda: BRL (R$).
-                Retorne APENAS um JSON válido: 
-                { "analysis_summary": "Resumo em 1 frase", "metrics": { "breakeven_cpa": "R$...", "target_roas": "...", "potential_profit": "Alta/Média/Baixa" }, "recommendation": "..." }`;
+                prompt = `Análise financeira dropshipping para: "${input}". 
+                Retorne JSON: { "analysis_summary": "...", "metrics": { "breakeven_cpa": "...", "target_roas": "...", "potential_profit": "..." }, "recommendation": "..." }`;
                 break;
             case 'studio':
                 prompt = `Professional product photography of ${input}, studio lighting, 4k, advertising standard, centered.`;
@@ -272,12 +451,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
             
             if (text) {
               try {
-                // Remove Markdown se a IA mandar (```json ... ```)
                 const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
                 setResult(JSON.parse(cleanText));
               } catch (e) {
                 console.error("Erro parsing JSON:", e);
-                // Fallback para exibir texto puro se o JSON falhar
                 setResult({ "Resposta": text }); 
               }
             } else {
@@ -297,56 +474,64 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     }
   };
 
-  // --- RENDERIZADOR INTELIGENTE (TRADUTOR) ---
-  const renderValue = (key: string, value: any) => {
-    // Lista de itens (ex: Benefícios, Interesses)
-    if (Array.isArray(value)) {
-        // Verifica se é lista de objetos (Cenas do roteiro)
-        if (value.length > 0 && typeof value[0] === 'object') {
-            return (
-                <div className="space-y-3 mt-2">
-                    {value.map((scene: any, idx: number) => (
-                        <div key={idx} className="bg-slate-950/50 p-3 rounded-lg border border-slate-800">
-                             <div className="text-[10px] font-bold text-slate-500 mb-2 uppercase">Cena {idx + 1}</div>
-                             {Object.entries(scene).map(([k, v]) => (
-                                 <div key={k} className="mb-2 last:mb-0">
-                                     <span className="text-purple-400 font-bold text-xs">{LABEL_MAP[k] || k}: </span>
-                                     <span className="text-slate-300 text-sm">{String(v)}</span>
-                                 </div>
-                             ))}
-                        </div>
-                    ))}
-                </div>
-            );
+  // --- SWITCH DE RENDERIZAÇÃO ---
+  const renderPreview = () => {
+    if (!result) return null;
+
+    if (activeModule === 'generator') {
+        switch(platform) {
+            case 'Instagram': return <InstagramPreview data={result} />;
+            case 'Facebook': return <FacebookPreview data={result} />;
+            case 'Shopee': return <ShopeePreview data={result} />;
+            case 'Mercado Livre': return <MLPreview data={result} />;
+            case 'Amazon': return <AmazonPreview data={result} />;
+            case 'OLX': return <OLXPreview data={result} />;
+            default: return <FacebookPreview data={result} />;
         }
-        // Lista simples de texto
+    }
+
+    // Default renderer for other modules (Script, SEO, etc)
+    if (result.type === 'image') {
         return (
-            <div className="flex flex-wrap gap-2 mt-2">
-                {value.map((item, idx) => (
-                    <span key={idx} className="bg-purple-900/20 text-purple-200 border border-purple-500/30 px-2 py-1 rounded text-xs">
-                        {String(item)}
-                    </span>
-                ))}
+            <div className="bg-slate-900 border border-slate-700 p-3 rounded-2xl shadow-2xl inline-block w-full">
+                <img src={result.url} className="w-full h-auto rounded-xl" />
+                <div className="mt-3 flex justify-between items-center px-2">
+                    <span className="text-[10px] text-slate-500">Gerado por IA (Studio Mode)</span>
+                    <a href={result.url} download="dropai-img.png" className="text-white bg-purple-600 hover:bg-purple-500 px-3 py-1.5 rounded-lg text-xs font-bold flex gap-2 items-center transition-colors"><Download size={14}/> Baixar Imagem</a>
+                </div>
             </div>
         );
     }
 
-    // Objeto aninhado (ex: Métricas ROAS)
-    if (typeof value === 'object' && value !== null) {
-        return (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
-                {Object.entries(value).map(([subKey, subValue]) => (
-                    <div key={subKey} className="bg-slate-950/30 p-2 rounded border border-slate-800">
-                        <div className="text-[10px] text-slate-500 uppercase font-bold mb-1">{LABEL_MAP[subKey] || subKey}</div>
-                        <div className="text-sm text-white font-medium">{String(subValue)}</div>
+    return (
+        <div className="space-y-4">
+            {Object.entries(result).map(([key, value]: any, idx) => (
+                <div key={idx} className="bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden shadow-xl">
+                    <div className="px-6 py-4 border-b border-white/5 bg-white/5 flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_10px_#a855f7]"></div>
+                        <h3 className="text-sm font-bold text-white uppercase tracking-widest">
+                        {key.replace(/_/g, ' ')}
+                        </h3>
                     </div>
-                ))}
-            </div>
-        );
-    }
-
-    // Texto Simples
-    return <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap mt-1">{String(value)}</p>;
+                    <div className="p-6">
+                        {Array.isArray(value) ? (
+                            <ul className="space-y-2">
+                                {value.map((v, i) => (
+                                    <li key={i} className="text-sm text-slate-300 bg-black/20 p-2 rounded border border-white/5">
+                                        {typeof v === 'object' ? JSON.stringify(v) : v}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : typeof value === 'object' ? (
+                            <pre className="text-xs text-slate-400 whitespace-pre-wrap font-mono">{JSON.stringify(value, null, 2)}</pre>
+                        ) : (
+                            <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap">{String(value)}</p>
+                        )}
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
   };
 
   return (
@@ -534,9 +719,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                          </div>
 
                          {activeModule === 'generator' && (
-                             <div className="grid grid-cols-2 gap-4">
-                                <CustomSelect label="Tom" value={tone} onChange={setTone} options={['Agressivo', 'Amigável']} />
-                                <CustomSelect label="Plat." value={platform} onChange={setPlatform} options={['FB Ads', 'TikTok']} />
+                             <div className="grid grid-cols-1 gap-4">
+                                <CustomSelect 
+                                    label="Simular Plataforma" 
+                                    value={platform} 
+                                    onChange={setPlatform} 
+                                    options={['Facebook', 'Instagram', 'Shopee', 'Mercado Livre', 'Amazon', 'OLX']} 
+                                />
                              </div>
                          )}
                          
@@ -558,7 +747,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                   </div>
 
                   {/* RIGHT: PREVIEW AREA */}
-                  <div id="result-area" className="flex-1 bg-transparent relative overflow-hidden flex flex-col min-h-[50vh]">
+                  <div id="result-area" className="flex-1 bg-slate-950 relative overflow-hidden flex flex-col min-h-[50vh]">
                       <div className="h-12 md:h-16 border-b border-white/5 flex items-center justify-between px-4 md:px-8 bg-black/20 backdrop-blur-sm sticky top-0 z-10">
                           <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
                             <Sparkles size={14} className="text-purple-500" /> Resultado Final
@@ -573,11 +762,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                           )}
                       </div>
 
-                      <div className="flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar flex items-start justify-center pb-24 md:pb-8 bg-slate-950/20">
+                      <div className="flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar flex items-start justify-center pb-24 md:pb-8 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-opacity-5">
                           {!result && !isGenerating && (
                               <div className="text-center opacity-40 mt-10 md:mt-20">
                                   <LayoutTemplate className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-6 text-slate-500"/>
-                                  <p className="text-slate-300 font-medium text-base md:text-lg">Preencha os dados ao lado para começar.</p>
+                                  <p className="text-slate-300 font-medium text-base md:text-lg">Selecione a plataforma e gere seu anúncio.</p>
                               </div>
                           )}
 
@@ -588,40 +777,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                        <div className="absolute inset-0 border-4 border-t-purple-500 rounded-full animate-spin"></div>
                                        <Zap className="absolute inset-0 m-auto text-purple-400 w-6 h-6 md:w-8 md:h-8 animate-pulse"/>
                                    </div>
-                                   <p className="text-purple-300 font-bold animate-pulse text-sm">A IA está escrevendo...</p>
+                                   <p className="text-purple-300 font-bold animate-pulse text-sm">Construindo Mockup do {platform}...</p>
                               </div>
                           )}
 
                           {result && !isGenerating && (
-                              <div className="w-full max-w-4xl animate-in zoom-in-95 slide-in-from-bottom-5 duration-500 pb-10 space-y-6">
-                                  {/* TRATAMENTO ESPECIAL PARA IMAGENS */}
-                                  {result.type === 'image' ? (
-                                      <div className="bg-slate-900 border border-slate-700 p-3 rounded-2xl shadow-2xl inline-block w-full">
-                                          <img src={result.url} className="w-full h-auto rounded-xl" />
-                                          <div className="mt-3 flex justify-between items-center px-2">
-                                              <span className="text-[10px] text-slate-500">Gerado por IA (Studio Mode)</span>
-                                              <a href={result.url} download="dropai-img.png" className="text-white bg-purple-600 hover:bg-purple-500 px-3 py-1.5 rounded-lg text-xs font-bold flex gap-2 items-center transition-colors"><Download size={14}/> Baixar Imagem</a>
-                                          </div>
-                                      </div>
-                                  ) : (
-                                      /* RENDERIZAÇÃO GENÉRICA BONITA */
-                                      Object.entries(result).map(([key, value]: any, idx) => (
-                                          <div key={idx} className="bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden shadow-xl">
-                                              {/* HEADER DO CARD (TRADUZIDO) */}
-                                              <div className="px-6 py-4 border-b border-white/5 bg-white/5 flex items-center gap-2">
-                                                  <div className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_10px_#a855f7]"></div>
-                                                  <h3 className="text-sm font-bold text-white uppercase tracking-widest">
-                                                    {LABEL_MAP[key] || key.replace(/_/g, ' ')}
-                                                  </h3>
-                                              </div>
-                                              
-                                              {/* CONTEÚDO DO CARD */}
-                                              <div className="p-6">
-                                                  {renderValue(key, value)}
-                                              </div>
-                                          </div>
-                                      ))
-                                  )}
+                              <div className="w-full max-w-4xl animate-in zoom-in-95 slide-in-from-bottom-5 duration-500 pb-10">
+                                  {renderPreview()}
                               </div>
                           )}
                       </div>
