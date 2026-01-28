@@ -13,6 +13,23 @@ import { Footer } from '@/components/Footer';
 import { SupportWidget } from '@/components/SupportWidget';
 import { AlertCircle, X, ArrowRight } from 'lucide-react';
 
+// Componente de Fundo Animado (Roxo Profissional & Rápido)
+const AnimatedBackground = () => (
+  <div className="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
+    {/* Orbe Roxo Principal - Movimento Lateral Rápido */}
+    <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-purple-600/30 rounded-full blur-[120px] animate-side-to-side mix-blend-screen opacity-50"></div>
+    
+    {/* Orbe Índigo - Movimento "Blob" Acelerado */}
+    <div className="absolute top-[20%] right-[-10%] w-[40vw] h-[40vw] bg-indigo-600/20 rounded-full blur-[100px] animate-blob-fast mix-blend-screen opacity-40"></div>
+    
+    {/* Orbe Pink - Movimento Contrário */}
+    <div className="absolute bottom-[-10%] left-[20%] w-[60vw] h-[60vw] bg-pink-600/10 rounded-full blur-[120px] animate-side-to-side mix-blend-screen opacity-30" style={{ animationDirection: 'reverse', animationDuration: '5s' }}></div>
+    
+    {/* Noise Texture Overlay para dar textura profissional */}
+    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+  </div>
+);
+
 // Componente isolado para lidar com Parâmetros de URL
 const PaymentStatusNotification = () => {
   const searchParams = useSearchParams();
@@ -100,7 +117,10 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white selection:bg-purple-500 selection:text-white overflow-hidden">
+    <div className="min-h-screen bg-slate-950 text-white selection:bg-purple-500 selection:text-white overflow-hidden relative">
+      {/* Background Animado Global */}
+      <AnimatedBackground />
+
       {/* Suspense é necessário para componentes que usam useSearchParams */}
       <Suspense fallback={null}>
         <PaymentStatusNotification />
