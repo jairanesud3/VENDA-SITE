@@ -352,7 +352,25 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                       <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
                       Sistema Operacional
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600"></div>
+                  
+                  {/* Perfil do Usuário Adicionado */}
+                  <div className="pl-4 border-l border-slate-800 flex items-center gap-3">
+                    <div className="hidden md:block text-right">
+                      <p className="text-xs font-bold text-white">Hacker</p>
+                      <p className="text-[10px] text-slate-500">Plano Pro</p>
+                    </div>
+                    <div className="relative group cursor-pointer">
+                      <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 p-0.5 overflow-hidden shadow-lg shadow-purple-500/10 group-hover:border-purple-500 transition-colors">
+                        <img 
+                          src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=faces" 
+                          alt="Avatar" 
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      </div>
+                      <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-slate-950 rounded-full"></div>
+                    </div>
+                  </div>
+
               </div>
           </header>
 
