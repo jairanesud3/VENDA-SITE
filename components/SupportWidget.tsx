@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, Bot, X, Send, Loader2, Sparkles } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
