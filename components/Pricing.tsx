@@ -111,8 +111,8 @@ export const Pricing: React.FC = () => {
                     <span>Ilimitado: Textos e Roteiros</span>
                   </li>
                   <PricingItem text="300 Gerações de Imagens" />
-                  <PricingItem text="Modelos Premium (Gemini 2.5 + GPT-4)" />
-                  <PricingItem text="Studio Product AI (Fotos 4K)" />
+                  <PricingItem text="Modelos de Alta Velocidade" />
+                  <PricingItem text="Studio Product AI (Fotos HD)" />
                   <PricingItem text="Suporte Prioritário WhatsApp" />
                 </ul>
 
