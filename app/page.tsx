@@ -13,75 +13,55 @@ import { Footer } from '@/components/Footer';
 import { SupportWidget } from '@/components/SupportWidget';
 import { AlertCircle, X, ArrowRight } from 'lucide-react';
 
-// Componente de Fundo Animado (Roxo Profissional & Rápido)
+// Fundo Animado HIPER VELOCIDADE
 const AnimatedBackground = () => (
   <div className="fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
-    {/* Orbe Roxo Principal - Movimento Lateral Rápido */}
-    <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-purple-600/30 rounded-full blur-[120px] animate-side-to-side mix-blend-screen opacity-50"></div>
-    
-    {/* Orbe Índigo - Movimento "Blob" Acelerado */}
-    <div className="absolute top-[20%] right-[-10%] w-[40vw] h-[40vw] bg-indigo-600/20 rounded-full blur-[100px] animate-blob-fast mix-blend-screen opacity-40"></div>
-    
-    {/* Orbe Pink - Movimento Contrário */}
-    <div className="absolute bottom-[-10%] left-[20%] w-[60vw] h-[60vw] bg-pink-600/10 rounded-full blur-[120px] animate-side-to-side mix-blend-screen opacity-30" style={{ animationDirection: 'reverse', animationDuration: '5s' }}></div>
-    
-    {/* Noise Texture Overlay para dar textura profissional */}
+    <div className="absolute top-[-10%] left-[-10%] w-[60vw] h-[60vw] bg-purple-600/20 rounded-full blur-[100px] animate-side-to-side-hyper mix-blend-screen"></div>
+    <div className="absolute top-[30%] right-[-10%] w-[50vw] h-[50vw] bg-indigo-600/15 rounded-full blur-[90px] animate-blob-hyper mix-blend-screen"></div>
+    <div className="absolute bottom-[-10%] left-[20%] w-[70vw] h-[70vw] bg-pink-600/10 rounded-full blur-[120px] animate-side-to-side-hyper mix-blend-screen" style={{ animationDirection: 'reverse', animationDuration: '2s' }}></div>
     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
   </div>
 );
 
-// Componente isolado para lidar com Parâmetros de URL
+// Notificação de Falta de Pagamento
 const PaymentStatusNotification = () => {
   const searchParams = useSearchParams();
   const [isVisible, setIsVisible] = useState(false);
   
-  // Extrai o valor para garantir que o efeito reaja à mudança
   const canceled = searchParams.get('canceled');
 
   useEffect(() => {
-    // Verifica explicitamente se é 'true'
     if (canceled === 'true') {
       setIsVisible(true);
-      // Timer removido para garantir que o usuário veja a mensagem
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [canceled]);
 
   if (!isVisible) return null;
 
   return (
-    <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-md">
-      <div className="bg-[#1a0b2e] border-2 border-red-500/50 text-white p-5 rounded-xl shadow-[0_0_50px_rgba(239,68,68,0.4)] flex items-start gap-4 relative overflow-hidden backdrop-blur-xl">
-        
-        {/* Barra lateral decorativa */}
-        <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-red-500 to-pink-600"></div>
-        
-        <div className="p-2.5 bg-red-500/20 rounded-full shrink-0 border border-red-500/30">
-          <AlertCircle className="w-6 h-6 text-red-400" />
+    <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-md animate-in slide-in-from-top-10 fade-in duration-300">
+      <div className="bg-[#1a0b2e] border-2 border-red-500 text-white p-6 rounded-2xl shadow-[0_0_100px_rgba(239,68,68,0.6)] flex flex-col gap-4 relative overflow-hidden backdrop-blur-xl">
+        <div className="absolute inset-0 bg-red-500/10 animate-pulse"></div>
+        <div className="relative flex items-start gap-4">
+            <div className="p-3 bg-red-600 rounded-full shrink-0 shadow-lg shadow-red-900/50">
+            <AlertCircle className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+            <h3 className="font-extrabold text-white text-lg uppercase tracking-tight mb-1">Pagamento Pendente</h3>
+            <p className="text-slate-200 text-sm leading-relaxed font-medium">Você voltou antes de finalizar! Sua vaga no preço antigo ainda está reservada por <span className="text-red-400 font-bold">5 minutos</span>.</p>
+            </div>
+            <button onClick={() => setIsVisible(false)} className="text-slate-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-full"><X size={20} /></button>
         </div>
-        
-        <div className="flex-1">
-          <h3 className="font-bold text-red-100 text-sm uppercase tracking-wider mb-1 flex items-center gap-2">
-            Pagamento Não Concluído
-          </h3>
-          <p className="text-slate-200 text-sm leading-relaxed mb-4 font-medium">
-            Parece que você não finalizou sua assinatura. Seus concorrentes já estão usando IA. Não fique para trás.
-          </p>
-          <button 
-            onClick={() => {
-              document.getElementById('pricing')?.scrollIntoView({behavior: 'smooth'});
-              setIsVisible(false);
-            }} 
-            className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white text-sm font-bold py-2.5 rounded-lg transition-all shadow-lg shadow-red-900/40 flex items-center justify-center gap-2"
-          >
-            Voltar para Planos <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
-
         <button 
-          onClick={() => setIsVisible(false)} 
-          className="text-slate-400 hover:text-white transition-colors absolute top-2 right-2 p-1 hover:bg-white/10 rounded-full"
+          onClick={() => {
+            document.getElementById('pricing')?.scrollIntoView({behavior: 'smooth'});
+            setIsVisible(false);
+          }} 
+          className="relative w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white font-bold py-3 rounded-xl transition-all shadow-xl shadow-red-900/40 flex items-center justify-center gap-2 group overflow-hidden"
         >
-          <X size={18} />
+          <span className="relative z-10 flex items-center gap-2">Finalizar Agora <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></span>
+          <div className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-500 skew-x-12"></div>
         </button>
       </div>
     </div>
@@ -91,7 +71,6 @@ const PaymentStatusNotification = () => {
 export default function LandingPage() {
   const router = useRouter();
 
-  // Scroll Animations Logic
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -99,33 +78,19 @@ export default function LandingPage() {
           entry.target.classList.add('active');
         }
       });
-    }, {
-      threshold: 0.1,
-      rootMargin: "0px 0px -50px 0px"
-    });
+    }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
 
     const hiddenElements = document.querySelectorAll('.reveal');
     hiddenElements.forEach((el) => observer.observe(el));
-
-    return () => {
-      hiddenElements.forEach((el) => observer.unobserve(el));
-    };
+    return () => { hiddenElements.forEach((el) => observer.unobserve(el)); };
   }, []);
 
-  const handleLoginNavigation = () => {
-    router.push('/login');
-  };
+  const handleLoginNavigation = () => { router.push('/login'); };
 
   return (
     <div className="min-h-screen bg-slate-950 text-white selection:bg-purple-500 selection:text-white overflow-hidden relative">
-      {/* Background Animado Global */}
       <AnimatedBackground />
-
-      {/* Suspense é necessário para componentes que usam useSearchParams */}
-      <Suspense fallback={null}>
-        <PaymentStatusNotification />
-      </Suspense>
-
+      <Suspense fallback={null}><PaymentStatusNotification /></Suspense>
       <Header onLogin={handleLoginNavigation} />
       <main>
         <Hero onLogin={handleLoginNavigation} />

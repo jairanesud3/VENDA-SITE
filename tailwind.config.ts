@@ -18,10 +18,10 @@ const config: Config = {
       animation: {
         "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "blob": "blob 7s infinite",
-        // Nova animação rápida (10x mais dinâmica)
-        "blob-fast": "blob 3s infinite ease-in-out", 
-        "side-to-side": "sideToSide 4s ease-in-out infinite",
-        "float": "float 6s ease-in-out infinite",
+        // HYPER SPEED: Animações muito rápidas (2s e 3s) com muito movimento
+        "blob-hyper": "blob 3s infinite ease-in-out", 
+        "side-to-side-hyper": "sideToSide 3s infinite ease-in-out alternate",
+        "spin-slow": "spin 3s linear infinite",
         "border-spin": "border-spin 3s linear infinite",
         "text-shimmer": "shimmer 3s linear infinite",
         "ripple": "ripple 1.5s infinite",
@@ -33,14 +33,10 @@ const config: Config = {
           "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
           "100%": { transform: "translate(0px, 0px) scale(1)" },
         },
-        // Nova keyframe para movimento lateral agressivo/rápido
+        // Movimento lateral agressivo para o background "vivo"
         sideToSide: {
-          "0%, 100%": { transform: "translateX(-25%) translateY(-10%)" },
-          "50%": { transform: "translateX(25%) translateY(10%)" },
-        },
-        float: {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-20px)" },
+          "0%": { transform: "translateX(-20%) translateY(-10%) scale(1)" },
+          "100%": { transform: "translateX(20%) translateY(10%) scale(1.1)" },
         },
         "border-spin": {
             "0%": { transform: "rotate(0deg)" },

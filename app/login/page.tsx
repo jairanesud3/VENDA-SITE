@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Zap, ArrowRight, AlertTriangle, UserCheck } from 'lucide-react';
+import { Zap, ArrowRight, AlertTriangle, UserCheck, Chrome } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { login, signup } from './actions';
@@ -15,10 +15,18 @@ export default function LoginPage() {
 
   const handleDemoAccess = () => {
     setIsLoading(true);
-    // Simula um delay de carregamento e redireciona
     setTimeout(() => {
       router.push('/dashboard');
     }, 800);
+  };
+
+  const handleGoogleLogin = () => {
+    // Simulação visual por enquanto
+    setIsLoading(true);
+    setTimeout(() => {
+        setIsLoading(false);
+        setError("A integração com Google está sendo configurada. Por favor, use e-mail e senha.");
+    }, 1000);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -37,8 +45,6 @@ export default function LoginPage() {
         setIsLoading(false);
       }
     } catch (e) {
-      // Se falhar o backend, redireciona para demo por enquanto
-      // setError("Ocorreu um erro inesperado. Tente o modo demonstração.");
       setIsLoading(false);
     }
   };
@@ -46,15 +52,15 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#0B0518]">
       
-      {/* Background Effects */}
-      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-[#0B0518] to-[#0B0518] -z-10"></div>
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-600/10 blur-[120px] rounded-full pointer-events-none"></div>
+      {/* Background Effects (Hyper Speed) */}
+      <div className="absolute top-[-20%] left-[-20%] w-[80vw] h-[80vw] bg-purple-900/30 rounded-full blur-[100px] animate-side-to-side-hyper"></div>
+      <div className="absolute bottom-[-20%] right-[-20%] w-[80vw] h-[80vw] bg-indigo-900/30 rounded-full blur-[100px] animate-blob-hyper"></div>
 
       <div className="w-full max-w-md p-6 relative z-10 animate-in fade-in zoom-in-95 duration-500">
         
         {/* Logo */}
         <div className="flex justify-center mb-8">
-           <div className="flex items-center gap-2">
+           <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push('/')}>
             <div className="p-2 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-xl shadow-lg shadow-purple-500/20">
               <Zap className="w-6 h-6 text-white fill-white" />
             </div>
@@ -63,65 +69,58 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/50">
+        <div className="bg-slate-900/50 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/50">
           
-          {/* Tabs */}
-          <div className="flex p-1 bg-black/20 rounded-xl mb-8 border border-white/5">
-            <button 
-              onClick={() => { setMode('login'); setError(null); }}
-              className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
-                mode === 'login' 
-                  ? 'bg-purple-600 text-white shadow-lg' 
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              ENTRAR
-            </button>
-            <button 
-              onClick={() => { setMode('signup'); setError(null); }}
-              className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
-                mode === 'signup' 
-                  ? 'bg-purple-600 text-white shadow-lg' 
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              CADASTRAR
-            </button>
-          </div>
-
           <div className="mb-6 text-center">
             <h1 className="text-2xl font-bold text-white mb-2">
-              {mode === 'login' ? 'Bem-vindo de volta!' : 'Comece a hackear vendas.'}
+              {mode === 'login' ? 'Acesse sua conta' : 'Crie sua conta grátis'}
             </h1>
             <p className="text-slate-400 text-sm">
-              {mode === 'login' 
-                ? 'Acesse seu painel e crie novos anúncios.' 
-                : 'Crie sua conta gratuita em segundos.'}
+              Automatize suas vendas com Inteligência Artificial.
             </p>
+          </div>
+
+          {/* Google Button */}
+          <button 
+            type="button"
+            onClick={handleGoogleLogin}
+            className="w-full mb-4 py-3 bg-white text-slate-900 hover:bg-slate-100 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg"
+          >
+             <Chrome className="w-5 h-5 text-red-500" />
+             Entrar com Google
+          </button>
+
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-white/10" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-[#0f0721] px-2 text-slate-500">Ou use e-mail</span>
+            </div>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase ml-1">E-mail Profissional</label>
               <Input 
                 name="email" 
                 type="email" 
-                placeholder="seu@email.com" 
+                placeholder="E-mail Profissional" 
                 required 
                 autoComplete="email"
+                className="bg-slate-950/50 border-slate-800 focus:bg-slate-900"
               />
             </div>
             
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase ml-1">Senha</label>
               <Input 
                 name="password" 
                 type="password" 
-                placeholder="••••••••" 
+                placeholder="Senha" 
                 required 
                 minLength={6}
                 autoComplete={mode === 'login' ? "current-password" : "new-password"}
+                className="bg-slate-900/50 border-slate-800 focus:bg-slate-900"
               />
             </div>
 
@@ -134,41 +133,34 @@ export default function LoginPage() {
 
             <Button 
               type="submit" 
-              className="w-full mt-4" 
+              className="w-full mt-2 py-6 text-base" 
               isLoading={isLoading}
             >
-              {mode === 'login' ? 'ACESSAR PAINEL' : 'CRIAR CONTA AGORA'} 
-              {!isLoading && <ArrowRight className="ml-2 w-4 h-4" />}
+              {mode === 'login' ? 'ENTRAR' : 'COMEÇAR AGORA'} 
+              {!isLoading && <ArrowRight className="ml-2 w-5 h-5" />}
             </Button>
           </form>
 
-          {/* DIVISOR */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-white/10" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-[#0B0518]/50 backdrop-blur px-2 text-slate-500">
-                Ou acesse agora
-              </span>
-            </div>
+          <div className="mt-6 flex justify-center">
+            <button 
+                onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(null); }}
+                className="text-sm text-slate-400 hover:text-purple-400 transition-colors"
+            >
+                {mode === 'login' ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Faça login'}
+            </button>
           </div>
 
-          {/* DEMO BUTTON */}
-          <button 
-            type="button"
-            onClick={handleDemoAccess}
-            className="w-full py-3 rounded-xl border border-dashed border-white/20 hover:border-purple-500 hover:bg-purple-500/10 text-slate-300 hover:text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 group"
-          >
-             <UserCheck className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
-             Entrar como Visitante
-          </button>
-
         </div>
-
-        <p className="text-center text-slate-600 text-xs mt-8">
-          Protegido por reCAPTCHA e sujeito à Política de Privacidade e Termos de Uso do DropAI.
-        </p>
+        
+        {/* Demo Link */}
+        <div className="mt-8 text-center">
+            <button 
+                onClick={handleDemoAccess}
+                className="text-xs font-bold text-slate-600 hover:text-white transition-colors uppercase tracking-widest"
+            >
+                Acessar Demonstração (Visitante)
+            </button>
+        </div>
 
       </div>
     </div>
