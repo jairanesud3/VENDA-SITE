@@ -39,11 +39,17 @@ export const SupportWidget: React.FC = () => {
     try {
       // SEGURANÇA: Chave obtida via variável de ambiente
       const apiKey = process.env.API_KEY;
+
+      if (!apiKey) {
+         setMessages(prev => [...prev, { role: 'model', text: "⚠️ Ops! A chave da API não está configurada. Por favor, adicione sua API_KEY no arquivo .env para que eu possa funcionar." }]);
+         setIsTyping(false);
+         return;
+      }
       
       const ai = new GoogleGenAI({ apiKey: apiKey || '' });
       
       const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash-lite-preview-02-05',
+        model: 'gemini-2.0-flash',
         contents: `
           CONTEXTO DO SISTEMA:
           Você é o assistente virtual de suporte do "DropAI" (DROPHACKER.AI).
@@ -82,10 +88,10 @@ export const SupportWidget: React.FC = () => {
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 font-sans pointer-events-none">
       
       {/* JANELA DE CHAT IA (Pointer events auto para interação) */}
-      <div className={`pointer-events-auto transition-all duration-300 ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none absolute bottom-20'}`}>
+      <div className={`pointer-events-auto transition-all duration-300 origin-bottom-right ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none absolute bottom-10 right-0'}`}>
         {isOpen && (
-          <div className="w-[340px] h-[450px] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 fade-in">
-            {/* Header */}
+          <div className="w-[340px] h-[500px] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 fade-in">
+            {/* Header unificado */}
             <div className="bg-slate-950 p-4 border-b border-slate-800 flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-purple-600/20 flex items-center justify-center border border-purple-500/30">
@@ -94,13 +100,25 @@ export const SupportWidget: React.FC = () => {
                 <div>
                   <h3 className="font-bold text-white text-sm">Suporte DropAI</h3>
                   <span className="text-[10px] text-green-400 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> Online
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span> IA Online
                   </span>
                 </div>
               </div>
-              <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white transition-colors">
-                <X size={18} />
-              </button>
+              <div className="flex items-center gap-1">
+                {/* Botão WhatsApp Integrado no Header */}
+                <a 
+                   href={whatsappLink} 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   className="p-2 text-slate-400 hover:text-[#25D366] hover:bg-[#25D366]/10 rounded-lg transition-colors flex items-center gap-1.5 mr-1"
+                   title="Falar com humano no WhatsApp"
+                >
+                   <MessageCircle size={18} />
+                </a>
+                <button onClick={() => setIsOpen(false)} className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors">
+                  <X size={18} />
+                </button>
+              </div>
             </div>
 
             {/* Messages Area */}
@@ -150,13 +168,11 @@ export const SupportWidget: React.FC = () => {
         )}
       </div>
 
-      {/* BOTÕES FLUTUANTES (Pointer events auto) */}
+      {/* BOTÃO FLUTUANTE ÚNICO (Pointer events auto) */}
       <div className="flex flex-col gap-3 items-end pointer-events-auto">
-        
-        {/* Botão Chat IA Toggle */}
         <div className="group flex items-center gap-3">
           <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-xs py-1.5 px-3 rounded-lg border border-slate-700 shadow-xl whitespace-nowrap pointer-events-none translate-x-2 group-hover:translate-x-0 duration-200">
-            {isOpen ? 'Fechar Chat' : 'Tire dúvidas com IA'}
+            {isOpen ? 'Fechar Suporte' : 'Dúvidas? Fale com a IA'}
           </span>
           <button 
             onClick={() => setIsOpen(!isOpen)}
@@ -165,24 +181,6 @@ export const SupportWidget: React.FC = () => {
             {isOpen ? <X className="w-6 h-6" /> : <Bot className="w-7 h-7" />}
           </button>
         </div>
-
-        {/* Botão WhatsApp (Visível apenas se Chat Fechado) */}
-        {!isOpen && (
-          <div className="group flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-xs py-1.5 px-3 rounded-lg border border-slate-700 shadow-xl whitespace-nowrap pointer-events-none translate-x-2 group-hover:translate-x-0 duration-200">
-              Falar com Humano
-            </span>
-            <a 
-              href={whatsappLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-14 h-14 rounded-full bg-[#25D366] border-2 border-[#4ade80] flex items-center justify-center text-white shadow-lg shadow-green-900/30 transition-all transform hover:scale-105 active:scale-95 hover:bg-[#22c55e] hover:border-white/50"
-            >
-              <MessageCircle className="w-7 h-7 fill-white text-transparent" />
-            </a>
-          </div>
-        )}
-
       </div>
     </div>
   );

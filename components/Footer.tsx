@@ -6,7 +6,8 @@ const LegalModal = ({ title, content, isOpen, onClose }: { title: string, conten
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    // Z-INDEX AUMENTADO PARA 1000 PARA COBRIR O CHAT
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
@@ -21,7 +22,7 @@ const LegalModal = ({ title, content, isOpen, onClose }: { title: string, conten
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="p-6 max-h-[70vh] overflow-y-auto text-slate-300 text-sm leading-relaxed space-y-4">
+        <div className="p-6 max-h-[70vh] overflow-y-auto text-slate-300 text-sm leading-relaxed space-y-4 custom-scrollbar">
           {content}
         </div>
         <div className="px-6 py-4 border-t border-slate-800 bg-slate-900/50 flex justify-end">
@@ -60,7 +61,7 @@ export const Footer: React.FC = () => {
 
   return (
     <>
-      <footer className="py-12 bg-slate-950 border-t border-slate-900 text-center relative z-10">
+      <footer className="py-12 bg-slate-950 border-t border-slate-900 text-center relative z-10 pb-24 md:pb-12">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-slate-500 text-sm">
             © 2026 DROPHACKER.AI. Todos os direitos reservados.

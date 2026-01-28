@@ -275,12 +275,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
     try {
       const apiKey = process.env.API_KEY;
       
-      const ai = new GoogleGenAI({ apiKey: apiKey || '' });
+      if (!apiKey) {
+        throw new Error("Chave de API não configurada. Verifique se o arquivo .env contem a API_KEY.");
+      }
+
+      const ai = new GoogleGenAI({ apiKey: apiKey });
       const prompt = config.promptTemplate(inputValue);
       
-      // GEMINI 2.0 FLASH LITE (SLASH LITE) CONFIG
+      // GEMINI 2.0 FLASH (STABLE) - Fixing the user issue with preview models
       const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash-lite-preview-02-05', 
+        model: 'gemini-2.0-flash', 
         contents: prompt,
         config: {
           responseMimeType: 'application/json',

@@ -10,11 +10,12 @@
         theme: {
           extend: {
             colors: {
-              neon: {
-                purple: '#a855f7', // Purple-500/600 feel
-                green: '#22c55e',  // Green-500
-                dark: '#0f172a',   // Slate-900
-                darker: '#020617', // Slate-950
+              brand: {
+                dark: '#0B0518',   // Fundo principal (Deep Purple)
+                primary: '#6D28D9', // Roxo vibrante
+                secondary: '#A855F7', // Roxo claro/Lilás
+                surface: '#1E1236', // Superfícies de cards
+                glass: 'rgba(255, 255, 255, 0.05)',
               }
             },
             fontFamily: {
@@ -23,20 +24,40 @@
             animation: {
               'float': 'float 6s ease-in-out infinite',
               'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'glow': 'glow 3s ease-in-out infinite alternate',
+              'blob': 'blob 7s infinite',
             },
             keyframes: {
               float: {
                 '0%, 100%': { transform: 'translateY(0)' },
-                '50%': { transform: 'translateY(-10px)' },
+                '50%': { transform: 'translateY(-15px)' },
+              },
+              glow: {
+                '0%': { boxShadow: '0 0 10px rgba(168, 85, 247, 0.2)' },
+                '100%': { boxShadow: '0 0 30px rgba(168, 85, 247, 0.6)' },
+              },
+              blob: {
+                '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                '100%': { transform: 'translate(0px, 0px) scale(1)' },
               }
+            },
+            backgroundImage: {
+              'hero-glow': 'radial-gradient(ellipse at top center, #581c87 0%, #0B0518 60%)',
+              'card-gradient': 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)',
             }
           }
         }
       }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-      body { font-family: 'Inter', sans-serif; }
+      body { 
+        font-family: 'Inter', sans-serif; 
+        background-color: #0B0518;
+        color: white;
+      }
       
       /* Animation Utilities */
       .reveal {
@@ -54,9 +75,31 @@
       .delay-200 { transition-delay: 200ms; }
       .delay-300 { transition-delay: 300ms; }
 
-      /* Glow Effects */
-      .glow-text { text-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
-      .glow-green { text-shadow: 0 0 20px rgba(34, 197, 94, 0.5); }
+      /* Wave Pattern Background */
+      .wave-bg {
+        background-image: repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 20px,
+          rgba(168, 85, 247, 0.03) 20px,
+          rgba(168, 85, 247, 0.03) 40px
+        );
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0B0518;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #3b0764;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #581c87;
+      }
     </style>
 <script type="importmap">
 {
@@ -64,13 +107,13 @@
     "react": "https://esm.sh/react@^19.2.4",
     "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
     "react/": "https://esm.sh/react@^19.2.4/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+    "@google/genai": "https://esm.sh/@google/genai",
     "lucide-react": "https://esm.sh/lucide-react@^0.563.0"
   }
 }
 </script>
 </head>
-  <body class="bg-slate-950 text-white overflow-x-hidden antialiased">
+  <body class="bg-[#0B0518] text-white overflow-x-hidden antialiased">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
