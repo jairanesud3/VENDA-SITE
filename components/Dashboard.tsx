@@ -7,7 +7,7 @@ import {
   Search, Users, Calculator, Megaphone, 
   Menu, MousePointerClick, 
   Camera, Home, ChevronRight, Wand2, LucideIcon, Download,
-  Lock, AlertTriangle, X
+  Lock, AlertTriangle, X, LayoutTemplate
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { generateCopy } from '@/app/actions/generate-copy';
@@ -18,6 +18,46 @@ interface DashboardProps {
   onLogout: () => void;
   userEmail?: string | null;
 }
+
+// --- TRADUÇÃO DE TERMOS TÉCNICOS ---
+const LABEL_MAP: Record<string, string> = {
+  // ADS
+  ad_1: "📢 Variação de Anúncio #01",
+  ad_2: "📢 Variação de Anúncio #02",
+  ad_3: "📢 Variação de Anúncio #03",
+  headline: "Título (Headline)",
+  body: "Texto do Post (Legenda)",
+  cta: "Botão (Chamada para Ação)",
+  
+  // ROTEIROS
+  hook_visual: "👀 Gancho Visual (O que aparece na tela)",
+  hook_audio: "🗣️ Gancho de Áudio (O que é falado)",
+  scenes: "🎬 Passo a Passo das Cenas",
+  visual: "🎥 O que filmar",
+  audio: "🎙️ O que narrar",
+  seconds: "⏱️ Duração",
+
+  // PERSONA
+  avatar_name: "👤 Nome do Avatar",
+  age_range: "🎂 Faixa Etária",
+  interests: "❤️ Interesses",
+  pain_points: "😫 Dores e Problemas",
+  objections: "✋ Objeções de Compra",
+  buying_triggers: "🔥 Gatilhos de Compra",
+
+  // SEO
+  product_title: "🏷️ Título do Produto",
+  meta_description: "🔍 Descrição para Google",
+  description_body: "📄 Descrição Completa",
+  features_list: "✅ Lista de Benefícios",
+
+  // ROAS
+  analysis_summary: "📊 Resumo da Análise",
+  breakeven_cpa: "⚖️ CPA Máximo (Breakeven)",
+  target_roas: "🎯 ROAS Meta",
+  potential_profit: "💰 Lucro Potencial",
+  recommendation: "💡 Veredito da IA"
+};
 
 // --- CONFIGURAÇÃO ---
 type ModuleId = 
@@ -38,14 +78,14 @@ interface ModuleConfig {
 
 const MODULES: Record<string, ModuleConfig> = {
   home: { label: 'Visão Geral', icon: Home, color: 'text-purple-400', desc: 'Resumo da sua conta' },
-  generator: { label: 'Copy Ad Facebook', icon: Megaphone, color: 'text-blue-400', desc: 'Textos de alta conversão', placeholder: 'Ex: Corretor Postural, Tênis de Corrida...' },
-  product_desc: { label: 'SEO E-commerce', icon: Search, color: 'text-cyan-400', desc: 'Descrições otimizadas', placeholder: 'Ex: Fone Bluetooth à prova d\'água...' },
-  roas_analyzer: { label: 'Calculadora ROAS', icon: Calculator, color: 'text-emerald-400', desc: 'Previsão de lucro e viabilidade', placeholder: 'Ex: Custo do Produto R$50, Preço de Venda R$129...' },
+  generator: { label: 'Criador de Anúncios', icon: Megaphone, color: 'text-blue-400', desc: 'Textos de alta conversão para FB/Insta', placeholder: 'Ex: Corretor Postural, Tênis de Corrida...' },
+  product_desc: { label: 'Descrições de Produto', icon: Search, color: 'text-cyan-400', desc: 'SEO para sua loja (Shopify/Nuvem)', placeholder: 'Ex: Fone Bluetooth à prova d\'água...' },
+  roas_analyzer: { label: 'Calculadora de Lucro', icon: Calculator, color: 'text-emerald-400', desc: 'Previsão de lucro e viabilidade', placeholder: 'Ex: Custo do Produto R$50, Preço de Venda R$129, Taxa da Maquininha 5%...' },
   
   // Módulos Premium
-  video_script: { label: 'Roteiro TikTok', icon: Video, color: 'text-pink-400', desc: 'Scripts virais para vídeos curtos', placeholder: 'Ex: Escova Alisadora 3 em 1...', isPremium: true },
+  video_script: { label: 'Roteiros TikTok/Reels', icon: Video, color: 'text-pink-400', desc: 'Scripts virais para vídeos curtos', placeholder: 'Ex: Escova Alisadora 3 em 1...', isPremium: true },
   studio: { label: 'Studio Product AI', icon: Camera, color: 'text-orange-400', desc: 'Fotos profissionais de produtos', placeholder: 'Ex: Garrafa Térmica Preta em cima de uma mesa de madeira...', isPremium: true },
-  persona: { label: 'Hacker de Avatar', icon: Users, color: 'text-indigo-400', desc: 'Análise profunda do público', placeholder: 'Ex: Kit de Ferramentas para Jardim...', isPremium: true },
+  persona: { label: 'Hacker de Público', icon: Users, color: 'text-indigo-400', desc: 'Descubra quem compra seu produto', placeholder: 'Ex: Kit de Ferramentas para Jardim...', isPremium: true },
   settings: { label: 'Configurações', icon: Settings, color: 'text-slate-400', desc: 'Ajustes da conta' },
 };
 
@@ -131,14 +171,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const userName = userEmail ? userEmail.split('@')[0] : null;
   const formattedName = userName ? userName.charAt(0).toUpperCase() + userName.slice(1) : "Visitante";
 
-  // Sincronização Segura de Plano
   useEffect(() => {
     const fetchUserPlan = async () => {
         try {
             const supabase = createClient();
             const { data: { user } } = await supabase.auth.getUser();
-            
-            // Verifica metadata do Supabase (source of truth)
             if (user?.user_metadata?.plan === 'pro') {
                 setUserPlan('pro');
             } else {
@@ -176,37 +213,41 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
 
     try {
         let prompt = "";
-        const moduleId = activeModule; // Passar ID para o backend validar permissão
-
-        // Prompt construction logic remains the same...
+        
+        // PROMPTS REFINADOS PARA PORTUGUÊS CLARO
         switch (activeModule) {
             case 'generator':
-                prompt = `Atue como um Copywriter Sênior. Crie 3 opções de Copy para Anúncio do produto: "${input}". 
-                Tom: ${tone}. Plataforma: ${platform}. 
-                Use gatilhos mentais (Urgência, Escassez). 
-                Retorne APENAS JSON: { "ad_1": {"headline": "...", "body": "...", "cta": "..."}, "ad_2": {...}, "ad_3": {...} }`;
+                prompt = `Atue como um Copywriter Brasileiro Sênior. Crie 3 variações de texto de anúncio (Ad Copy) para o produto: "${input}". 
+                Tom de voz: ${tone}. Focado na plataforma: ${platform}. Idioma: Português do Brasil.
+                Use gatilhos mentais (Urgência, Escassez, Novidade).
+                Retorne APENAS um JSON válido com esta estrutura exata: 
+                { "ad_1": {"headline": "...", "body": "...", "cta": "..."}, "ad_2": {...}, "ad_3": {...} }`;
                 break;
             case 'video_script':
-                prompt = `Crie um roteiro viral de TikTok de ${videoDuration} para: "${input}". 
-                Estrutura: Gancho Visual -> Retenção -> Oferta.
-                Retorne APENAS JSON: { "hook_visual": "...", "hook_audio": "...", "scenes": [{"seconds": "0-3", "visual": "...", "audio": "..."}] }`;
+                prompt = `Crie um roteiro viral de TikTok/Reels de ${videoDuration} para o produto: "${input}". 
+                Idioma: Português do Brasil. Estrutura de Retenção Alta.
+                Retorne APENAS um JSON válido com esta estrutura: 
+                { "hook_visual": "...", "hook_audio": "...", "scenes": [{"seconds": "0-3s", "visual": "...", "audio": "..."}] }`;
                 break;
             case 'product_desc':
-                prompt = `Especialista em SEO de E-commerce. Descreva: "${input}". 
-                Use palavras-chave de alto volume. 
-                Retorne APENAS JSON: { "product_title": "...", "meta_description": "...", "description_body": "...", "features_list": ["...", "..."] }`;
+                prompt = `Especialista em SEO de E-commerce Brasileiro. Descreva o produto: "${input}". 
+                Foque em conversão e palavras-chave.
+                Retorne APENAS um JSON válido: 
+                { "product_title": "...", "meta_description": "...", "description_body": "...", "features_list": ["Benefício 1", "Benefício 2"] }`;
                 break;
             case 'persona':
-                prompt = `Analise o público-alvo para: "${input}". 
-                Retorne APENAS JSON: { "avatar_name": "...", "age_range": "...", "interests": ["...", "..."], "pain_points": ["...", "..."], "objections": ["...", "..."], "buying_triggers": ["...", "..."] }`;
+                prompt = `Crie um perfil de comprador (Avatar) brasileiro para: "${input}". 
+                Retorne APENAS um JSON válido: 
+                { "avatar_name": "Nome e Idade", "interests": ["..."], "pain_points": ["..."], "objections": ["..."], "buying_triggers": ["..."] }`;
                 break;
             case 'roas_analyzer':
-                prompt = `Analise financeiramente: "${input}". 
-                Estime margens e CPA ideal. 
-                Retorne APENAS JSON: { "analysis_summary": "...", "metrics": { "breakeven_cpa": "...", "target_roas": "...", "potential_profit": "..." }, "recommendation": "..." }`;
+                prompt = `Faça uma análise financeira simulada para dropshipping do produto: "${input}". 
+                Moeda: BRL (R$).
+                Retorne APENAS um JSON válido: 
+                { "analysis_summary": "Resumo em 1 frase", "metrics": { "breakeven_cpa": "R$...", "target_roas": "...", "potential_profit": "Alta/Média/Baixa" }, "recommendation": "..." }`;
                 break;
             case 'studio':
-                prompt = `Professional high-end product photography of ${input}, studio lighting, 4k, ultra-realistic, advertising standard.`;
+                prompt = `Professional product photography of ${input}, studio lighting, 4k, advertising standard, centered.`;
                 break;
             default:
                 prompt = `Ajude com: ${input}`;
@@ -217,8 +258,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
              if (!apiKey) throw new Error("API Key não encontrada.");
              const ai = new GoogleGenAI({ apiKey });
              
-             // Client-side image gen calls should also be secured via a Next.js API route proxy in production
-             // For now, we rely on the component conditional rendering, but real security is in `generateCopy` action
              const response = await ai.models.generateContent({
                  model: 'gemini-2.5-flash-image',
                  contents: { parts: [{ text: prompt }] },
@@ -229,16 +268,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
              else throw new Error("Falha ao gerar imagem.");
         
         } else {
-            // CHAMADA SEGURA AO SERVIDOR
-            // Agora passamos o moduleId para validar permissões no backend
             const text = await generateCopy(prompt, activeModule);
             
             if (text) {
               try {
-                setResult(JSON.parse(text));
-              } catch (e) {
-                const cleanText = text.replace(/```json/g, '').replace(/```/g, '');
+                // Remove Markdown se a IA mandar (```json ... ```)
+                const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
                 setResult(JSON.parse(cleanText));
+              } catch (e) {
+                console.error("Erro parsing JSON:", e);
+                // Fallback para exibir texto puro se o JSON falhar
+                setResult({ "Resposta": text }); 
               }
             } else {
               throw new Error("Nenhuma resposta da IA.");
@@ -257,40 +297,56 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     }
   };
 
-  const renderResultValue = (value: any) => {
+  // --- RENDERIZADOR INTELIGENTE (TRADUTOR) ---
+  const renderValue = (key: string, value: any) => {
+    // Lista de itens (ex: Benefícios, Interesses)
     if (Array.isArray(value)) {
-      return (
-        <ul className="space-y-3 mt-2">
-          {value.map((item: any, i: number) => (
-            <li key={i} className="bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-slate-300 break-words">
-               {typeof item === 'object' ? (
-                  <div className="space-y-1">
-                     {Object.entries(item).map(([k, v]: any) => (
-                        <div key={k} className="flex flex-col sm:flex-row gap-1 sm:gap-2">
-                          <span className="font-bold text-slate-500 uppercase text-[10px] tracking-wider min-w-[80px] pt-0.5">{k.replace(/_/g, ' ')}:</span>
-                          <span className="text-slate-200 break-words">{String(v)}</span>
+        // Verifica se é lista de objetos (Cenas do roteiro)
+        if (value.length > 0 && typeof value[0] === 'object') {
+            return (
+                <div className="space-y-3 mt-2">
+                    {value.map((scene: any, idx: number) => (
+                        <div key={idx} className="bg-slate-950/50 p-3 rounded-lg border border-slate-800">
+                             <div className="text-[10px] font-bold text-slate-500 mb-2 uppercase">Cena {idx + 1}</div>
+                             {Object.entries(scene).map(([k, v]) => (
+                                 <div key={k} className="mb-2 last:mb-0">
+                                     <span className="text-purple-400 font-bold text-xs">{LABEL_MAP[k] || k}: </span>
+                                     <span className="text-slate-300 text-sm">{String(v)}</span>
+                                 </div>
+                             ))}
                         </div>
-                     ))}
-                  </div>
-               ) : item}
-            </li>
-          ))}
-        </ul>
-      )
-    }
-    if (typeof value === 'object' && value !== null) {
-      return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
-          {Object.entries(value).map(([k, v]: any) => (
-            <div key={k} className="bg-slate-950/40 border border-white/5 rounded-lg p-3 flex flex-col hover:border-purple-500/20 transition-colors">
-              <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-1">{k.replace(/_/g, ' ')}</span>
-              <span className="text-sm font-medium text-white break-words">{String(v)}</span>
+                    ))}
+                </div>
+            );
+        }
+        // Lista simples de texto
+        return (
+            <div className="flex flex-wrap gap-2 mt-2">
+                {value.map((item, idx) => (
+                    <span key={idx} className="bg-purple-900/20 text-purple-200 border border-purple-500/30 px-2 py-1 rounded text-xs">
+                        {String(item)}
+                    </span>
+                ))}
             </div>
-          ))}
-        </div>
-      )
+        );
     }
-    return <p className="text-slate-200 leading-relaxed whitespace-pre-wrap break-words">{String(value)}</p>;
+
+    // Objeto aninhado (ex: Métricas ROAS)
+    if (typeof value === 'object' && value !== null) {
+        return (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                {Object.entries(value).map(([subKey, subValue]) => (
+                    <div key={subKey} className="bg-slate-950/30 p-2 rounded border border-slate-800">
+                        <div className="text-[10px] text-slate-500 uppercase font-bold mb-1">{LABEL_MAP[subKey] || subKey}</div>
+                        <div className="text-sm text-white font-medium">{String(subValue)}</div>
+                    </div>
+                ))}
+            </div>
+        );
+    }
+
+    // Texto Simples
+    return <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap mt-1">{String(value)}</p>;
   };
 
   return (
@@ -309,9 +365,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
         </button>
       </div>
 
-      {/* SIDEBAR (Desktop: Persistent / Mobile: Drawer) */}
+      {/* SIDEBAR */}
       <>
-        {/* Backdrop Mobile */}
         {mobileMenuOpen && (
             <div className="fixed inset-0 bg-black/80 z-40 lg:hidden backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}></div>
         )}
@@ -322,7 +377,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
             ${mobileMenuOpen ? 'translate-x-0 w-[80%]' : '-translate-x-full lg:translate-x-0'}
             ${sidebarOpen ? 'lg:w-64' : 'lg:w-20'}
         `}>
-            {/* Header Sidebar Desktop */}
             <div className="hidden lg:flex h-20 items-center px-6 border-b border-slate-800 shrink-0">
                 <div className="p-1.5 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-lg mr-3 shadow-lg shadow-purple-500/20 shrink-0">
                     <Zap className="w-5 h-5 text-white" />
@@ -330,13 +384,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                 {sidebarOpen && <span className="font-bold tracking-tight italic text-lg">DROPHACKER</span>}
             </div>
 
-            {/* Header Sidebar Mobile (Close Button) */}
             <div className="lg:hidden h-16 flex items-center justify-between px-6 border-b border-slate-800">
                 <span className="font-bold text-slate-300">Menu</span>
                 <button onClick={() => setMobileMenuOpen(false)}><X className="text-slate-400" /></button>
             </div>
 
-            {/* User Plan Badge */}
             {sidebarOpen && (
                 <div className="px-6 pt-6 pb-2">
                     {isLoadingPlan ? (
@@ -364,7 +416,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                 </div>
             )}
 
-            {/* Navigation */}
             <div className="flex-1 overflow-y-auto py-2 space-y-0 custom-scrollbar">
                 <SidebarItem 
                     id="home" 
@@ -390,7 +441,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                 ))}
             </div>
 
-            {/* Footer Sidebar */}
             <div className="p-4 border-t border-slate-800 bg-slate-900/50">
                 <button onClick={() => setSidebarOpen(!sidebarOpen)} className="hidden lg:flex w-full items-center justify-center p-2 hover:bg-white/5 rounded-lg text-slate-500 mb-2 transition-colors">
                     <Menu size={18} />
@@ -442,10 +492,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                   </div>
               </div>
           ) : (
-              // --- TOOL VIEW (MOBILE OPTIMIZED) ---
+              // --- TOOL VIEW ---
               <div className="flex flex-col lg:flex-row h-full overflow-hidden relative z-10">
                   
-                  {/* LEFT: CONTROLS (Top on Mobile) */}
+                  {/* LEFT: CONTROLS */}
                   <div className="w-full lg:w-[400px] bg-slate-950 border-b lg:border-b-0 lg:border-r border-slate-800 flex flex-col h-auto lg:h-full shadow-2xl z-20 shrink-0 max-h-[50vh] lg:max-h-full overflow-y-auto custom-scrollbar">
                      <div className="p-4 md:p-6 border-b border-slate-800 bg-slate-900/50 sticky top-0 z-10 backdrop-blur-md">
                         <div className="flex items-center gap-3 text-white mb-1">
@@ -473,11 +523,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                          )}
 
                          <div className="space-y-3">
-                             <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Entrada de Dados</label>
+                             <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">O que vamos vender?</label>
                              <textarea 
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
-                                placeholder={MODULES[activeModule].placeholder || "Descreva o produto..."}
+                                placeholder={MODULES[activeModule].placeholder || "Descreva o produto com detalhes..."}
                                 disabled={isModuleLocked}
                                 className="w-full h-32 md:h-40 bg-slate-900 border border-slate-700 rounded-xl p-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500 transition-colors resize-none text-sm leading-relaxed shadow-inner disabled:opacity-50"
                              />
@@ -502,32 +552,32 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                             className="w-full py-3 md:py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-purple-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-2 text-sm md:text-base"
                         >
                             {isGenerating ? <Loader2 className="animate-spin w-5 h-5"/> : <Wand2 className="w-5 h-5"/>}
-                            {isGenerating ? 'HACKEANDO...' : 'GERAR AGORA'}
+                            {isGenerating ? 'CRIANDO MÁGICA...' : 'GERAR AGORA'}
                         </button>
                      </div>
                   </div>
 
-                  {/* RIGHT: PREVIEW (Bottom on Mobile) */}
+                  {/* RIGHT: PREVIEW AREA */}
                   <div id="result-area" className="flex-1 bg-transparent relative overflow-hidden flex flex-col min-h-[50vh]">
                       <div className="h-12 md:h-16 border-b border-white/5 flex items-center justify-between px-4 md:px-8 bg-black/20 backdrop-blur-sm sticky top-0 z-10">
                           <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                            <Sparkles size={14} className="text-purple-500" /> Resultado
+                            <Sparkles size={14} className="text-purple-500" /> Resultado Final
                           </span>
                           {result && (
                               <button 
                                 onClick={() => navigator.clipboard.writeText(JSON.stringify(result, null, 2))}
                                 className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[10px] md:text-xs flex items-center gap-2 text-slate-300 transition-colors border border-white/5"
                               >
-                                  <Copy className="w-3 h-3"/> Copiar
+                                  <Copy className="w-3 h-3"/> Copiar Tudo
                               </button>
                           )}
                       </div>
 
-                      <div className="flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar flex items-start justify-center pb-24 md:pb-8">
+                      <div className="flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar flex items-start justify-center pb-24 md:pb-8 bg-slate-950/20">
                           {!result && !isGenerating && (
                               <div className="text-center opacity-40 mt-10 md:mt-20">
-                                  <MousePointerClick className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-6 text-slate-500"/>
-                                  <p className="text-slate-300 font-medium text-base md:text-lg">Aguardando comando...</p>
+                                  <LayoutTemplate className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-6 text-slate-500"/>
+                                  <p className="text-slate-300 font-medium text-base md:text-lg">Preencha os dados ao lado para começar.</p>
                               </div>
                           )}
 
@@ -538,32 +588,39 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                        <div className="absolute inset-0 border-4 border-t-purple-500 rounded-full animate-spin"></div>
                                        <Zap className="absolute inset-0 m-auto text-purple-400 w-6 h-6 md:w-8 md:h-8 animate-pulse"/>
                                    </div>
-                                   <p className="text-purple-300 font-bold animate-pulse text-sm">IA trabalhando...</p>
+                                   <p className="text-purple-300 font-bold animate-pulse text-sm">A IA está escrevendo...</p>
                               </div>
                           )}
 
                           {result && !isGenerating && (
-                              <div className="w-full max-w-4xl animate-in zoom-in-95 slide-in-from-bottom-5 duration-500 pb-10">
+                              <div className="w-full max-w-4xl animate-in zoom-in-95 slide-in-from-bottom-5 duration-500 pb-10 space-y-6">
+                                  {/* TRATAMENTO ESPECIAL PARA IMAGENS */}
                                   {result.type === 'image' ? (
                                       <div className="bg-slate-900 border border-slate-700 p-3 rounded-2xl shadow-2xl inline-block w-full">
                                           <img src={result.url} className="w-full h-auto rounded-xl" />
                                           <div className="mt-3 flex justify-between items-center px-2">
-                                              <span className="text-[10px] text-slate-500">Gemini 2.5 Image</span>
-                                              <a href={result.url} download="dropai-img.png" className="text-white bg-purple-600 hover:bg-purple-500 px-3 py-1.5 rounded-lg text-xs font-bold flex gap-2 items-center transition-colors"><Download size={14}/> Baixar</a>
+                                              <span className="text-[10px] text-slate-500">Gerado por IA (Studio Mode)</span>
+                                              <a href={result.url} download="dropai-img.png" className="text-white bg-purple-600 hover:bg-purple-500 px-3 py-1.5 rounded-lg text-xs font-bold flex gap-2 items-center transition-colors"><Download size={14}/> Baixar Imagem</a>
                                           </div>
                                       </div>
                                   ) : (
-                                      <div className="space-y-4 md:space-y-6">
-                                          {Object.entries(result).map(([key, value]: any, idx) => (
-                                              <div key={idx} className="bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-4 md:p-6 shadow-xl">
-                                                  <h3 className="text-xs md:text-sm font-bold text-purple-400 uppercase tracking-widest mb-4 border-b border-white/5 pb-2 flex items-center gap-2">
-                                                    <Sparkles size={14} className="text-purple-500" />
-                                                    {key.replace(/_/g, ' ')}
+                                      /* RENDERIZAÇÃO GENÉRICA BONITA */
+                                      Object.entries(result).map(([key, value]: any, idx) => (
+                                          <div key={idx} className="bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden shadow-xl">
+                                              {/* HEADER DO CARD (TRADUZIDO) */}
+                                              <div className="px-6 py-4 border-b border-white/5 bg-white/5 flex items-center gap-2">
+                                                  <div className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_10px_#a855f7]"></div>
+                                                  <h3 className="text-sm font-bold text-white uppercase tracking-widest">
+                                                    {LABEL_MAP[key] || key.replace(/_/g, ' ')}
                                                   </h3>
-                                                  {renderResultValue(value)}
                                               </div>
-                                          ))}
-                                      </div>
+                                              
+                                              {/* CONTEÚDO DO CARD */}
+                                              <div className="p-6">
+                                                  {renderValue(key, value)}
+                                              </div>
+                                          </div>
+                                      ))
                                   )}
                               </div>
                           )}
