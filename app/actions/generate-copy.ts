@@ -13,20 +13,20 @@ export async function generateCopy(prompt: string) {
   const ai = new GoogleGenAI({ apiKey });
 
   try {
-    // Uso exclusivo do modelo Gemini 2.0 Flash Lite conforme solicitado
+    // Uso do modelo Gemini 2.5 Flash Lite
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-lite', 
+      model: 'gemini-2.5-flash-lite', 
       contents: prompt,
       config: {
         responseMimeType: 'application/json'
       }
     });
 
-    if (!response.text) throw new Error("Resposta vazia do modelo 2.0");
+    if (!response.text) throw new Error("Resposta vazia do modelo 2.5");
     return response.text;
 
   } catch (error: any) {
-    console.error("❌ Erro no Gemini 2.0 Flash Lite:", error);
-    throw new Error(`Falha na IA (Gemini 2.0): ${error.message}`);
+    console.error("❌ Erro no Gemini 2.5 Flash Lite:", error);
+    throw new Error(`Falha na IA (Gemini 2.5): ${error.message}`);
   }
 }
