@@ -87,7 +87,6 @@ interface SidebarItemProps {
   onClick: () => void;
 }
 
-// SIDEBAR ITEM CORRIGIDO: Sem "quadradinhos", ocupa largura total, visual limpo.
 const SidebarItem: React.FC<SidebarItemProps> = ({ 
   id, 
   conf, 
@@ -103,11 +102,8 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
           : 'text-slate-400 hover:bg-white/5 hover:text-white border-r-4 border-transparent'
       }`}
   >
-      {/* Background Gradient no Active */}
       {active && <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-transparent pointer-events-none"></div>}
-      
       <conf.icon className={`w-5 h-5 ${active ? 'text-purple-400 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]' : 'text-slate-500 group-hover:text-white'} transition-colors relative z-10`} />
-      
       {open && <span className={`relative z-10 ${active ? 'font-bold tracking-wide' : ''}`}>{conf.label}</span>}
   </button>
 );
@@ -127,9 +123,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const [platform, setPlatform] = useState('FB Ads');
   const [videoDuration, setVideoDuration] = useState('30s');
   
-  // Extrair nome do email para saudação
   const userName = userEmail ? userEmail.split('@')[0] : null;
-  // Formata o nome (ex: joao -> Joao)
   const formattedName = userName ? userName.charAt(0).toUpperCase() + userName.slice(1) : "Visitante";
 
   // --- LÓGICA DA API ---
@@ -142,7 +136,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     try {
         let prompt = "";
         
-        // Configuração dinâmica dos prompts
         switch (activeModule) {
             case 'generator':
                 prompt = `Atue como um Copywriter Sênior. Crie 3 opções de Copy para Anúncio do produto: "${input}". 
@@ -175,11 +168,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
             default:
                 prompt = `Ajude com: ${input}`;
         }
-
-        // --- DIVISÃO: IMAGEM (Client-Side) vs TEXTO (Server Action) ---
         
         if (activeModule === 'studio') {
-             // Imagem continua no Client-side por enquanto para lidar com retorno binário mais facilmente
              const apiKey = process.env.API_KEY;
              if (!apiKey) throw new Error("API Key não encontrada.");
              const ai = new GoogleGenAI({ apiKey });
@@ -194,13 +184,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
              else throw new Error("Falha ao gerar imagem.");
         
         } else {
-            // Texto usa a nova Server Action
+            // Server Action para texto
             const text = await generateCopy(prompt);
             if (text) {
               try {
                 setResult(JSON.parse(text));
               } catch (e) {
-                // Fallback caso a IA retorne algo que não é JSON puro (ex: Markdown code blocks)
                 const cleanText = text.replace(/```json/g, '').replace(/```/g, '');
                 setResult(JSON.parse(cleanText));
               }
@@ -217,166 +206,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     }
   };
 
-  const HomeView = () => (
-      <div className="p-8 max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 relative z-10">
-          <div className="mb-10 flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-white mb-2">
-                    {/* SAUDAÇÃO DINÂMICA COM O NOME */}
-                    Bem-vindo(a), <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{formattedName}</span>.
-                </h1>
-                <p className="text-slate-400">O Quartel General do seu E-commerce está pronto.</p>
-              </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Object.entries(MODULES).filter(([k]) => k !== 'home' && k !== 'settings').map(([key, mod]) => (
-                  <button 
-                    key={key}
-                    onClick={() => setActiveModule(key as ModuleId)}
-                    className="group bg-slate-900/40 backdrop-blur-md hover:bg-slate-800/60 border border-slate-800 hover:border-purple-500/50 p-6 rounded-2xl text-left transition-all hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-900/10 flex flex-col h-full"
-                  >
-                      <div className="flex items-start justify-between mb-4">
-                        <div className={`w-12 h-12 rounded-xl bg-slate-950/50 border border-slate-800 flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                            <mod.icon className={`w-6 h-6 ${mod.color}`} />
-                        </div>
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/10 p-1 rounded-full">
-                            <ChevronRight size={16} className="text-white"/>
-                        </div>
-                      </div>
-                      <h3 className="text-lg font-bold text-white mb-1 group-hover:text-purple-300 transition-colors">{mod.label}</h3>
-                      <p className="text-sm text-slate-500 leading-relaxed">{mod.desc}</p>
-                  </button>
-              ))}
-          </div>
-      </div>
-  );
-
-  const ToolView = () => {
-      const ActiveIcon = MODULES[activeModule].icon;
-      return (
-      <div className="flex flex-col lg:flex-row h-full overflow-hidden relative z-10">
-          {/* LEFT: CONTROLS */}
-          <div className="w-full lg:w-[400px] bg-slate-950 border-r border-slate-800 flex flex-col h-full shadow-2xl z-20">
-             <div className="p-6 border-b border-slate-800 bg-slate-900/50">
-                <div className="flex items-center gap-3 text-white mb-1">
-                    <ActiveIcon className={`w-5 h-5 ${MODULES[activeModule].color}`} />
-                    <span className="font-bold text-lg">{MODULES[activeModule].label}</span>
-                </div>
-                <p className="text-xs text-slate-500">{MODULES[activeModule].desc}</p>
-             </div>
-
-             <div className="p-6 flex-1 overflow-y-auto custom-scrollbar space-y-6">
-                 <div className="space-y-3">
-                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Entrada de Dados</label>
-                     <textarea 
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder={MODULES[activeModule].placeholder || "Descreva o produto ou cenário aqui..."}
-                        className="w-full h-40 bg-slate-900 border border-slate-700 rounded-xl p-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500 transition-colors resize-none text-sm leading-relaxed shadow-inner"
-                     />
-                 </div>
-
-                 {activeModule === 'generator' && (
-                     <>
-                        <CustomSelect label="Tom de Voz" value={tone} onChange={setTone} options={['Agressivo', 'Amigável', 'Urgente', 'Exclusivo']} />
-                        <CustomSelect label="Plataforma" value={platform} onChange={setPlatform} options={['FB Ads', 'Instagram', 'Google', 'TikTok']} />
-                     </>
-                 )}
-                 
-                 {activeModule === 'video_script' && (
-                     <CustomSelect label="Duração" value={videoDuration} onChange={setVideoDuration} options={['15s', '30s', '60s']} />
-                 )}
-             </div>
-
-             <div className="p-6 border-t border-slate-800 bg-slate-900/30">
-                <button 
-                    onClick={handleGenerate}
-                    disabled={isGenerating || !input}
-                    className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-purple-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-2"
-                >
-                    {isGenerating ? <Loader2 className="animate-spin w-5 h-5"/> : <Wand2 className="w-5 h-5"/>}
-                    {isGenerating ? 'HACKEANDO...' : 'GERAR AGORA'}
-                </button>
-             </div>
-          </div>
-
-          {/* RIGHT: PREVIEW */}
-          <div className="flex-1 bg-transparent relative overflow-hidden flex flex-col">
-              {/* Toolbar */}
-              <div className="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-black/20 backdrop-blur-sm">
-                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                    <Sparkles size={14} className="text-purple-500" /> Resultado Gerado
-                  </span>
-                  {result && (
-                      <button 
-                        onClick={() => navigator.clipboard.writeText(JSON.stringify(result, null, 2))}
-                        className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs flex items-center gap-2 text-slate-300 transition-colors border border-white/5"
-                      >
-                          <Copy className="w-3 h-3"/> Copiar
-                      </button>
-                  )}
-              </div>
-
-              {/* Content Area */}
-              <div className="flex-1 p-8 overflow-y-auto custom-scrollbar flex items-start justify-center">
-                  {!result && !isGenerating && (
-                      <div className="text-center opacity-40 mt-20">
-                          <MousePointerClick className="w-20 h-20 mx-auto mb-6 text-slate-500"/>
-                          <p className="text-slate-300 font-medium text-lg">Aguardando comando...</p>
-                          <p className="text-slate-600 text-sm mt-2">Preencha os dados ao lado e clique em Gerar</p>
-                      </div>
-                  )}
-
-                  {isGenerating && (
-                      <div className="text-center mt-20">
-                           <div className="relative w-24 h-24 mx-auto mb-6">
-                               <div className="absolute inset-0 border-4 border-white/5 rounded-full"></div>
-                               <div className="absolute inset-0 border-4 border-t-purple-500 rounded-full animate-spin"></div>
-                               <Zap className="absolute inset-0 m-auto text-purple-400 w-8 h-8 animate-pulse"/>
-                           </div>
-                           <p className="text-purple-300 font-bold animate-pulse">Inteligência Artificial trabalhando...</p>
-                      </div>
-                  )}
-
-                  {result && !isGenerating && (
-                      <div className="w-full max-w-4xl animate-in zoom-in-95 slide-in-from-bottom-5 duration-500 pb-20">
-                          {result.type === 'image' ? (
-                              <div className="bg-slate-900 border border-slate-700 p-3 rounded-2xl shadow-2xl inline-block">
-                                  <img src={result.url} className="max-w-full max-h-[600px] rounded-xl" />
-                                  <div className="mt-3 flex justify-between items-center px-2">
-                                      <span className="text-xs text-slate-500">Gerado com Gemini 2.5 Image</span>
-                                      <a href={result.url} download="dropai-img.png" className="text-white bg-purple-600 hover:bg-purple-500 px-3 py-1.5 rounded-lg text-xs font-bold flex gap-2 items-center transition-colors"><Download size={14}/> Baixar HD</a>
-                                  </div>
-                              </div>
-                          ) : (
-                              <div className="space-y-6">
-                                  {/* Renderização Inteligente de JSON */}
-                                  {Object.entries(result).map(([key, value]: any, idx) => (
-                                      <div key={idx} className="bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-xl">
-                                          <h3 className="text-sm font-bold text-purple-400 uppercase tracking-widest mb-4 border-b border-white/5 pb-2">{key.replace(/_/g, ' ')}</h3>
-                                          {typeof value === 'object' ? (
-                                              <pre className="text-sm text-slate-300 font-mono whitespace-pre-wrap">{JSON.stringify(value, null, 2)}</pre>
-                                          ) : (
-                                              <p className="text-slate-200 leading-relaxed whitespace-pre-wrap">{value}</p>
-                                          )}
-                                      </div>
-                                  ))}
-                              </div>
-                          )}
-                      </div>
-                  )}
-              </div>
-          </div>
-      </div>
-      );
-  };
-
   return (
     <div className="flex h-screen bg-[#0B0518] text-white font-sans overflow-hidden relative">
       <DashboardBackground />
       
-      {/* SIDEBAR CORRIGIDA: Sem espaçamentos estranhos, full height */}
       <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-slate-950 border-r border-slate-800 flex flex-col transition-all duration-300 z-50 shadow-2xl relative`}>
           <div className="h-20 flex items-center px-6 border-b border-slate-800 shrink-0">
               <div className="p-1.5 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-lg mr-3 shadow-lg shadow-purple-500/20 shrink-0">
@@ -420,9 +253,157 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
           </div>
       </aside>
 
-      {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
-          {activeModule === 'home' ? <HomeView /> : <ToolView />}
+          {activeModule === 'home' ? (
+              // --- HOME VIEW (Inline) ---
+              <div className="p-8 max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 relative z-10">
+                  <div className="mb-10 flex items-center justify-between">
+                      <div>
+                        <h1 className="text-3xl font-bold text-white mb-2">
+                            Bem-vindo(a), <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{formattedName}</span>.
+                        </h1>
+                        <p className="text-slate-400">O Quartel General do seu E-commerce está pronto.</p>
+                      </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {Object.entries(MODULES).filter(([k]) => k !== 'home' && k !== 'settings').map(([key, mod]) => (
+                          <button 
+                            key={key}
+                            onClick={() => setActiveModule(key as ModuleId)}
+                            className="group bg-slate-900/40 backdrop-blur-md hover:bg-slate-800/60 border border-slate-800 hover:border-purple-500/50 p-6 rounded-2xl text-left transition-all hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-900/10 flex flex-col h-full"
+                          >
+                              <div className="flex items-start justify-between mb-4">
+                                <div className={`w-12 h-12 rounded-xl bg-slate-950/50 border border-slate-800 flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                                    <mod.icon className={`w-6 h-6 ${mod.color}`} />
+                                </div>
+                                <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/10 p-1 rounded-full">
+                                    <ChevronRight size={16} className="text-white"/>
+                                </div>
+                              </div>
+                              <h3 className="text-lg font-bold text-white mb-1 group-hover:text-purple-300 transition-colors">{mod.label}</h3>
+                              <p className="text-sm text-slate-500 leading-relaxed">{mod.desc}</p>
+                          </button>
+                      ))}
+                  </div>
+              </div>
+          ) : (
+              // --- TOOL VIEW (Inline) ---
+              <div className="flex flex-col lg:flex-row h-full overflow-hidden relative z-10">
+                  {/* LEFT: CONTROLS */}
+                  <div className="w-full lg:w-[400px] bg-slate-950 border-r border-slate-800 flex flex-col h-full shadow-2xl z-20">
+                     <div className="p-6 border-b border-slate-800 bg-slate-900/50">
+                        <div className="flex items-center gap-3 text-white mb-1">
+                            {React.createElement(MODULES[activeModule].icon, { className: `w-5 h-5 ${MODULES[activeModule].color}` })}
+                            <span className="font-bold text-lg">{MODULES[activeModule].label}</span>
+                        </div>
+                        <p className="text-xs text-slate-500">{MODULES[activeModule].desc}</p>
+                     </div>
+
+                     <div className="p-6 flex-1 overflow-y-auto custom-scrollbar space-y-6">
+                         <div className="space-y-3">
+                             <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Entrada de Dados</label>
+                             <textarea 
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                placeholder={MODULES[activeModule].placeholder || "Descreva o produto ou cenário aqui..."}
+                                className="w-full h-40 bg-slate-900 border border-slate-700 rounded-xl p-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-purple-500 transition-colors resize-none text-sm leading-relaxed shadow-inner"
+                             />
+                         </div>
+
+                         {activeModule === 'generator' && (
+                             <>
+                                <CustomSelect label="Tom de Voz" value={tone} onChange={setTone} options={['Agressivo', 'Amigável', 'Urgente', 'Exclusivo']} />
+                                <CustomSelect label="Plataforma" value={platform} onChange={setPlatform} options={['FB Ads', 'Instagram', 'Google', 'TikTok']} />
+                             </>
+                         )}
+                         
+                         {activeModule === 'video_script' && (
+                             <CustomSelect label="Duração" value={videoDuration} onChange={setVideoDuration} options={['15s', '30s', '60s']} />
+                         )}
+                     </div>
+
+                     <div className="p-6 border-t border-slate-800 bg-slate-900/30">
+                        <button 
+                            onClick={handleGenerate}
+                            disabled={isGenerating || !input}
+                            className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-purple-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-2"
+                        >
+                            {isGenerating ? <Loader2 className="animate-spin w-5 h-5"/> : <Wand2 className="w-5 h-5"/>}
+                            {isGenerating ? 'HACKEANDO...' : 'GERAR AGORA'}
+                        </button>
+                     </div>
+                  </div>
+
+                  {/* RIGHT: PREVIEW */}
+                  <div className="flex-1 bg-transparent relative overflow-hidden flex flex-col">
+                      {/* Toolbar */}
+                      <div className="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-black/20 backdrop-blur-sm">
+                          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                            <Sparkles size={14} className="text-purple-500" /> Resultado Gerado
+                          </span>
+                          {result && (
+                              <button 
+                                onClick={() => navigator.clipboard.writeText(JSON.stringify(result, null, 2))}
+                                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs flex items-center gap-2 text-slate-300 transition-colors border border-white/5"
+                              >
+                                  <Copy className="w-3 h-3"/> Copiar
+                              </button>
+                          )}
+                      </div>
+
+                      {/* Content Area */}
+                      <div className="flex-1 p-8 overflow-y-auto custom-scrollbar flex items-start justify-center">
+                          {!result && !isGenerating && (
+                              <div className="text-center opacity-40 mt-20">
+                                  <MousePointerClick className="w-20 h-20 mx-auto mb-6 text-slate-500"/>
+                                  <p className="text-slate-300 font-medium text-lg">Aguardando comando...</p>
+                                  <p className="text-slate-600 text-sm mt-2">Preencha os dados ao lado e clique em Gerar</p>
+                              </div>
+                          )}
+
+                          {isGenerating && (
+                              <div className="text-center mt-20">
+                                   <div className="relative w-24 h-24 mx-auto mb-6">
+                                       <div className="absolute inset-0 border-4 border-white/5 rounded-full"></div>
+                                       <div className="absolute inset-0 border-4 border-t-purple-500 rounded-full animate-spin"></div>
+                                       <Zap className="absolute inset-0 m-auto text-purple-400 w-8 h-8 animate-pulse"/>
+                                   </div>
+                                   <p className="text-purple-300 font-bold animate-pulse">Inteligência Artificial trabalhando...</p>
+                              </div>
+                          )}
+
+                          {result && !isGenerating && (
+                              <div className="w-full max-w-4xl animate-in zoom-in-95 slide-in-from-bottom-5 duration-500 pb-20">
+                                  {result.type === 'image' ? (
+                                      <div className="bg-slate-900 border border-slate-700 p-3 rounded-2xl shadow-2xl inline-block">
+                                          <img src={result.url} className="max-w-full max-h-[600px] rounded-xl" />
+                                          <div className="mt-3 flex justify-between items-center px-2">
+                                              <span className="text-xs text-slate-500">Gerado com Gemini 2.5 Image</span>
+                                              <a href={result.url} download="dropai-img.png" className="text-white bg-purple-600 hover:bg-purple-500 px-3 py-1.5 rounded-lg text-xs font-bold flex gap-2 items-center transition-colors"><Download size={14}/> Baixar HD</a>
+                                          </div>
+                                      </div>
+                                  ) : (
+                                      <div className="space-y-6">
+                                          {/* Renderização Inteligente de JSON */}
+                                          {Object.entries(result).map(([key, value]: any, idx) => (
+                                              <div key={idx} className="bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-xl">
+                                                  <h3 className="text-sm font-bold text-purple-400 uppercase tracking-widest mb-4 border-b border-white/5 pb-2">{key.replace(/_/g, ' ')}</h3>
+                                                  {typeof value === 'object' ? (
+                                                      <pre className="text-sm text-slate-300 font-mono whitespace-pre-wrap">{JSON.stringify(value, null, 2)}</pre>
+                                                  ) : (
+                                                      <p className="text-slate-200 leading-relaxed whitespace-pre-wrap">{value}</p>
+                                                  )}
+                                              </div>
+                                          ))}
+                                      </div>
+                                  )}
+                              </div>
+                          )}
+                      </div>
+                  </div>
+              </div>
+          )}
       </main>
     </div>
   );
