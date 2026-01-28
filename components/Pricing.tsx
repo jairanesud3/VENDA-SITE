@@ -56,7 +56,14 @@ export const Pricing: React.FC = () => {
           <div className="reveal delay-100 p-8 rounded-3xl bg-slate-900/40 border border-slate-800 flex flex-col hover:border-slate-600 transition-colors backdrop-blur-sm">
             <div className="mb-6">
               <h3 className="text-xl font-semibold text-slate-400">INICIANTE</h3>
-              <div className="flex items-baseline gap-1 mt-4">
+              
+              {/* PREÇO PROMOCIONAL ANCORADO */}
+              <div className="mt-4 mb-1 text-sm text-slate-500 font-medium flex items-center gap-2">
+                <span>De <span className="line-through text-slate-600 decoration-slate-600">R$ 99,90</span></span>
+                <span className="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded-full border border-slate-700">50% OFF</span>
+              </div>
+              
+              <div className="flex items-baseline gap-1">
                 <span className="text-sm text-slate-500">R$</span>
                 <span className="text-4xl font-bold text-white">49,90</span>
                 <span className="text-slate-500">/mês</span>
@@ -94,7 +101,14 @@ export const Pricing: React.FC = () => {
                   <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 flex items-center gap-2">
                     ESCALA PRO <Zap className="w-4 h-4 text-yellow-400 fill-yellow-400 animate-pulse"/>
                   </h3>
-                  <div className="flex items-baseline gap-1 mt-4">
+                  
+                  {/* PREÇO PROMOCIONAL ANCORADO (DESTAQUE) */}
+                  <div className="mt-4 mb-1 flex items-center gap-2">
+                      <span className="text-sm text-slate-400 font-medium">De <span className="line-through text-red-400/70 decoration-red-500/50 decoration-2">R$ 299,90</span></span>
+                      <span className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-green-500/30 animate-pulse">OFERTA ESPECIAL</span>
+                  </div>
+
+                  <div className="flex items-baseline gap-1">
                     <span className="text-sm text-slate-500">R$</span>
                     <span className="text-5xl font-extrabold text-white tracking-tight">97,00</span>
                     <span className="text-slate-500">/mês</span>

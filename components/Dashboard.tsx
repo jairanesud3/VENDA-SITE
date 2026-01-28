@@ -9,6 +9,7 @@ import {
   Camera, Home, ChevronRight, Wand2, LucideIcon, Download
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
+import { generateCopy } from '@/app/actions/generate-copy';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -131,7 +132,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   // Formata o nome (ex: joao -> Joao)
   const formattedName = userName ? userName.charAt(0).toUpperCase() + userName.slice(1) : "Visitante";
 
-  // --- LÓGICA DA API (Funcional para TODOS os módulos) ---
+  // --- LÓGICA DA API ---
   const handleGenerate = async () => {
     if (!input) return;
     setIsGenerating(true);
@@ -139,10 +140,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     setError(null);
 
     try {
-        const apiKey = process.env.API_KEY;
-        if (!apiKey) throw new Error("API Key não encontrada.");
-        
-        const ai = new GoogleGenAI({ apiKey });
         let prompt = "";
         
         // Configuração dinâmica dos prompts
@@ -179,8 +176,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                 prompt = `Ajude com: ${input}`;
         }
 
-        // Execução da chamada
+        // --- DIVISÃO: IMAGEM (Client-Side) vs TEXTO (Server Action) ---
+        
         if (activeModule === 'studio') {
+             // Imagem continua no Client-side por enquanto para lidar com retorno binário mais facilmente
+             const apiKey = process.env.API_KEY;
+             if (!apiKey) throw new Error("API Key não encontrada.");
+             const ai = new GoogleGenAI({ apiKey });
+             
              const response = await ai.models.generateContent({
                  model: 'gemini-2.5-flash-image',
                  contents: { parts: [{ text: prompt }] },
@@ -189,14 +192,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
              const imgData = response.candidates?.[0]?.content?.parts?.find((p:any) => p.inlineData)?.inlineData?.data;
              if (imgData) setResult({ type: 'image', url: `data:image/png;base64,${imgData}`, prompt });
              else throw new Error("Falha ao gerar imagem.");
+        
         } else {
-            const response = await ai.models.generateContent({
-                model: 'gemini-3-flash-preview',
-                contents: prompt,
-                config: { responseMimeType: 'application/json' }
-            });
-            const text = response.text || "{}";
-            setResult(JSON.parse(text));
+            // Texto usa a nova Server Action
+            const text = await generateCopy(prompt);
+            if (text) {
+              try {
+                setResult(JSON.parse(text));
+              } catch (e) {
+                // Fallback caso a IA retorne algo que não é JSON puro (ex: Markdown code blocks)
+                const cleanText = text.replace(/```json/g, '').replace(/```/g, '');
+                setResult(JSON.parse(cleanText));
+              }
+            } else {
+              throw new Error("Nenhuma resposta da IA.");
+            }
         }
 
     } catch (err: any) {
