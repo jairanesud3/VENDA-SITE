@@ -1,1 +1,1 @@
-// FILE DEPRECATED - Migrated to Next.js
+// FILE CAN BE DELETED

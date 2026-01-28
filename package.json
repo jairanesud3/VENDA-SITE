@@ -2,8 +2,6 @@
   "name": "dropai-sales-hacker-tool",
   "version": "1.0.0",
   "private": true,
-  "main": "index.tsx",
-  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
