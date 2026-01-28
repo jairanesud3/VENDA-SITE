@@ -13,53 +13,56 @@ import { Footer } from '@/components/Footer';
 import { SupportWidget } from '@/components/SupportWidget';
 import { AlertCircle, X, ArrowRight } from 'lucide-react';
 
-// Componente isolado para lidar com Parâmetros de URL (Necessário para evitar erros de Build no Next.js)
+// Componente isolado para lidar com Parâmetros de URL
 const PaymentStatusNotification = () => {
   const searchParams = useSearchParams();
   const [isVisible, setIsVisible] = useState(false);
+  
+  // Extrai o valor para garantir que o efeito reaja à mudança
+  const canceled = searchParams.get('canceled');
 
   useEffect(() => {
-    if (searchParams.get('canceled') === 'true') {
+    // Verifica explicitamente se é 'true'
+    if (canceled === 'true') {
       setIsVisible(true);
-      // Opcional: Auto-fechar após 10 segundos
-      const timer = setTimeout(() => setIsVisible(false), 10000);
-      return () => clearTimeout(timer);
+      // Timer removido para garantir que o usuário veja a mensagem
     }
-  }, [searchParams]);
+  }, [canceled]);
 
   if (!isVisible) return null;
 
   return (
-    <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-md animate-in slide-in-from-top-10 fade-in duration-500">
-      <div className="bg-[#1a0b2e] border border-red-500/50 text-white p-5 rounded-xl shadow-2xl flex items-start gap-4 relative overflow-hidden backdrop-blur-md">
+    <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-md">
+      <div className="bg-[#1a0b2e] border-2 border-red-500/50 text-white p-5 rounded-xl shadow-[0_0_50px_rgba(239,68,68,0.4)] flex items-start gap-4 relative overflow-hidden backdrop-blur-xl">
+        
         {/* Barra lateral decorativa */}
         <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-red-500 to-pink-600"></div>
         
-        <div className="p-2.5 bg-red-500/10 rounded-full shrink-0 border border-red-500/20">
+        <div className="p-2.5 bg-red-500/20 rounded-full shrink-0 border border-red-500/30">
           <AlertCircle className="w-6 h-6 text-red-400" />
         </div>
         
         <div className="flex-1">
           <h3 className="font-bold text-red-100 text-sm uppercase tracking-wider mb-1 flex items-center gap-2">
-            Pagamento Pendente
+            Pagamento Não Concluído
           </h3>
-          <p className="text-slate-300 text-sm leading-relaxed mb-3">
-            Houve um problema ou você desistiu? Não deixe para depois o faturamento que você pode ter hoje. Sua vaga ainda está reservada.
+          <p className="text-slate-200 text-sm leading-relaxed mb-4 font-medium">
+            Parece que você não finalizou sua assinatura. Seus concorrentes já estão usando IA. Não fique para trás.
           </p>
           <button 
             onClick={() => {
               document.getElementById('pricing')?.scrollIntoView({behavior: 'smooth'});
               setIsVisible(false);
             }} 
-            className="text-white text-xs font-bold bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg transition-colors flex items-center gap-2 w-fit"
+            className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white text-sm font-bold py-2.5 rounded-lg transition-all shadow-lg shadow-red-900/40 flex items-center justify-center gap-2"
           >
-            Tentar Novamente <ArrowRight className="w-3 h-3" />
+            Voltar para Planos <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
         <button 
           onClick={() => setIsVisible(false)} 
-          className="text-slate-500 hover:text-white transition-colors absolute top-3 right-3"
+          className="text-slate-400 hover:text-white transition-colors absolute top-2 right-2 p-1 hover:bg-white/10 rounded-full"
         >
           <X size={18} />
         </button>
