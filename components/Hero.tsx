@@ -7,7 +7,7 @@ interface HeroProps {
 
 // Componente visual que simula o Dashboard na imagem
 const DashboardPreview = () => (
-  <div className="relative w-full max-w-4xl mx-auto mt-16 aspect-[16/10] bg-[#1a1033] border border-white/10 rounded-xl shadow-2xl shadow-purple-900/50 overflow-hidden flex flex-col animate-float group hover:shadow-[0_0_50px_rgba(147,51,234,0.3)] transition-all duration-500">
+  <div className="relative w-full max-w-4xl mx-auto mt-10 md:mt-12 aspect-[16/10] bg-[#1a1033] border border-white/10 rounded-xl shadow-2xl shadow-purple-900/50 overflow-hidden flex flex-col animate-float group hover:shadow-[0_0_50px_rgba(147,51,234,0.3)] transition-all duration-500">
     {/* Header Fake */}
     <div className="h-10 border-b border-white/5 bg-white/5 flex items-center px-4 gap-2">
       <div className="flex gap-1.5">
@@ -73,7 +73,7 @@ const Node = ({ icon: Icon, position, delay, color }: { icon: any, position: str
 
 export const Hero: React.FC<HeroProps> = ({ onLogin }) => {
   return (
-    <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden bg-hero-glow">
+    <section className="relative pt-24 pb-12 md:pt-32 md:pb-20 overflow-hidden bg-hero-glow">
       
       {/* Wave/Grid Background Pattern at bottom */}
       <div className="absolute bottom-0 left-0 w-full h-[300px] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay"></div>
@@ -81,8 +81,8 @@ export const Hero: React.FC<HeroProps> = ({ onLogin }) => {
 
       <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
         
-        {/* Badge Superior */}
-        <div className="reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-purple-200 text-xs font-medium mb-8 hover:bg-white/10 transition-colors cursor-default backdrop-blur-md animate-[bounce_2s_infinite]">
+        {/* Badge Superior - Reduzido margem inferior */}
+        <div className="reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-purple-200 text-xs font-medium mb-6 hover:bg-white/10 transition-colors cursor-default backdrop-blur-md animate-[bounce_2s_infinite]">
           <Sparkles className="w-3 h-3 text-purple-400" />
           <span>Nova IA V.2.0: Crie campanhas vencedoras sozinho</span>
         </div>
@@ -92,19 +92,22 @@ export const Hero: React.FC<HeroProps> = ({ onLogin }) => {
 
         {/* Título Principal */}
         <h1 className="reveal delay-100 relative text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 text-white drop-shadow-2xl">
-          Transforme Produtos<br/> em <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-green-400 drop-shadow-[0_0_25px_rgba(52,211,153,0.3)]">Dinheiro.</span> <br/>
-          <span className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 block mt-4 pb-2 drop-shadow-sm">
+          Transforme Produtos<br/> em <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-green-400 drop-shadow-[0_0_35px_rgba(52,211,153,0.5)]">Dinheiro.</span> <br/>
+          
+          {/* ATUALIZADO: Efeito Neon Roxo/Rosa */}
+          <span className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-purple-400 block mt-2 pb-2 drop-shadow-[0_0_35px_rgba(168,85,247,0.5)]">
             Anúncios Virais em 30 Segundos.
           </span>
         </h1>
 
-        <p className="reveal delay-200 text-lg md:text-xl text-slate-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+        {/* Reduzido margem inferior */}
+        <p className="reveal delay-200 text-lg md:text-xl text-slate-300 mb-8 max-w-2xl mx-auto leading-relaxed">
           A primeira Inteligência Artificial treinada exclusivamente para Vendas Online. 
           Gere <strong className="text-white">textos que convencem</strong> e <strong className="text-white">imagens ultrarrealistas</strong> do seu produto instantaneamente.
         </p>
 
-        {/* Botões CTA */}
-        <div className="reveal delay-300 flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 relative z-20">
+        {/* Botões CTA - Reduzido margem inferior */}
+        <div className="reveal delay-300 flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 relative z-20">
           <button 
             onClick={onLogin}
             className="group relative px-8 py-4 rounded-full bg-purple-600 text-white font-bold text-lg transition-all shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:shadow-[0_0_40px_rgba(147,51,234,0.6)] hover:-translate-y-1 w-full sm:w-auto overflow-hidden"
