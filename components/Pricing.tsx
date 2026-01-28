@@ -49,7 +49,7 @@ export const Pricing: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto items-start">
           
-          {/* PLANO 0 - GRATUITO (NOVO) */}
+          {/* PLANO 0 - GRATUITO */}
           <div className="reveal delay-100 p-6 md:p-8 rounded-3xl bg-slate-900/40 border border-slate-800 flex flex-col hover:border-slate-600 transition-colors backdrop-blur-sm order-2 md:order-1">
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-slate-400 uppercase tracking-widest">Teste Grátis</h3>
@@ -62,8 +62,8 @@ export const Pricing: React.FC = () => {
             </div>
             
             <ul className="space-y-4 mb-8 flex-1 text-sm">
-              <PricingItem text="5 Gerações de Texto / mês" />
-              <PricingItem text="2 Gerações de Imagem / mês" />
+              <PricingItem text="10 Gerações de Texto / mês" />
+              <PricingItem text="3 Gerações de Imagem / mês" />
               <PricingItem text="Acesso à IA Padrão" />
               <PricingItem text="Ferramentas Avançadas" included={false} />
               <PricingItem text="Suporte Humano" included={false} />
@@ -78,7 +78,7 @@ export const Pricing: React.FC = () => {
             </button>
           </div>
 
-          {/* PLANO 2 - ESCALA PRO (DESTAQUE - CENTRO) */}
+          {/* PLANO 2 - ESCALA PRO */}
           <div className="reveal delay-200 relative p-[2px] rounded-3xl overflow-hidden transform md:-translate-y-6 hover:scale-[1.02] transition-transform duration-300 shadow-2xl shadow-purple-900/30 order-1 md:order-2 z-10">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500 to-transparent animate-border-spin opacity-75"></div>
             
@@ -112,7 +112,7 @@ export const Pricing: React.FC = () => {
                   </li>
                   <PricingItem text="300 Gerações de Imagens" />
                   <PricingItem text="Modelos de Alta Velocidade" />
-                  <PricingItem text="Studio Product AI (Fotos HD)" />
+                  <PricingItem text="Studio Product AI (Alta Definição)" />
                   <PricingItem text="Suporte Prioritário WhatsApp" />
                 </ul>
 
