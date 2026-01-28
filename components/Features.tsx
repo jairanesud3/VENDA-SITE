@@ -2,20 +2,22 @@ import React from 'react';
 import { BrainCircuit, Camera, ShieldCheck, Zap, Layers, Globe2 } from 'lucide-react';
 
 const FeatureCard = ({ icon: Icon, title, description, delay, gradient }: any) => (
-  <div className={`reveal ${delay} group relative p-1 rounded-2xl bg-gradient-to-b ${gradient} hover:scale-[1.02] transition-transform duration-300`}>
-    <div className="absolute inset-0 bg-white/5 blur-xl opacity-0 group-hover:opacity-50 transition-opacity"></div>
-    <div className="relative h-full bg-[#130b24] rounded-xl p-8 border border-white/5 overflow-hidden">
+  <div className={`reveal ${delay} group relative p-1 rounded-2xl bg-gradient-to-b ${gradient} hover:scale-[1.05] transition-transform duration-300`}>
+    {/* Flashy Hover Border */}
+    <div className="absolute inset-0 bg-white/20 blur-xl opacity-0 group-hover:opacity-60 transition-opacity duration-500"></div>
+    
+    <div className="relative h-full bg-[#130b24] rounded-xl p-8 border border-white/5 overflow-hidden group-hover:border-purple-500/30 transition-colors">
       {/* Background Glow */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 blur-[50px] rounded-full group-hover:bg-purple-500/20 transition-all"></div>
+      <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 blur-[50px] rounded-full group-hover:bg-purple-500/30 transition-all duration-500"></div>
       
-      <div className="w-14 h-14 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-6 group-hover:bg-white/10 transition-colors">
+      <div className="w-14 h-14 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mb-6 group-hover:bg-purple-600 group-hover:border-purple-400 group-hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] transition-all duration-300 transform group-hover:-rotate-3">
         <Icon className="w-7 h-7 text-white" />
       </div>
       
       <h3 className="text-xl font-bold mb-3 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-purple-200 transition-all">
         {title}
       </h3>
-      <p className="text-slate-400 leading-relaxed text-sm">
+      <p className="text-slate-400 leading-relaxed text-sm group-hover:text-slate-300 transition-colors">
         {description}
       </p>
     </div>
@@ -31,7 +33,10 @@ export const Features: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-20 reveal">
           <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white">
-            Por que escolher o <span className="text-purple-400">DropAI</span>?
+            Por que escolher o <span className="text-purple-400 relative inline-block">
+              DropAI
+              <span className="absolute bottom-0 left-0 w-full h-1 bg-purple-500 rounded-full opacity-50 blur-sm"></span>
+            </span>?
           </h2>
           <p className="text-slate-400 max-w-2xl mx-auto text-lg">
             Nossa IA foi desenhada especificamente para substituir times inteiros de marketing por uma fração do custo.
