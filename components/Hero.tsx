@@ -92,8 +92,8 @@ export const Hero: React.FC<HeroProps> = ({ onLogin }) => {
 
         {/* Título Principal */}
         <h1 className="reveal delay-100 relative text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 text-white drop-shadow-2xl">
-          Transforme Produtos<br/> em <span className="bg-clip-text text-transparent bg-shimmer-gradient bg-[length:200%_auto] animate-text-shimmer">Dinheiro.</span> <br/>
-          <span className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 block mt-2">
+          Transforme Produtos<br/> em <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-green-400 drop-shadow-[0_0_25px_rgba(52,211,153,0.3)]">Dinheiro.</span> <br/>
+          <span className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-orange-500 to-yellow-500 block mt-4 pb-2 drop-shadow-sm">
             Anúncios Virais em 30 Segundos.
           </span>
         </h1>

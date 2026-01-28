@@ -51,7 +51,7 @@ export const SupportWidget: React.FC = () => {
       const ai = new GoogleGenAI({ apiKey: apiKey || '' });
       
       const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash',
+        model: 'gemini-3-flash-preview',
         contents: `
           CONTEXTO DO SISTEMA:
           Você é o assistente virtual de suporte do "DropAI" (DROPHACKER.AI).

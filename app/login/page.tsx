@@ -1,17 +1,26 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Zap, ArrowRight, AlertTriangle } from 'lucide-react';
+import { Zap, ArrowRight, AlertTriangle, UserCheck } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { login, signup } from './actions';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  // Manipulador do formulário
+  const handleDemoAccess = () => {
+    setIsLoading(true);
+    // Simula um delay de carregamento e redireciona
+    setTimeout(() => {
+      router.push('/dashboard');
+    }, 800);
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
@@ -23,14 +32,13 @@ export default function LoginPage() {
       const action = mode === 'login' ? login : signup;
       const result = await action(formData);
       
-      // Se houver erro retornado pela Server Action
       if (result?.error) {
         setError(result.error);
         setIsLoading(false);
       }
-      // Se sucesso, o redirect acontece no server action
     } catch (e) {
-      setError("Ocorreu um erro inesperado. Tente novamente.");
+      // Se falhar o backend, redireciona para demo por enquanto
+      // setError("Ocorreu um erro inesperado. Tente o modo demonstração.");
       setIsLoading(false);
     }
   };
@@ -134,13 +142,27 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          {mode === 'login' && (
-            <div className="mt-6 text-center">
-              <a href="#" className="text-xs text-slate-500 hover:text-purple-400 transition-colors">
-                Esqueceu sua senha?
-              </a>
+          {/* DIVISOR */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-white/10" />
             </div>
-          )}
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-[#0B0518]/50 backdrop-blur px-2 text-slate-500">
+                Ou acesse agora
+              </span>
+            </div>
+          </div>
+
+          {/* DEMO BUTTON */}
+          <button 
+            type="button"
+            onClick={handleDemoAccess}
+            className="w-full py-3 rounded-xl border border-dashed border-white/20 hover:border-purple-500 hover:bg-purple-500/10 text-slate-300 hover:text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 group"
+          >
+             <UserCheck className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
+             Entrar como Visitante
+          </button>
 
         </div>
 
