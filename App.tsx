@@ -8,6 +8,7 @@ import { Pricing } from './components/Pricing';
 import { FAQ } from './components/FAQ';
 import { Footer } from './components/Footer';
 import { Dashboard } from './components/Dashboard';
+import { SupportWidget } from './components/SupportWidget';
 
 // Simple Auth & Loader State Management
 function App() {
@@ -88,6 +89,8 @@ function App() {
         <FAQ />
       </main>
       <Footer />
+      {/* Widget Flutuante apenas na Landing Page */}
+      <SupportWidget />
     </div>
   );
 }
