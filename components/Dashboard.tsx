@@ -5,7 +5,8 @@ import {
   Search, Users, Calculator, Target, Megaphone, TrendingUp, 
   ShieldAlert, Menu, X, MessageSquare, MousePointerClick, 
   Camera, DollarSign, Clock, Hash, Smartphone, MapPin, 
-  BarChart2, PieChart, ArrowRight, CheckCircle2, ThumbsUp, ThumbsDown
+  BarChart2, PieChart, ArrowRight, CheckCircle2, ThumbsUp, ThumbsDown,
+  ChevronDown, Check
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 
@@ -31,6 +32,70 @@ interface ModuleConfig {
   isTool?: boolean;
 }
 
+// --- COMPONENTE CUSTOM SELECT (DROPDOWN PROFISSIONAL) ---
+interface CustomSelectProps {
+  value: string;
+  onChange: (val: string) => void;
+  options: string[];
+  icon?: any;
+  label?: string;
+  placeholder?: string;
+}
+
+const CustomSelect: React.FC<CustomSelectProps> = ({ value, onChange, options, icon: Icon, label, placeholder }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Fecha ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative w-full" ref={containerRef}>
+      {label && <label className="text-[11px] font-black text-slate-500 uppercase mb-2 block tracking-wider">{label}</label>}
+      
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-full bg-slate-950 border-2 ${isOpen ? 'border-purple-500' : 'border-slate-700'} rounded-xl p-3 flex items-center justify-between text-left transition-all hover:border-purple-500/50 group`}
+      >
+        <div className="flex items-center gap-2 overflow-hidden">
+          {Icon && <Icon size={16} className={`text-slate-400 group-hover:text-purple-400 transition-colors`} />}
+          <span className={`text-sm font-bold truncate ${value ? 'text-white' : 'text-slate-500'}`}>
+            {value || placeholder || "Selecione..."}
+          </span>
+        </div>
+        <ChevronDown size={16} className={`text-slate-500 transition-transform duration-300 ${isOpen ? 'rotate-180 text-purple-500' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 w-full mt-2 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-[100] max-h-60 overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200">
+          <div className="p-1">
+            {options.map((option, idx) => (
+              <button
+                key={idx}
+                onClick={() => { onChange(option); setIsOpen(false); }}
+                className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-between group
+                  ${value === option ? 'bg-purple-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}
+                `}
+              >
+                {option}
+                {value === option && <Check size={14} className="text-white" />}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [activeModule, setActiveModule] = useState<ModuleId>('generator');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -52,7 +117,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
   const [videoStyle, setVideoStyle] = useState('Viral/Curiosidade');
 
   // Studio AI
-  const [imageStyle, setImageStyle] = useState('Estúdio Luxuoso');
+  const [imageStyle, setImageStyle] = useState('Estúdio Luxuoso (Fundo Infinito)');
 
   // Calculadora ROAS (ESTADO ESPECÍFICO)
   const [roasProductName, setRoasProductName] = useState(''); 
@@ -336,7 +401,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                 </div>
              </div>
              
-             <div className="grid md:grid-cols-2 gap-6">
+             <div className="grid md:grid-cols-2 gap-6 z-20 relative">
                 <div>
                    <label className="text-[11px] font-black text-slate-500 uppercase mb-3 block">Duração</label>
                    <div className="flex bg-slate-950 p-1.5 rounded-xl border border-slate-800 gap-1">
@@ -348,19 +413,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                    </div>
                 </div>
                 <div>
-                   <label className="text-[11px] font-black text-slate-500 uppercase mb-3 block">Estilo</label>
-                   <div className="relative">
-                     <select value={videoStyle} onChange={e => setVideoStyle(e.target.value)} className="w-full bg-slate-950 border-2 border-slate-700 rounded-xl p-3 text-white text-sm font-bold focus:outline-none focus:border-cyan-500 appearance-none">
-                        <option>Viral/Curiosidade</option>
-                        <option>Unboxing ASMR</option>
-                        <option>Depoimento (UGC)</option>
-                        <option>Polêmico</option>
-                     </select>
-                     <ArrowRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none rotate-90" />
-                   </div>
+                   {/* Custom Select para Estilo */}
+                   <CustomSelect 
+                     label="Estilo do Vídeo"
+                     value={videoStyle}
+                     onChange={setVideoStyle}
+                     options={['Viral/Curiosidade', 'Unboxing ASMR', 'Depoimento (UGC)', 'Polêmico', 'Tutorial Rápido', 'Humor/Meme']}
+                   />
                 </div>
              </div>
-             <button onClick={handleGenerate} disabled={isGenerating || !mainInput} className="w-full py-5 bg-cyan-600 hover:bg-cyan-500 rounded-2xl font-black text-white text-lg shadow-[0_10px_20px_rgba(8,145,178,0.4)] hover:-translate-y-1 transition-all flex items-center justify-center gap-3 uppercase tracking-wide mt-4">
+             <button onClick={handleGenerate} disabled={isGenerating || !mainInput} className="w-full py-5 bg-cyan-600 hover:bg-cyan-500 rounded-2xl font-black text-white text-lg shadow-[0_10px_20px_rgba(8,145,178,0.4)] hover:-translate-y-1 transition-all flex items-center justify-center gap-3 uppercase tracking-wide mt-4 relative z-10">
                 {isGenerating ? <Loader2 className="animate-spin w-6 h-6"/> : <Zap className="w-6 h-6"/>} GERAR ROTEIRO VIRAL
              </button>
           </div>
@@ -381,18 +443,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                         className="w-full bg-slate-950 border-2 border-slate-700 rounded-2xl p-4 text-white focus:border-pink-500 focus:outline-none resize-none h-32 text-lg font-medium transition-all"
                       />
                     </div>
-                    <div>
-                      <label className="text-[11px] font-black text-slate-500 uppercase mb-3 block">Estilo de Fotografia</label>
-                      <div className="relative">
-                        <select value={imageStyle} onChange={e => setImageStyle(e.target.value)} className="w-full bg-slate-950 border-2 border-slate-700 rounded-xl p-3 text-white text-sm font-bold focus:outline-none focus:border-pink-500 appearance-none">
-                          <option>Estúdio Luxuoso (Fundo Infinito)</option>
-                          <option>Minimalista/Clean (Apple Style)</option>
-                          <option>Natureza/Outdoor (Lifestyle)</option>
-                          <option>Neon/Cyberpunk (Gamer)</option>
-                          <option>Caseiro (UGC Realista)</option>
-                        </select>
-                         <Camera className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-pink-500 pointer-events-none" />
-                      </div>
+                    <div className="relative z-20">
+                      <CustomSelect 
+                        label="Estilo de Fotografia"
+                        value={imageStyle}
+                        onChange={setImageStyle}
+                        options={[
+                          'Estúdio Luxuoso (Fundo Infinito)', 
+                          'Minimalista/Clean (Apple Style)', 
+                          'Natureza/Outdoor (Lifestyle)', 
+                          'Neon/Cyberpunk (Gamer)', 
+                          'Caseiro (UGC Realista)',
+                          'Cinemático (Dramatic Lighting)'
+                        ]}
+                        icon={Camera}
+                      />
                     </div>
                  </div>
 
@@ -422,7 +487,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
                  </div>
               </div>
 
-              <button onClick={handleGenerate} disabled={isGenerating || (!mainInput && !capturedImage)} className="w-full py-5 bg-pink-600 hover:bg-pink-500 rounded-2xl font-black text-white text-lg shadow-[0_10px_20px_rgba(219,39,119,0.4)] hover:-translate-y-1 transition-all flex items-center justify-center gap-3 uppercase tracking-wide">
+              <button onClick={handleGenerate} disabled={isGenerating || (!mainInput && !capturedImage)} className="w-full py-5 bg-pink-600 hover:bg-pink-500 rounded-2xl font-black text-white text-lg shadow-[0_10px_20px_rgba(219,39,119,0.4)] hover:-translate-y-1 transition-all flex items-center justify-center gap-3 uppercase tracking-wide relative z-10">
                 {isGenerating ? <Loader2 className="animate-spin w-6 h-6"/> : <Sparkles className="w-6 h-6"/>} GERAR CONCEITOS VISUAIS
              </button>
           </div>
@@ -432,18 +497,26 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout }) => {
       default:
         return (
           <div className="bg-slate-900 border-2 border-slate-800 p-8 rounded-3xl shadow-2xl animate-fade-in relative">
-             <div className="flex flex-col md:flex-row gap-4 mb-6">
-                <div className="bg-slate-950 px-4 py-2 rounded-xl border-2 border-slate-800 flex items-center gap-3 flex-1">
-                   <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">TOM DE VOZ</span>
-                   <select value={tone} onChange={e => setTone(e.target.value)} className="bg-transparent text-white text-sm font-bold focus:outline-none cursor-pointer w-full"><option>Agressivo (Venda Direta)</option><option>Amigável (Influencer)</option><option>Profissional (B2B)</option></select>
+             <div className="flex flex-col md:flex-row gap-4 mb-6 z-20 relative">
+                <div className="flex-1">
+                   <CustomSelect 
+                      label="TOM DE VOZ"
+                      value={tone}
+                      onChange={setTone}
+                      options={['Agressivo (Venda Direta)', 'Amigável (Influencer)', 'Profissional (B2B)', 'Urgente (Escassez)', 'Humorado (Meme)']}
+                   />
                 </div>
-                <div className="bg-slate-950 px-4 py-2 rounded-xl border-2 border-slate-800 flex items-center gap-3 flex-1">
-                   <span className="text-[10px] text-slate-500 uppercase font-black tracking-widest">PLATAFORMA</span>
-                   <select value={platform} onChange={e => setPlatform(e.target.value)} className="bg-transparent text-white text-sm font-bold focus:outline-none cursor-pointer w-full"><option>Facebook / Instagram Ads</option><option>TikTok Ads</option><option>Google Ads</option></select>
+                <div className="flex-1">
+                   <CustomSelect 
+                      label="PLATAFORMA"
+                      value={platform}
+                      onChange={setPlatform}
+                      options={['Facebook / Instagram Ads', 'TikTok Ads', 'Google Ads', 'YouTube Shorts', 'E-mail Marketing']}
+                   />
                 </div>
              </div>
 
-             <div className="flex flex-col md:flex-row gap-6">
+             <div className="flex flex-col md:flex-row gap-6 relative z-10">
                 <textarea 
                   value={mainInput} 
                   onChange={e => setMainInput(e.target.value)} 
