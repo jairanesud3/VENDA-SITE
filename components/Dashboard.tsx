@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Settings, LogOut, Sparkles, Copy, 
   Image as ImageIcon, Zap, Loader2, Video, 
@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { generateCopy } from '@/app/actions/generate-copy';
+import { createClient } from '@/utils/supabase/client';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -31,7 +32,7 @@ interface ModuleConfig {
   color: string;
   desc: string;
   placeholder?: string;
-  isPremium?: boolean; // Novo flag para plano gratuito
+  isPremium?: boolean;
 }
 
 const MODULES: Record<string, ModuleConfig> = {
@@ -107,12 +108,13 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
 
 export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => {
   const [activeModule, setActiveModule] = useState<ModuleId>('home');
-  const [sidebarOpen, setSidebarOpen] = useState(true); // Desktop state
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Mobile state
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  // Simulação de Plano do Usuário (Troque para 'pro' para testar a versão paga)
+  // SEGURANÇA: State inicial sempre 'free'. Só muda se o backend confirmar.
   const [userPlan, setUserPlan] = useState<'free' | 'pro'>('free'); 
-  
+  const [isLoadingPlan, setIsLoadingPlan] = useState(true);
+
   // State for Generation
   const [input, setInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -127,7 +129,35 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const userName = userEmail ? userEmail.split('@')[0] : null;
   const formattedName = userName ? userName.charAt(0).toUpperCase() + userName.slice(1) : "Visitante";
 
-  // Verifica se o módulo atual está bloqueado para o plano
+  // Sincronização Segura de Plano
+  useEffect(() => {
+    const fetchUserPlan = async () => {
+        try {
+            const supabase = createClient();
+            const { data: { user } } = await supabase.auth.getUser();
+            
+            // Verifica metadata do Supabase (source of truth)
+            if (user?.user_metadata?.plan === 'pro') {
+                setUserPlan('pro');
+            } else {
+                setUserPlan('free');
+            }
+        } catch (e) {
+            console.error("Erro ao verificar plano", e);
+            setUserPlan('free');
+        } finally {
+            setIsLoadingPlan(false);
+        }
+    };
+    fetchUserPlan();
+  }, []);
+
+  const handleUpgrade = () => {
+    // Redireciona para o checkout real
+    // Em produção, isso chamaria /api/stripe/checkout
+    window.open('https://buy.stripe.com/test_seu_link_aqui', '_blank');
+  };
+
   const isModuleLocked = MODULES[activeModule].isPremium && userPlan === 'free';
 
   // --- LÓGICA DA API ---
@@ -146,7 +176,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
 
     try {
         let prompt = "";
-        
+        const moduleId = activeModule; // Passar ID para o backend validar permissão
+
+        // Prompt construction logic remains the same...
         switch (activeModule) {
             case 'generator':
                 prompt = `Atue como um Copywriter Sênior. Crie 3 opções de Copy para Anúncio do produto: "${input}". 
@@ -185,6 +217,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
              if (!apiKey) throw new Error("API Key não encontrada.");
              const ai = new GoogleGenAI({ apiKey });
              
+             // Client-side image gen calls should also be secured via a Next.js API route proxy in production
+             // For now, we rely on the component conditional rendering, but real security is in `generateCopy` action
              const response = await ai.models.generateContent({
                  model: 'gemini-2.5-flash-image',
                  contents: { parts: [{ text: prompt }] },
@@ -195,8 +229,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
              else throw new Error("Falha ao gerar imagem.");
         
         } else {
-            // Server Action para texto
-            const text = await generateCopy(prompt);
+            // CHAMADA SEGURA AO SERVIDOR
+            // Agora passamos o moduleId para validar permissões no backend
+            const text = await generateCopy(prompt, activeModule);
+            
             if (text) {
               try {
                 setResult(JSON.parse(text));
@@ -211,7 +247,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
 
     } catch (err: any) {
         console.error(err);
-        setError("Erro ao processar. Tente novamente.");
+        if (err.message.includes("Upgrade required")) {
+            setError("🔒 ACESSO NEGADO: Este recurso é exclusivo para membros PRO. Faça o upgrade.");
+        } else {
+            setError("Erro ao processar. Tente novamente.");
+        }
     } finally {
         setIsGenerating(false);
     }
@@ -299,21 +339,25 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
             {/* User Plan Badge */}
             {sidebarOpen && (
                 <div className="px-6 pt-6 pb-2">
-                    <div className={`rounded-xl p-3 border ${userPlan === 'free' ? 'bg-slate-900 border-slate-700' : 'bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border-purple-500/30'}`}>
-                        <div className="flex justify-between items-center mb-1">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Plano Atual</span>
-                            {userPlan === 'free' ? 
-                                <span className="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-300">Grátis</span> :
-                                <span className="text-[10px] bg-purple-500 text-white px-1.5 py-0.5 rounded font-bold flex items-center gap-1"><Zap size={8} fill="white"/> PRO</span>
-                            }
+                    {isLoadingPlan ? (
+                        <div className="h-16 w-full bg-slate-900 rounded-xl animate-pulse"></div>
+                    ) : (
+                        <div className={`rounded-xl p-3 border ${userPlan === 'free' ? 'bg-slate-900 border-slate-700' : 'bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border-purple-500/30'}`}>
+                            <div className="flex justify-between items-center mb-1">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Plano Atual</span>
+                                {userPlan === 'free' ? 
+                                    <span className="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-300">Grátis</span> :
+                                    <span className="text-[10px] bg-purple-500 text-white px-1.5 py-0.5 rounded font-bold flex items-center gap-1"><Zap size={8} fill="white"/> PRO</span>
+                                }
+                            </div>
+                            <div className="text-xs font-bold text-white mb-2">{userPlan === 'free' ? 'Visitante' : 'Membro VIP'}</div>
+                            {userPlan === 'free' && (
+                                <button onClick={handleUpgrade} className="w-full py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-bold rounded transition-colors shadow-lg">
+                                    Fazer Upgrade
+                                </button>
+                            )}
                         </div>
-                        <div className="text-xs font-bold text-white mb-2">{userPlan === 'free' ? 'Visitante' : 'Membro VIP'}</div>
-                        {userPlan === 'free' && (
-                            <button onClick={() => setUserPlan('pro')} className="w-full py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-bold rounded transition-colors">
-                                Fazer Upgrade
-                            </button>
-                        )}
-                    </div>
+                    )}
                 </div>
             )}
 
@@ -416,7 +460,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                  </div>
                                  <h3 className="font-bold text-white mb-1">Recurso Premium</h3>
                                  <p className="text-xs text-slate-400 mb-4 max-w-[200px]">Atualize para o plano PRO para desbloquear o {MODULES[activeModule].label}.</p>
-                                 <button onClick={() => setUserPlan('pro')} className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg text-white text-xs font-bold shadow-lg shadow-purple-900/30 hover:scale-105 transition-transform">
+                                 <button onClick={handleUpgrade} className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg text-white text-xs font-bold shadow-lg shadow-purple-900/30 hover:scale-105 transition-transform">
                                      Desbloquear Agora
                                  </button>
                              </div>
