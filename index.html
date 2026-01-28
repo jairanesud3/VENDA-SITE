@@ -1,158 +1,19 @@
-<!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DropAI - Venda Mais Online com IA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              brand: {
-                dark: '#0B0518',   // Fundo principal (Deep Purple)
-                primary: '#6D28D9', // Roxo vibrante
-                secondary: '#A855F7', // Roxo claro/Lilás
-                surface: '#1E1236', // Superfícies de cards
-                glass: 'rgba(255, 255, 255, 0.05)',
-              }
-            },
-            fontFamily: {
-              sans: ['Outfit', 'sans-serif'],
-            },
-            animation: {
-              'float': 'float 6s ease-in-out infinite',
-              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-              'glow': 'glow 3s ease-in-out infinite alternate',
-              'blob': 'blob 7s infinite',
-              'text-shimmer': 'text-shimmer 2.5s ease-out infinite alternate',
-              'border-spin': 'border-spin 4s linear infinite',
-              'ripple': 'ripple 1.5s cubic-bezier(0, 0.2, 0.8, 1) infinite',
-              'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
-            },
-            keyframes: {
-              float: {
-                '0%, 100%': { transform: 'translateY(0)' },
-                '50%': { transform: 'translateY(-15px)' },
-              },
-              glow: {
-                '0%': { boxShadow: '0 0 10px rgba(168, 85, 247, 0.2)' },
-                '100%': { boxShadow: '0 0 30px rgba(168, 85, 247, 0.6)' },
-              },
-              blob: {
-                '0%': { transform: 'translate(0px, 0px) scale(1)' },
-                '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
-                '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
-                '100%': { transform: 'translate(0px, 0px) scale(1)' },
-              },
-              'text-shimmer': {
-                '0%': { backgroundPosition: '0% 50%' },
-                '100%': { backgroundPosition: '100% 50%' },
-              },
-              'border-spin': {
-                '0%': { transform: 'rotate(0deg)' },
-                '100%': { transform: 'rotate(360deg)' },
-              },
-              'ripple': {
-                '0%': { transform: 'scale(0.9)', opacity: '1' },
-                '100%': { transform: 'scale(2)', opacity: '0' },
-              },
-              shake: {
-                '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
-                '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
-                '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
-                '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
-              }
-            },
-            backgroundImage: {
-              'hero-glow': 'radial-gradient(ellipse at top center, #581c87 0%, #0B0518 60%)',
-              'card-gradient': 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)',
-              'shimmer-gradient': 'linear-gradient(90deg, #A855F7 0%, #F472B6 25%, #A855F7 50%, #F472B6 75%, #A855F7 100%)',
-            }
-          }
-        }
-      }
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-      body { 
-        font-family: 'Outfit', sans-serif; 
-        background-color: #0B0518;
-        color: white;
-      }
-      
-      /* Animation Utilities */
-      .reveal {
-        opacity: 0;
-        transform: translateY(30px);
-        transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
-      }
-      
-      .reveal.active {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      .delay-100 { transition-delay: 100ms; }
-      .delay-200 { transition-delay: 200ms; }
-      .delay-300 { transition-delay: 300ms; }
-
-      /* Wave Pattern Background */
-      .wave-bg {
-        background-image: repeating-linear-gradient(
-          -45deg,
-          transparent,
-          transparent 20px,
-          rgba(168, 85, 247, 0.03) 20px,
-          rgba(168, 85, 247, 0.03) 40px
-        );
-      }
-
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #0B0518;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #3b0764;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #581c87;
-      }
-      
-      /* Remove arrows from number inputs */
-      input[type=number]::-webkit-inner-spin-button, 
-      input[type=number]::-webkit-outer-spin-button { 
-        -webkit-appearance: none; 
-        margin: 0; 
-      }
-      input[type=number] {
-        -moz-appearance: textfield;
-      }
-    </style>
 <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.2.4",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "@google/genai": "https://esm.sh/@google/genai",
-    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
-    "next/": "https://esm.sh/next@^16.1.6/",
     "@supabase/ssr": "https://esm.sh/@supabase/ssr@^0.8.0",
-    "next": "https://esm.sh/next@^16.1.6"
+    "next/": "https://esm.sh/next@^16.1.6/",
+    "next": "https://esm.sh/next@^16.1.6",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0"
   }
 }
 </script>
-</head>
-  <body class="bg-[#0B0518] text-white overflow-x-hidden antialiased selection:bg-purple-500 selection:text-white">
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
-  </body>
-</html>
+<!-- 
+  FILE DEPRECATED 
+  This project has been migrated to Next.js App Router.
+  Please use app/layout.tsx and app/page.tsx instead.
+-->
