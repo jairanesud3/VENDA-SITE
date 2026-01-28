@@ -12,6 +12,7 @@ import {
 import { GoogleGenAI } from "@google/genai";
 import { generateCopy } from '@/app/actions/generate-copy';
 import { createClient } from '@/utils/supabase/client';
+import { useRouter } from 'next/navigation';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -110,6 +111,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const [activeModule, setActiveModule] = useState<ModuleId>('home');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const router = useRouter();
   
   // SEGURANÇA: State inicial sempre 'free'. Só muda se o backend confirmar.
   const [userPlan, setUserPlan] = useState<'free' | 'pro'>('free'); 
@@ -120,9 +122,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
-  // State for Checkout/Upgrade
-  const [isUpgrading, setIsUpgrading] = useState(false);
   
   // Options State
   const [tone, setTone] = useState('Agressivo');
@@ -155,30 +154,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     fetchUserPlan();
   }, []);
 
-  const handleUpgrade = async () => {
-    setIsUpgrading(true);
-    try {
-        // Chama a API de Checkout Segura do Backend
-        const response = await fetch('/api/stripe/checkout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ plan: 'pro' }), // Dashboard sempre leva pro plano PRO
-        });
-        
-        const data = await response.json();
-        
-        if (data.url) {
-            window.location.href = data.url;
-        } else {
-            console.error("Erro no checkout:", data.error);
-            alert("Erro ao iniciar pagamento. Tente novamente mais tarde.");
-        }
-    } catch (e) {
-        console.error("Erro de conexão:", e);
-        alert("Erro de conexão com o servidor de pagamento.");
-    } finally {
-        setIsUpgrading(false);
-    }
+  const handleUpgradeClick = () => {
+    router.push('/plans');
   };
 
   const isModuleLocked = MODULES[activeModule].isPremium && userPlan === 'free';
@@ -376,11 +353,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                             <div className="text-xs font-bold text-white mb-2">{userPlan === 'free' ? 'Visitante' : 'Membro VIP'}</div>
                             {userPlan === 'free' && (
                                 <button 
-                                    onClick={handleUpgrade} 
-                                    disabled={isUpgrading}
-                                    className="w-full py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-bold rounded transition-colors shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-wait"
+                                    onClick={handleUpgradeClick} 
+                                    className="w-full py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-bold rounded transition-colors shadow-lg flex items-center justify-center gap-2"
                                 >
-                                    {isUpgrading ? <Loader2 className="w-3 h-3 animate-spin"/> : 'Fazer Upgrade'}
+                                    Fazer Upgrade
                                 </button>
                             )}
                         </div>
@@ -488,11 +464,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                  <h3 className="font-bold text-white mb-1">Recurso Premium</h3>
                                  <p className="text-xs text-slate-400 mb-4 max-w-[200px]">Atualize para o plano PRO para desbloquear o {MODULES[activeModule].label}.</p>
                                  <button 
-                                     onClick={handleUpgrade}
-                                     disabled={isUpgrading}
-                                     className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg text-white text-xs font-bold shadow-lg shadow-purple-900/30 hover:scale-105 transition-transform flex items-center gap-2 disabled:opacity-50 disabled:cursor-wait"
+                                     onClick={handleUpgradeClick}
+                                     className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg text-white text-xs font-bold shadow-lg shadow-purple-900/30 hover:scale-105 transition-transform flex items-center gap-2"
                                  >
-                                     {isUpgrading ? <Loader2 className="w-4 h-4 animate-spin"/> : 'Desbloquear Agora'}
+                                     Desbloquear Agora
                                  </button>
                              </div>
                          )}
