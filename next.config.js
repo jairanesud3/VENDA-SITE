@@ -6,6 +6,7 @@ const nextConfig = {
   // directly in the browser, replicating the behavior of the previous Vite app.
   env: {
     API_KEY: process.env.API_KEY,
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   },
   images: {
     domains: [

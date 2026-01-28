@@ -12,8 +12,8 @@ export async function generateCopy(prompt: string) {
 
   const ai = new GoogleGenAI({ apiKey });
 
-  // TENTATIVA 1: Modelo Principal (gemini-2.0-flash-lite)
   try {
+    // Uso exclusivo do modelo Gemini 2.0 Flash Lite conforme solicitado
     const response = await ai.models.generateContent({
       model: 'gemini-2.0-flash-lite', 
       contents: prompt,
@@ -25,24 +25,8 @@ export async function generateCopy(prompt: string) {
     if (!response.text) throw new Error("Resposta vazia do modelo 2.0");
     return response.text;
 
-  } catch (primaryError: any) {
-    console.warn("⚠️ Aviso: Falha no Gemini 2.0 Flash Lite. Tentando fallback...", primaryError.message);
-
-    // TENTATIVA 2: Fallback (gemini-1.5-flash)
-    try {
-      const responseFallback = await ai.models.generateContent({
-        model: 'gemini-1.5-flash',
-        contents: prompt,
-        config: {
-          responseMimeType: 'application/json'
-        }
-      });
-
-      return responseFallback.text;
-    } catch (fallbackError: any) {
-      console.error("❌ Erro Fatal: Ambos os modelos falharam.", fallbackError);
-      // Retorna o erro original ou o do fallback para o frontend
-      throw new Error(`Falha na IA (Tentativas esgotadas): ${fallbackError.message}`);
-    }
+  } catch (error: any) {
+    console.error("❌ Erro no Gemini 2.0 Flash Lite:", error);
+    throw new Error(`Falha na IA (Gemini 2.0): ${error.message}`);
   }
 }

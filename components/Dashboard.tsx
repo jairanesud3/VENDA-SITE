@@ -170,7 +170,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
         }
         
         if (activeModule === 'studio') {
-             const apiKey = process.env.API_KEY;
+             // UPDATE: Suporte para GEMINI_API_KEY no cliente
+             const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
              if (!apiKey) throw new Error("API Key não encontrada.");
              const ai = new GoogleGenAI({ apiKey });
              

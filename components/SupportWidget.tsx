@@ -39,20 +39,18 @@ export const SupportWidget: React.FC = () => {
     setIsTyping(true);
 
     try {
-      // SEGURANÇA: Chave obtida via variável de ambiente
-      const apiKey = process.env.API_KEY;
+      // SEGURANÇA: Chave obtida via variável de ambiente (Suporte para GEMINI_API_KEY)
+      const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
 
       if (!apiKey) {
-         setMessages(prev => [...prev, { role: 'model', text: "⚠️ Ops! A chave da API não está configurada. Por favor, adicione sua API_KEY no arquivo .env para que eu possa funcionar." }]);
+         setMessages(prev => [...prev, { role: 'model', text: "⚠️ Ops! A chave da API não está configurada. Por favor, adicione sua GEMINI_API_KEY no arquivo .env para que eu possa funcionar." }]);
          setIsTyping(false);
          return;
       }
       
-      const ai = new GoogleGenAI({ apiKey: apiKey || '' });
+      const ai = new GoogleGenAI({ apiKey });
       
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: `
+      const prompt = `
           CONTEXTO DO SISTEMA:
           Você é o assistente virtual de suporte do "DropAI" (DROPHACKER.AI).
           O DropAI é uma ferramenta SaaS que cria anúncios, copy e imagens para dropshipping e e-commerce usando IA.
@@ -67,17 +65,47 @@ export const SupportWidget: React.FC = () => {
           Se perguntarem sobre suporte humano, direcione para o botão do WhatsApp.
           
           PERGUNTA DO USUÁRIO: "${userMsg}"
-        `,
-        config: {
-          temperature: 0.6,
-          maxOutputTokens: 150,
-        }
-      });
+      `;
 
-      const text = response.text || "Desculpe, tive um lapso de conexão. Pode repetir?";
+      let text = "";
+
+      try {
+        // TENTATIVA 1: Modelo Principal (gemini-2.0-flash-lite)
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.0-flash-lite',
+            contents: prompt,
+            config: {
+                temperature: 0.6,
+                maxOutputTokens: 150,
+            }
+        });
+        text = response.text || "";
+
+      } catch (errPrimary: any) {
+        console.warn("⚠️ Falha no Gemini 2.0 Flash Lite (Chatbot). Tentando fallback...", errPrimary);
+        
+        try {
+            // TENTATIVA 2: Fallback (gemini-1.5-flash)
+            const responseFallback = await ai.models.generateContent({
+                model: 'gemini-1.5-flash',
+                contents: prompt,
+                config: {
+                    temperature: 0.6,
+                    maxOutputTokens: 150,
+                }
+            });
+            text = responseFallback.text || "";
+        } catch (errFallback) {
+             console.error("❌ Erro Fatal no Chatbot:", errFallback);
+             text = "Desculpe, estou enfrentando instabilidade técnica momentânea. Tente novamente em instantes.";
+        }
+      }
+      
+      if (!text) text = "Não consegui gerar uma resposta. Tente reformular sua pergunta.";
+
       setMessages(prev => [...prev, { role: 'model', text: text }]);
     } catch (error) {
-      console.error("Erro no chat:", error);
+      console.error("Erro geral no chat:", error);
       setMessages(prev => [...prev, { role: 'model', text: "Estou com dificuldade de conexão agora. Verifique sua internet ou tente recarregar." }]);
     } finally {
       setIsTyping(false);
