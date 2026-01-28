@@ -121,6 +121,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const [result, setResult] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
   
+  // State for Checkout/Upgrade
+  const [isUpgrading, setIsUpgrading] = useState(false);
+  
   // Options State
   const [tone, setTone] = useState('Agressivo');
   const [platform, setPlatform] = useState('FB Ads');
@@ -152,10 +155,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     fetchUserPlan();
   }, []);
 
-  const handleUpgrade = () => {
-    // Redireciona para o checkout real
-    // Em produção, isso chamaria /api/stripe/checkout
-    window.open('https://buy.stripe.com/test_seu_link_aqui', '_blank');
+  const handleUpgrade = async () => {
+    setIsUpgrading(true);
+    try {
+        // Chama a API de Checkout Segura do Backend
+        const response = await fetch('/api/stripe/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ plan: 'pro' }), // Dashboard sempre leva pro plano PRO
+        });
+        
+        const data = await response.json();
+        
+        if (data.url) {
+            window.location.href = data.url;
+        } else {
+            console.error("Erro no checkout:", data.error);
+            alert("Erro ao iniciar pagamento. Tente novamente mais tarde.");
+        }
+    } catch (e) {
+        console.error("Erro de conexão:", e);
+        alert("Erro de conexão com o servidor de pagamento.");
+    } finally {
+        setIsUpgrading(false);
+    }
   };
 
   const isModuleLocked = MODULES[activeModule].isPremium && userPlan === 'free';
@@ -352,8 +375,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                             </div>
                             <div className="text-xs font-bold text-white mb-2">{userPlan === 'free' ? 'Visitante' : 'Membro VIP'}</div>
                             {userPlan === 'free' && (
-                                <button onClick={handleUpgrade} className="w-full py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-bold rounded transition-colors shadow-lg">
-                                    Fazer Upgrade
+                                <button 
+                                    onClick={handleUpgrade} 
+                                    disabled={isUpgrading}
+                                    className="w-full py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-bold rounded transition-colors shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-wait"
+                                >
+                                    {isUpgrading ? <Loader2 className="w-3 h-3 animate-spin"/> : 'Fazer Upgrade'}
                                 </button>
                             )}
                         </div>
@@ -460,8 +487,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                  </div>
                                  <h3 className="font-bold text-white mb-1">Recurso Premium</h3>
                                  <p className="text-xs text-slate-400 mb-4 max-w-[200px]">Atualize para o plano PRO para desbloquear o {MODULES[activeModule].label}.</p>
-                                 <button onClick={handleUpgrade} className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg text-white text-xs font-bold shadow-lg shadow-purple-900/30 hover:scale-105 transition-transform">
-                                     Desbloquear Agora
+                                 <button 
+                                     onClick={handleUpgrade}
+                                     disabled={isUpgrading}
+                                     className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg text-white text-xs font-bold shadow-lg shadow-purple-900/30 hover:scale-105 transition-transform flex items-center gap-2 disabled:opacity-50 disabled:cursor-wait"
+                                 >
+                                     {isUpgrading ? <Loader2 className="w-4 h-4 animate-spin"/> : 'Desbloquear Agora'}
                                  </button>
                              </div>
                          )}
