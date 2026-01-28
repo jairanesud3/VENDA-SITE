@@ -2,10 +2,9 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, Bot, X, Send, Loader2, Sparkles } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
 
-// CONSTANTES (Fácil configuração)
-const WHATSAPP_NUMBER = "5511999999999"; // Apenas números
+// CONSTANTES
+const WHATSAPP_NUMBER = "5511999999999"; 
 const WHATSAPP_MESSAGE = "Olá! Gostaria de saber mais sobre o DropAI.";
 
 interface Message {
@@ -34,79 +33,36 @@ export const SupportWidget: React.FC = () => {
     if (!input.trim()) return;
 
     const userMsg = input;
+    // Adiciona mensagem do usuário na UI imediatamente
     setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setInput('');
     setIsTyping(true);
 
     try {
-      // SEGURANÇA: Chave obtida via variável de ambiente (Suporte para GEMINI_API_KEY)
-      const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+      // Chama nossa API Backend (Secure Server-Side call)
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: userMsg }),
+      });
 
-      if (!apiKey) {
-         setMessages(prev => [...prev, { role: 'model', text: "⚠️ Ops! A chave da API não está configurada. Por favor, adicione sua GEMINI_API_KEY no arquivo .env para que eu possa funcionar." }]);
-         setIsTyping(false);
-         return;
+      if (!response.ok) {
+        throw new Error(`Erro na API: ${response.status}`);
       }
+
+      const data = await response.json();
       
-      const ai = new GoogleGenAI({ apiKey });
-      
-      const prompt = `
-          CONTEXTO DO SISTEMA:
-          Você é o assistente virtual de suporte do "DropAI" (DROPHACKER.AI).
-          O DropAI é uma ferramenta SaaS que cria anúncios, copy e imagens para dropshipping e e-commerce usando IA.
-          
-          INFORMAÇÕES CHAVE:
-          - Preços: Iniciante (R$49,90/mês), Escala Pro (R$97,00/mês).
-          - Funcionalidades: Gera textos AIDA, imagens realistas de produtos, roteiros TikTok.
-          - Diferencial: Filtro anti-bloqueio para Facebook Ads.
-          
-          SUA MISSÃO:
-          Responda dúvidas sobre a ferramenta de forma curta, persuasiva e amigável.
-          Se perguntarem sobre suporte humano, direcione para o botão do WhatsApp.
-          
-          PERGUNTA DO USUÁRIO: "${userMsg}"
-      `;
+      // Adiciona resposta da IA na UI
+      setMessages(prev => [...prev, { role: 'model', text: data.text || "Sem resposta." }]);
 
-      let text = "";
-
-      try {
-        // TENTATIVA 1: Modelo Principal (gemini-2.0-flash-lite)
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.0-flash-lite',
-            contents: prompt,
-            config: {
-                temperature: 0.6,
-                maxOutputTokens: 150,
-            }
-        });
-        text = response.text || "";
-
-      } catch (errPrimary: any) {
-        console.warn("⚠️ Falha no Gemini 2.0 Flash Lite (Chatbot). Tentando fallback...", errPrimary);
-        
-        try {
-            // TENTATIVA 2: Fallback (gemini-1.5-flash)
-            const responseFallback = await ai.models.generateContent({
-                model: 'gemini-1.5-flash',
-                contents: prompt,
-                config: {
-                    temperature: 0.6,
-                    maxOutputTokens: 150,
-                }
-            });
-            text = responseFallback.text || "";
-        } catch (errFallback) {
-             console.error("❌ Erro Fatal no Chatbot:", errFallback);
-             text = "Desculpe, estou enfrentando instabilidade técnica momentânea. Tente novamente em instantes.";
-        }
-      }
-      
-      if (!text) text = "Não consegui gerar uma resposta. Tente reformular sua pergunta.";
-
-      setMessages(prev => [...prev, { role: 'model', text: text }]);
     } catch (error) {
-      console.error("Erro geral no chat:", error);
-      setMessages(prev => [...prev, { role: 'model', text: "Estou com dificuldade de conexão agora. Verifique sua internet ou tente recarregar." }]);
+      console.error("Erro ao enviar mensagem:", error);
+      setMessages(prev => [...prev, { 
+        role: 'model', 
+        text: "Desculpe, estou com instabilidade de conexão no momento. Tente novamente ou chame no WhatsApp." 
+      }]);
     } finally {
       setIsTyping(false);
     }
@@ -117,7 +73,7 @@ export const SupportWidget: React.FC = () => {
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-4 font-sans pointer-events-none">
       
-      {/* JANELA DE CHAT IA (Pointer events auto para interação) */}
+      {/* JANELA DE CHAT IA */}
       <div className={`pointer-events-auto transition-all duration-300 origin-bottom-right ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none absolute bottom-10 right-0'}`}>
         {isOpen && (
           <div className="w-[340px] h-[500px] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 fade-in">
@@ -198,7 +154,7 @@ export const SupportWidget: React.FC = () => {
         )}
       </div>
 
-      {/* BOTÃO FLUTUANTE ÚNICO (Pointer events auto) */}
+      {/* BOTÃO FLUTUANTE ÚNICO */}
       <div className="flex flex-col gap-3 items-end pointer-events-auto">
         <div className="group flex items-center gap-3">
           <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-xs py-1.5 px-3 rounded-lg border border-slate-700 shadow-xl whitespace-nowrap pointer-events-none translate-x-2 group-hover:translate-x-0 duration-200">
