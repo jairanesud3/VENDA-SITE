@@ -8,7 +8,6 @@ import { createClient } from '@/utils/supabase/client';
 export default function PlansPage() {
   const [loadingPlan, setLoadingPlan] = useState<'basic' | 'pro' | null>(null);
   const [currentPlan, setCurrentPlan] = useState<string>('free');
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const router = useRouter();
 
   useEffect(() => {
@@ -25,11 +24,10 @@ export default function PlansPage() {
   const handleCheckout = async (plan: 'basic' | 'pro') => {
     setLoadingPlan(plan);
     try {
-        // Envia o ciclo de cobrança junto (caso o backend suporte no futuro)
         const response = await fetch('/api/stripe/checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ plan, cycle: billingCycle }),
+            body: JSON.stringify({ plan }), // Removido cycle, pois agora é apenas mensal por padrão
         });
         
         const data = await response.json();
@@ -82,30 +80,14 @@ export default function PlansPage() {
 
       {/* Content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center p-6 pb-20">
-        <div className="text-center mb-10 max-w-2xl">
+        <div className="text-center mb-16 max-w-2xl">
             <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">Escolha seu Poder de Fogo</h1>
             <p className="text-slate-400 text-lg">
                 Desbloqueie ferramentas de IA que substituem uma equipe inteira.
             </p>
         </div>
 
-        {/* Toggle Mensal/Anual */}
-        <div className="flex items-center justify-center gap-4 mb-12 bg-slate-900/50 p-1.5 rounded-full border border-slate-800 inline-flex mx-auto backdrop-blur-sm">
-            <button 
-                onClick={() => setBillingCycle('monthly')}
-                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${billingCycle === 'monthly' ? 'bg-slate-700 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
-            >
-                Mensal
-            </button>
-            <button 
-                onClick={() => setBillingCycle('yearly')}
-                className={`px-6 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${billingCycle === 'yearly' ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
-            >
-                Anual
-                <span className="bg-white text-purple-600 text-[10px] px-1.5 rounded font-extrabold">-20%</span>
-            </button>
-        </div>
-
+        {/* Grid de Planos */}
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl w-full items-center">
             
             {/* PLANO BÁSICO */}
@@ -114,12 +96,9 @@ export default function PlansPage() {
                     <h3 className="text-lg font-bold text-slate-300 uppercase tracking-widest mb-2">Iniciante</h3>
                     <div className="flex items-baseline gap-1">
                         <span className="text-sm text-slate-500">R$</span>
-                        <span className="text-4xl font-bold text-white">
-                            {billingCycle === 'monthly' ? '49,90' : '39,90'}
-                        </span>
+                        <span className="text-4xl font-bold text-white">49,90</span>
                         <span className="text-slate-500">/mês</span>
                     </div>
-                    {billingCycle === 'yearly' && <p className="text-green-400 text-xs font-bold mt-1">Faturado R$ 478,80 anualmente</p>}
                     <p className="text-slate-500 text-sm mt-4">Ideal para quem está validando os primeiros produtos.</p>
                 </div>
                 <div className="w-full h-px bg-slate-800 my-6"></div>
@@ -160,12 +139,9 @@ export default function PlansPage() {
                     </h3>
                     <div className="flex items-baseline gap-1">
                         <span className="text-sm text-slate-500">R$</span>
-                        <span className="text-5xl font-bold text-white">
-                             {billingCycle === 'monthly' ? '97,00' : '77,60'}
-                        </span>
+                        <span className="text-5xl font-bold text-white">97,00</span>
                         <span className="text-slate-500">/mês</span>
                     </div>
-                    {billingCycle === 'yearly' && <p className="text-green-400 text-xs font-bold mt-1">Faturado R$ 931,20 anualmente (Economize R$ 232)</p>}
                     <p className="text-slate-400 text-sm mt-4">Poder total para escalar suas vendas sem limites.</p>
                 </div>
                 <div className="w-full h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent my-6"></div>
@@ -175,7 +151,6 @@ export default function PlansPage() {
                     <PlanFeature text="Gerador de Personas (Hacker de Avatar)" />
                     <PlanFeature text="Calculadora de ROAS & Lucro" />
                     <PlanFeature text="Filtro Anti-Bloqueio (Blacklist Check)" />
-                    {/* AQUI ESTÁ A MUDANÇA SOLICITADA */}
                     <PlanFeature text="IA de Última Geração (Mais Inteligente)" />
                     <PlanFeature text="Suporte VIP WhatsApp" />
                 </ul>
