@@ -48,8 +48,10 @@ export async function generateCopy(prompt: string, moduleId?: string) {
   const ai = new GoogleGenAI({ apiKey });
 
   try {
+    // ATUALIZAÇÃO CRÍTICA: Uso do modelo oficial 'gemini-flash-lite-latest'.
+    // Este modelo é mais rápido, econômico e substitui as versões 1.5.
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-lite', 
+      model: 'gemini-flash-lite-latest', 
       contents: prompt,
       config: {
         responseMimeType: 'application/json'
@@ -62,6 +64,8 @@ export async function generateCopy(prompt: string, moduleId?: string) {
 
   } catch (error: any) {
     console.error("Erro na Geração IA:", error);
-    throw new Error(`Erro no processamento: ${error.message}`);
+    // Retry simples: Em caso de falha momentânea, o frontend pode solicitar novamente.
+    // Não tentamos fallback para modelos antigos para evitar erros de depreciação.
+    throw new Error(`Erro no processamento da IA: ${error.message}`);
   }
 }

@@ -37,9 +37,9 @@ export async function POST(req: Request) {
       PERGUNTA DO USUÁRIO: "${message}"
     `;
 
-    // 5. Gerar conteúdo usando o modelo solicitado (gemini-2.5-flash-lite)
+    // 5. Gerar conteúdo usando o modelo solicitado (gemini-flash-lite-latest)
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-lite',
+      model: 'gemini-flash-lite-latest',
       contents: prompt,
       config: {
         temperature: 0.7,
