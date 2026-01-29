@@ -31,18 +31,14 @@ interface DashboardProps {
 // --- CONFIGURAÇÃO GLOBAL ---
 const MAX_PLATFORMS = 3; 
 
+// Lista simplificada conforme solicitado (Apenas os principais)
 const PLATFORM_TABS = [
     { id: 'instagram', label: 'Instagram', icon: Instagram, color: 'text-pink-500', bg: 'bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500', neon: 'shadow-[0_0_30px_rgba(236,72,153,0.3)] border-pink-500/30' },
     { id: 'facebook', label: 'Facebook', icon: Facebook, color: 'text-blue-500', bg: 'bg-blue-600', neon: 'shadow-[0_0_30px_rgba(59,130,246,0.3)] border-blue-500/30' },
-    { id: 'tiktok', label: 'TikTok', icon: Music2, color: 'text-cyan-400', bg: 'bg-black border border-cyan-400/30', neon: 'shadow-[0_0_30px_rgba(34,211,238,0.3)] border-cyan-400/30' },
     { id: 'shopee', label: 'Shopee', icon: ShoppingBag, color: 'text-orange-500', bg: 'bg-[#ee4d2d]', neon: 'shadow-[0_0_30px_rgba(249,115,22,0.3)] border-orange-500/30' },
     { id: 'mercadolivre', label: 'M. Livre', icon: ShoppingCart, color: 'text-yellow-400', bg: 'bg-[#ffe600]', neon: 'shadow-[0_0_30px_rgba(250,204,21,0.3)] border-yellow-400/30' },
     { id: 'olx', label: 'OLX', icon: MapPin, color: 'text-purple-500', bg: 'bg-[#6e0ad6]', neon: 'shadow-[0_0_30px_rgba(168,85,247,0.3)] border-purple-500/30' },
-    { id: 'amazon', label: 'Amazon', icon: ShoppingCart, color: 'text-yellow-600', bg: 'bg-[#232f3e]', neon: 'shadow-[0_0_30px_rgba(202,138,4,0.3)] border-yellow-600/30' },
-    { id: 'pinterest', label: 'Pinterest', icon: PinIcon, color: 'text-red-500', bg: 'bg-[#e60023]', neon: 'shadow-[0_0_30px_rgba(239,68,68,0.3)] border-red-500/30' },
-    { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: 'text-blue-700', bg: 'bg-[#0077b5]', neon: 'shadow-[0_0_30px_rgba(29,78,216,0.3)] border-blue-700/30' },
-    { id: 'twitter', label: 'Twitter', icon: Twitter, color: 'text-white', bg: 'bg-black', neon: 'shadow-[0_0_30px_rgba(255,255,255,0.2)] border-white/30' },
-    { id: 'youtube', label: 'YouTube', icon: Youtube, color: 'text-red-600', bg: 'bg-[#ff0000]', neon: 'shadow-[0_0_30px_rgba(220,38,38,0.3)] border-red-600/30' }
+    { id: 'amazon', label: 'Amazon', icon: ShoppingCart, color: 'text-yellow-600', bg: 'bg-[#232f3e]', neon: 'shadow-[0_0_30px_rgba(202,138,4,0.3)] border-yellow-600/30' }
 ];
 
 function PinIcon(props: any) {
@@ -52,15 +48,15 @@ function PinIcon(props: any) {
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel }: { isOpen: boolean, title: string, message: string, onConfirm: () => void, onCancel: () => void }) => {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-[#1a1025] border border-white/10 p-6 rounded-2xl max-w-sm w-full shadow-2xl shadow-purple-900/20 transform scale-100 animate-in zoom-in-95 duration-300">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-[#1a1025] border border-white/10 p-6 rounded-2xl max-w-sm w-full shadow-2xl shadow-purple-900/40 transform scale-100 animate-in zoom-in-95 duration-200">
         <div className="flex flex-col items-center text-center gap-4">
-          <div className="p-3 bg-red-500/10 rounded-full text-red-500 mb-2"><Trash2 className="w-8 h-8" /></div>
+          <div className="p-4 bg-red-500/10 rounded-full text-red-500 mb-1 border border-red-500/20"><Trash2 className="w-8 h-8" /></div>
           <h3 className="text-xl font-bold text-white">{title}</h3>
-          <p className="text-slate-400 text-sm leading-relaxed">{message}</p>
-          <div className="flex gap-3 w-full mt-2">
-            <button onClick={onCancel} className="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm transition-colors">Cancelar</button>
-            <button onClick={onConfirm} className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-sm transition-colors shadow-lg shadow-red-900/20">Sim, Excluir</button>
+          <p className="text-slate-300 text-sm leading-relaxed font-medium">{message}</p>
+          <div className="flex gap-3 w-full mt-4">
+            <button onClick={onCancel} className="flex-1 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm transition-colors">Cancelar</button>
+            <button onClick={onConfirm} className="flex-1 py-3.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-sm transition-colors shadow-lg shadow-red-900/20">Sim, Excluir</button>
           </div>
         </div>
       </div>
@@ -359,94 +355,6 @@ const AmazonPreview = ({ data, userImage, device }: { data: any, userImage: stri
    </div>
 );
 
-// 8. Pinterest
-const PinterestPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-white text-black rounded-2xl overflow-hidden font-sans shadow-xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[300px]'}`}>
-         <div className="relative aspect-[3/4] bg-slate-100">
-             {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <div className="flex items-center justify-center h-full"><ImageIcon className="w-12 h-12 text-slate-300"/></div>}
-             <button className="absolute top-4 right-4 bg-[#E60023] text-white px-4 py-2 rounded-full font-bold text-sm hover:bg-[#ad081b]">Salvar</button>
-         </div>
-         <div className="p-3">
-             <h3 className="font-bold text-slate-900 text-sm mb-1">{data.title}</h3>
-             <p className="text-xs text-slate-600 line-clamp-3">{data.description}</p>
-             <div className="flex items-center gap-2 mt-3">
-                 <div className="w-6 h-6 rounded-full bg-slate-200"></div>
-                 <span className="text-xs font-semibold text-slate-800">Sua Loja</span>
-             </div>
-         </div>
-    </div>
-);
-
-// 9. LinkedIn
-const LinkedinPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-white text-black rounded-lg border border-slate-200 overflow-hidden font-sans shadow-lg mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[500px]'}`}>
-        <div className="p-3 flex gap-2">
-             <div className="w-10 h-10 bg-slate-200 rounded"></div>
-             <div>
-                 <div className="text-sm font-bold text-slate-900 flex items-center gap-1">Sua Empresa <span className="text-slate-500 font-normal">• 1º</span></div>
-                 <div className="text-xs text-slate-500">Promovido</div>
-             </div>
-        </div>
-        <div className="px-3 pb-2 text-sm text-slate-800 whitespace-pre-wrap">{data.body || data.headline}</div>
-        {userImage ? <img src={userImage} className="w-full aspect-video object-cover" /> : <div className="w-full aspect-video bg-slate-100 flex items-center justify-center"><ImageIcon className="w-12 h-12 text-slate-300"/></div>}
-        <div className="bg-[#F3F6F8] p-3 flex justify-between items-center cursor-pointer hover:bg-[#EBEFF3]">
-            <div>
-                <div className="text-sm font-semibold text-slate-900">{data.headline || data.title || "Título do Anúncio"}</div>
-                <div className="text-xs text-slate-500">sualoja.com.br</div>
-            </div>
-            <button className="border border-slate-600 rounded-full px-4 py-1 text-slate-600 font-bold text-sm hover:border-[2px]">Saiba mais</button>
-        </div>
-        <div className="p-2 border-t border-slate-100 flex justify-between text-slate-500">
-             <div className="flex gap-4 px-2">
-                 <span className="flex items-center gap-1 text-sm"><ThumbsUp className="w-4 h-4"/> Gostei</span>
-                 <span className="flex items-center gap-1 text-sm"><MessageSquare className="w-4 h-4"/> Comentar</span>
-             </div>
-        </div>
-    </div>
-);
-
-// 10. Twitter
-const TwitterPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-black text-white rounded-xl border border-slate-800 overflow-hidden font-sans shadow-xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[500px]'}`}>
-         <div className="p-3 flex gap-3">
-             <div className="w-10 h-10 rounded-full bg-slate-700"></div>
-             <div className="flex-1">
-                 <div className="flex items-center gap-1 mb-0.5">
-                     <span className="font-bold text-sm">Sua Loja</span>
-                     <span className="text-slate-500 text-sm">@sualoja</span>
-                     <span className="text-slate-500 text-sm">· Promovido</span>
-                 </div>
-                 <div className="text-sm text-slate-100 mb-2 whitespace-pre-wrap">{data.text || data.body}</div>
-                 {userImage ? <img src={userImage} className="w-full rounded-xl border border-slate-800 mb-2" /> : null}
-                 <div className="flex justify-between text-slate-500 text-xs pr-8">
-                     <MessageCircle className="w-4 h-4"/>
-                     <RefreshCw className="w-4 h-4"/>
-                     <Heart className="w-4 h-4"/>
-                     <Share2 className="w-4 h-4"/>
-                 </div>
-             </div>
-         </div>
-    </div>
-);
-
-// 11. YouTube
-const YoutubePreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-white text-black rounded-none md:rounded-xl overflow-hidden font-sans shadow-xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[600px]'}`}>
-        {userImage ? <img src={userImage} className="w-full aspect-video object-cover" /> : <div className="w-full aspect-video bg-black flex items-center justify-center"><Video className="w-16 h-16 text-white"/></div>}
-        <div className="p-3 flex gap-3">
-             <div className="w-9 h-9 rounded-full bg-purple-600 flex-shrink-0"></div>
-             <div className="flex-1">
-                 <h3 className="text-sm font-medium text-slate-900 line-clamp-2 leading-snug mb-1">{data.title}</h3>
-                 <div className="text-xs text-slate-500 flex flex-wrap items-center gap-1">
-                     <span>Sua Loja</span> • <span>120 mil visualizações</span> • <span>há 2 horas</span>
-                 </div>
-                 <div className="mt-2 bg-blue-50 text-blue-700 text-xs font-bold px-2 py-1 inline-block rounded border border-blue-100 uppercase tracking-wide">Saiba Mais</div>
-             </div>
-             <div className="text-slate-400">⋮</div>
-        </div>
-    </div>
-);
-
 // --- NOVO: SELETOR DE PLATAFORMAS (LOGOS REAIS/ESTILIZADOS) ---
 const PlatformSelector = ({ selected, onToggle }: { selected: string[], onToggle: (id: string) => void }) => (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 mb-6">
@@ -454,7 +362,7 @@ const PlatformSelector = ({ selected, onToggle }: { selected: string[], onToggle
             Redes Ativas ({selected.length}/{MAX_PLATFORMS})
             {selected.length === MAX_PLATFORMS && <span className="text-purple-400 text-[10px]">Max Atingido</span>}
         </h4>
-        <div className="grid grid-cols-4 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
             {PLATFORM_TABS.map((platform) => {
                 const isSelected = selected.includes(platform.id);
                 return (
@@ -577,7 +485,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const [showClearModal, setShowClearModal] = useState(false);
   
   // --- NOVOS ESTADOS ---
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['instagram', 'facebook', 'tiktok']);
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['instagram', 'facebook', 'shopee']);
   const [previewPlatform, setPreviewPlatform] = useState<string>('instagram');
   const [previewDevice, setPreviewDevice] = useState<'mobile' | 'desktop'>('mobile');
 
@@ -742,14 +650,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
         
         case 'roas_analyzer': return ( <>
              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Custo Produto (R$)</label><input type="number" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="30,00" value={dynamicFormData.cost || ''} onChange={e => handleInputChange('cost', e.target.value)} /></div>
-                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Preço Venda (R$)</label><input type="number" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="99,90" value={dynamicFormData.salePrice || ''} onChange={e => handleInputChange('salePrice', e.target.value)} /></div>
+                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Quanto você pagou? (Custo)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="30,00" value={dynamicFormData.cost || ''} onChange={e => handleInputChange('cost', e.target.value)} /></div>
+                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Por quanto vai vender?</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="99,90" value={dynamicFormData.salePrice || ''} onChange={e => handleInputChange('salePrice', e.target.value)} /></div>
              </div>
              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Imposto (%)</label><input type="number" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="6" value={dynamicFormData.tax || ''} onChange={e => handleInputChange('tax', e.target.value)} /></div>
-                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Frete Médio (R$)</label><input type="number" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="20,00" value={dynamicFormData.shipping || ''} onChange={e => handleInputChange('shipping', e.target.value)} /></div>
+                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Imposto (%)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="6" value={dynamicFormData.tax || ''} onChange={e => handleInputChange('tax', e.target.value)} /></div>
+                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Frete Médio (R$)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="20,00" value={dynamicFormData.shipping || ''} onChange={e => handleInputChange('shipping', e.target.value)} /></div>
              </div>
-             <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">CPA Esperado (Marketing)</label><input type="number" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-emerald-500 outline-none" placeholder="25,00" value={dynamicFormData.cpa || ''} onChange={e => handleInputChange('cpa', e.target.value)} /></div>
+             <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Custo de Marketing (CPA)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-emerald-500 outline-none" placeholder="25,00" value={dynamicFormData.cpa || ''} onChange={e => handleInputChange('cpa', e.target.value)} /></div>
              </> );
 
         case 'policy_gen': return ( <>
@@ -861,15 +769,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
       }
       switch (platform) {
           case 'instagram': return <InstagramPreview data={platformData} userImage={userImage} device={device} />;
-          case 'tiktok': return <TikTokPreview data={platformData} userImage={userImage} device={device} />;
+          case 'facebook': return <FacebookPreview data={platformData} userImage={userImage} device={device} />;
           case 'shopee': return <ShopeePreview data={platformData} userImage={userImage} device={device} />;
-          case 'amazon': return <AmazonPreview data={platformData} userImage={userImage} device={device} />;
           case 'mercadolivre': return <MercadoLivrePreview data={platformData} userImage={userImage} device={device} />;
           case 'olx': return <OLXPreview data={platformData} userImage={userImage} device={device} />;
-          case 'pinterest': return <PinterestPreview data={platformData} userImage={userImage} device={device} />;
-          case 'linkedin': return <LinkedinPreview data={platformData} userImage={userImage} device={device} />;
-          case 'twitter': return <TwitterPreview data={platformData} userImage={userImage} device={device} />;
-          case 'youtube': return <YoutubePreview data={platformData} userImage={userImage} device={device} />;
+          case 'amazon': return <AmazonPreview data={platformData} userImage={userImage} device={device} />;
           default: return <FacebookPreview data={platformData} userImage={userImage} device={device} />;
       }
   };
@@ -903,7 +807,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                     setItemToDelete(item.id); 
                                     setShowDeleteModal(true); 
                                 }} 
-                                className="text-slate-600 hover:text-red-500 transition-colors p-1"
+                                className="p-2 bg-slate-800 hover:bg-red-500/20 rounded-lg text-slate-400 hover:text-red-500 transition-all border border-transparent hover:border-red-500/50"
+                                title="Excluir item"
                               >
                                 <Trash2 className="w-4 h-4"/>
                               </button>
@@ -933,8 +838,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
 
   return (
     <div className="flex h-screen bg-[#0B0518] text-white font-sans overflow-hidden relative selection:bg-purple-500/30">
-      <ConfirmModal isOpen={showDeleteModal} title="Excluir Item?" message="Tem certeza?" onConfirm={handleDeleteItemConfirm} onCancel={() => setShowDeleteModal(false)} />
-      <ConfirmModal isOpen={showClearModal} title="Limpar Campos?" message="Apagar tudo?" onConfirm={handleClearFormConfirm} onCancel={() => setShowClearModal(false)} />
+      <ConfirmModal isOpen={showDeleteModal} title="Excluir Item?" message="Tem certeza que deseja apagar este item permanentemente?" onConfirm={handleDeleteItemConfirm} onCancel={() => setShowDeleteModal(false)} />
+      <ConfirmModal isOpen={showClearModal} title="Limpar Campos?" message="Deseja apagar tudo o que escreveu?" onConfirm={handleClearFormConfirm} onCancel={() => setShowClearModal(false)} />
       
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 z-50 flex items-center justify-between px-4"><div className="flex items-center gap-2"><div className="p-1.5 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-lg"><Zap className="w-4 h-4 text-white" /></div><span className="font-bold text-white tracking-tight">DROP<span className="text-purple-400">HACKER</span></span></div><button onClick={() => setMobileMenuOpen(true)} className="p-2 text-slate-400 active:text-white transition-colors"><Menu className="w-6 h-6" /></button></div>
