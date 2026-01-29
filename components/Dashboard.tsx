@@ -14,7 +14,7 @@ import {
   Clock, HelpCircle, Briefcase, GraduationCap, Globe, Heart,
   Save, Smile, AlertTriangle, Music2, Share2, MessageCircle, MapPin, Star,
   Linkedin, Youtube, Facebook, Instagram, ShoppingBag, ShoppingCart, Twitter, Smartphone, Laptop,
-  Battery, Wifi, Signal, ThumbsUp, Percent, Truck, Building
+  Battery, Wifi, Signal, ThumbsUp, Percent, Truck, Building, RefreshCw, MessageSquare
 } from 'lucide-react';
 import { generateCopy } from '@/app/actions/generate-copy';
 import { getUserHistory, deleteHistoryItem } from '@/app/actions/history';
@@ -87,10 +87,346 @@ const MobileStatusBar = () => (
     </div>
 );
 
-// --- PREVIEWS (Mesmos anteriores, mantidos para brevidade) ---
-// (Adicione aqui todos os componentes *Preview definidos anteriormente: OLXPreview, MercadoLivrePreview, etc.)
-// Para economizar espaço na resposta, assumo que eles estão definidos aqui como no código anterior.
-// Vou redefinir apenas os componentes novos ou alterados.
+// --- TODOS OS PREVIEWS (COMPLETOS) ---
+
+// 1. OLX
+const OLXPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => {
+    if (device === 'mobile') {
+        return (
+            <div className="bg-[#F4F5F7] text-[#4A4A4A] rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl mx-auto max-w-[320px] aspect-[9/18] relative flex flex-col">
+                <div className="bg-white text-slate-800 pt-2 pb-1"><MobileStatusBar /></div>
+                <div className="bg-[#6E0AD6] text-white p-3 flex justify-between items-center shadow-md z-10">
+                    <div className="flex gap-4"><Menu className="w-5 h-5"/> <span className="font-bold text-lg">OLX</span></div>
+                    <Search className="w-5 h-5"/>
+                </div>
+                <div className="flex-1 overflow-y-auto bg-white">
+                    <div className="relative aspect-[4/3] bg-slate-200">
+                         {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <div className="flex items-center justify-center h-full"><ImageIcon className="text-slate-300 w-10 h-10"/></div>}
+                         <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded">1/4</div>
+                    </div>
+                    <div className="p-4">
+                        <div className="flex justify-between items-start mb-2">
+                             <h3 className="text-base text-slate-800 font-normal leading-snug w-3/4">{data.title || "Título do Produto"}</h3>
+                             <Heart className="w-6 h-6 text-[#6E0AD6]"/>
+                        </div>
+                        <div className="text-2xl font-bold text-slate-900 mb-2">R$ {data.price || "00,00"}</div>
+                        <p className="text-xs text-slate-500 mb-4">Publicado em 12/10 às 14:30</p>
+                        <div className="border-t border-slate-100 py-4">
+                             <h4 className="font-bold text-sm mb-2 text-slate-900">Descrição</h4>
+                             <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{data.body || data.description}</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="p-3 bg-white border-t border-slate-200 flex gap-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+                    <button className="flex-1 bg-[#F28000] active:bg-[#d97300] text-white font-bold py-3 rounded-full text-sm">Chat</button>
+                    <button className="w-12 h-12 rounded-full border border-[#F28000] flex items-center justify-center text-[#F28000]"><Share2 className="w-5 h-5"/></button>
+                </div>
+            </div>
+        );
+    }
+    // Desktop Version
+    return (
+        <div className="bg-white text-[#4A4A4A] rounded-lg border border-slate-200 overflow-hidden font-sans shadow-xl mx-auto max-w-[700px] flex">
+             <div className="w-[55%] bg-slate-100 relative">
+                 {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <div className="h-full flex items-center justify-center"><ImageIcon className="w-16 h-16 text-slate-300"/></div>}
+                 <div className="absolute top-4 left-4 bg-[#6E0AD6] text-white text-xs font-bold px-2 py-1 rounded">Destaque</div>
+             </div>
+             <div className="w-[45%] p-6 flex flex-col">
+                 <div className="flex justify-between items-start mb-4">
+                      <h2 className="text-xl text-slate-800 font-light leading-snug">{data.title}</h2>
+                      <Heart className="w-6 h-6 text-slate-300 hover:text-[#6E0AD6] cursor-pointer"/>
+                 </div>
+                 <div className="text-3xl font-bold text-slate-900 mb-1">R$ {data.price}</div>
+                 <div className="text-xs text-slate-400 mb-6">Em 12x de R$ {(parseFloat((data.price || "0").replace('.','').replace(',','.'))/12).toFixed(2)} sem juros</div>
+                 <button className="w-full bg-[#F28000] hover:bg-[#d97300] text-white font-bold py-3 rounded-full mb-3 shadow-lg shadow-orange-200 transition-all">Chat</button>
+                 <div className="flex gap-2 mb-6">
+                    <button className="flex-1 border border-[#6E0AD6] text-[#6E0AD6] font-bold py-2 rounded-full text-sm hover:bg-purple-50">Ver telefone</button>
+                 </div>
+                 <div className="mt-auto">
+                    <h4 className="font-bold text-sm text-slate-900 mb-1">Localização</h4>
+                    <div className="text-xs text-slate-500 flex items-center gap-1"><MapPin className="w-3 h-3"/> São Paulo, Centro</div>
+                 </div>
+             </div>
+        </div>
+    );
+};
+
+// 2. Mercado Livre
+const MercadoLivrePreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => {
+    if (device === 'mobile') {
+        return (
+            <div className="bg-[#ebebeb] text-slate-900 rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl mx-auto max-w-[320px] aspect-[9/18] relative flex flex-col">
+                <div className="bg-[#FFE600] text-slate-800 pt-2 pb-1"><MobileStatusBar /></div>
+                <div className="bg-[#FFE600] p-2 flex items-center gap-2 shadow-sm z-10">
+                    <ArrowLeftIcon className="w-5 h-5 text-slate-700"/>
+                    <div className="flex-1 bg-white h-8 rounded-full flex items-center px-3 text-xs text-slate-400 gap-2"><Search className="w-3 h-3"/> Buscar no Mercado Livre</div>
+                    <ShoppingCart className="w-5 h-5 text-slate-700"/>
+                </div>
+                <div className="flex-1 overflow-y-auto bg-white">
+                    <div className="p-3">
+                        <span className="text-[10px] text-slate-400">Novo  |  +1000 vendidos</span>
+                        <h3 className="text-sm font-normal text-slate-900 leading-snug mt-1 mb-2">{data.title || data.headline}</h3>
+                        <div className="aspect-square bg-white flex items-center justify-center mb-4">
+                            {userImage ? <img src={userImage} className="max-w-full max-h-full object-contain" /> : <ImageIcon className="w-16 h-16 text-slate-200"/>}
+                        </div>
+                        <div className="text-2xl font-normal text-slate-900">R$ {data.price}</div>
+                        <div className="text-xs text-slate-500 mb-2">em 10x R$ {(parseFloat((data.price || "0").replace('.','').replace(',','.'))/10).toFixed(2)} sem juros</div>
+                        <div className="text-xs font-bold text-[#00A650] mb-1">Frete Grátis</div>
+                        <div className="text-xs text-slate-500">Saiba os prazos de entrega e as formas de envio.</div>
+                        <div className="mt-4 flex flex-col gap-2">
+                            <button className="w-full bg-[#3483FA] text-white font-bold py-3 rounded-lg text-sm">Comprar agora</button>
+                            <button className="w-full bg-[#E3EDFB] text-[#3483FA] font-bold py-3 rounded-lg text-sm">Adicionar ao carrinho</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    // Desktop
+    return (
+        <div className="bg-white text-slate-900 rounded-lg border border-slate-200 overflow-hidden font-sans shadow-lg mx-auto max-w-[800px] flex p-6">
+             <div className="w-[50%] flex gap-4">
+                 <div className="w-12 flex flex-col gap-2">
+                     {[1,2,3].map(i => <div key={i} className="w-12 h-12 border border-slate-300 rounded hover:border-[#3483FA] cursor-pointer"></div>)}
+                 </div>
+                 <div className="flex-1 bg-white flex items-center justify-center border border-slate-100 rounded hover:scale-105 transition-transform">
+                     {userImage ? <img src={userImage} className="max-w-full max-h-full object-contain" /> : <ImageIcon className="w-20 h-20 text-slate-200"/>}
+                 </div>
+             </div>
+             <div className="w-[50%] pl-8 flex flex-col">
+                 <span className="text-xs text-slate-400 mb-1">Novo | 452 vendidos</span>
+                 <h1 className="text-xl font-bold text-slate-900 leading-snug mb-3">{data.title || data.headline}</h1>
+                 <div className="flex gap-1 mb-4">
+                    {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 text-[#3483FA] fill-[#3483FA]"/>)}
+                    <span className="text-xs text-slate-400 ml-1">(120 opiniões)</span>
+                 </div>
+                 <div className="text-4xl font-light text-slate-900 mb-2">R$ {data.price}</div>
+                 <div className="text-sm text-slate-500 mb-4">em <span className="text-[#00A650]">12x sem juros</span></div>
+                 <div className="flex items-center gap-2 mb-6">
+                    <Truck className="w-5 h-5 text-[#00A650]"/>
+                    <div className="text-sm text-[#00A650] font-normal">Chegará grátis amanhã<br/><span className="text-xs text-slate-400">Comprando dentro das próximas 2h</span></div>
+                 </div>
+                 <button className="w-full bg-[#3483FA] hover:bg-[#2968c8] text-white font-bold py-3.5 rounded-md text-base transition-colors mb-2">Comprar agora</button>
+                 <button className="w-full bg-[#E3EDFB] hover:bg-[#d0e4fc] text-[#3483FA] font-bold py-3.5 rounded-md text-base transition-colors">Adicionar ao carrinho</button>
+             </div>
+        </div>
+    );
+};
+
+// 3. Shopee
+const ShopeePreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
+    <div className={`bg-[#F5F5F5] text-black rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px] aspect-[9/18]' : 'max-w-[360px] aspect-[9/18]'}`}>
+        <div className="bg-[#EE4D2D] text-white pt-2 pb-1 px-4"><MobileStatusBar /></div>
+        <div className="bg-[#EE4D2D] p-3 flex gap-2 items-center text-white shadow-sm">
+             <div className="bg-white/20 p-1 rounded"><ArrowLeftIcon className="w-4 h-4"/></div>
+             <div className="bg-white text-orange-500 px-2 py-1 text-xs rounded flex-1">Buscar na Shopee</div>
+             <ShoppingCart className="w-5 h-5"/>
+        </div>
+        <div className="bg-white h-full overflow-y-auto">
+             <div className="aspect-square bg-slate-100 relative flex items-center justify-center">
+                 {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <ImageIcon className="w-12 h-12 text-slate-300"/>}
+                 <div className="absolute bottom-0 left-0 bg-[#EE4D2D] text-white text-[10px] px-2 py-0.5">Mall</div>
+             </div>
+             <div className="p-3">
+                 <div className="text-lg font-bold text-[#EE4D2D]">R$ {data.price || "00,00"}</div>
+                 <h3 className="text-sm text-slate-800 line-clamp-2 leading-snug mb-2">{data.title}</h3>
+                 <div className="flex gap-1 mb-2">
+                     <span className="text-[10px] border border-[#EE4D2D] text-[#EE4D2D] px-1 rounded">Frete Grátis</span>
+                 </div>
+                 <div className="text-xs text-slate-500 mb-4 whitespace-pre-wrap">{data.description}</div>
+             </div>
+        </div>
+    </div>
+);
+
+// 4. Facebook
+const FacebookPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
+    <div className={`bg-[#242526] text-white rounded-xl border border-slate-700 overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[500px]'}`}>
+        <div className="p-3 flex items-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs">SL</div>
+            <div className="flex-1">
+                <div className="font-bold text-sm">Sua Loja Oficial</div>
+                <div className="text-[10px] text-slate-400 flex items-center gap-1">Patrocinado <span className="text-[8px]">🌐</span></div>
+            </div>
+            <div className="text-slate-400">•••</div>
+        </div>
+        <div className="px-3 pb-2 text-sm text-slate-200 whitespace-pre-wrap">{data.body || data.description}</div>
+        <div className="bg-black w-full relative overflow-hidden flex items-center justify-center aspect-square">
+             {userImage ? (
+                <img src={userImage} className="w-full h-full object-cover" />
+             ) : <ImageIcon className="w-12 h-12 opacity-50" />}
+        </div>
+        <div className="bg-[#3A3B3C] p-3 flex items-center justify-between">
+            <div>
+                <div className="text-[10px] text-slate-400">LOJAOFICIAL.COM.BR</div>
+                <div className="font-bold text-sm leading-tight line-clamp-1">{data.headline || data.title}</div>
+            </div>
+            <button className="bg-[#4b4c4f] hover:bg-[#5e5f61] px-4 py-2 rounded text-sm font-bold transition-colors">{data.cta || "Saiba mais"}</button>
+        </div>
+    </div>
+);
+
+// 5. Instagram
+const InstagramPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
+    <div className={`bg-black text-white rounded-xl border border-slate-800 overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[400px]'}`}>
+        {device === 'mobile' && <div className="bg-black text-white pt-1 px-4"><MobileStatusBar /></div>}
+        <div className="flex items-center justify-between p-3">
+            <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600 p-[2px]"><div className="w-full h-full bg-black rounded-full"></div></div>
+                <span className="text-xs font-bold">sua_loja_br</span>
+            </div>
+            <div className="text-xs text-slate-400">Patrocinado</div>
+        </div>
+        <div className="bg-slate-900 w-full relative overflow-hidden flex items-center justify-center aspect-square">
+             {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <ImageIcon className="w-12 h-12 opacity-20" />}
+        </div>
+        <div className="p-3 bg-black">
+            <div className="flex justify-between items-center mb-3">
+               <div className="flex gap-4">
+                   <Heart className="w-6 h-6"/> <MessageCircle className="w-6 h-6"/> <Share2 className="w-6 h-6"/>
+               </div>
+               <button className="bg-blue-600 text-white px-4 py-1.5 rounded font-bold text-xs">{data.cta || "Comprar"}</button>
+            </div>
+            <p className="text-sm leading-snug">
+                <span className="font-bold mr-2">sua_loja_br</span>
+                {data.headline || data.title}
+                <br/>
+                <span className="text-slate-300 text-xs font-normal whitespace-pre-wrap">{data.body || data.description}</span>
+            </p>
+        </div>
+    </div>
+);
+
+// 6. TikTok
+const TikTokPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
+    <div className={`bg-black text-white rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl relative mx-auto ${device === 'mobile' ? 'max-w-[320px] aspect-[9/18]' : 'max-w-[360px] aspect-[9/18]'}`}>
+        <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">
+             {userImage ? <img src={userImage} className="w-full h-full object-cover opacity-80" /> : <div className="flex flex-col items-center opacity-30"><Video className="w-16 h-16 mb-2"/><span className="text-xs">Vídeo</span></div>}
+        </div>
+        <div className="absolute top-2 w-full px-4"><MobileStatusBar /></div>
+        <div className="absolute inset-0 flex flex-col justify-end p-4 bg-gradient-to-t from-black/90 via-transparent to-transparent">
+            <div className="absolute right-2 bottom-20 flex flex-col items-center gap-4">
+                <div className="flex flex-col items-center gap-1"><div className="w-10 h-10 rounded-full bg-slate-800 border border-white/20"></div></div>
+                <div className="flex flex-col items-center gap-1"><Heart className="w-8 h-8 text-white fill-white shadow-sm" /><span className="text-[10px] font-bold">12.5K</span></div>
+                <div className="flex flex-col items-center gap-1"><MessageCircle className="w-8 h-8 text-white shadow-sm" /><span className="text-[10px] font-bold">843</span></div>
+                <div className="w-10 h-10 rounded-full bg-slate-900 border-4 border-slate-800 flex items-center justify-center animate-spin-slow"><Music2 className="w-5 h-5 text-white" /></div>
+            </div>
+            <div className="mb-4 pr-12">
+                <div className="font-bold text-sm mb-1 shadow-black drop-shadow-md">@sualojaoficial</div>
+                <p className="text-xs text-white/90 leading-snug mb-2 shadow-black drop-shadow-md">{data.body || data.description || "Descrição..."} #viral #fyp</p>
+            </div>
+            <div className="w-full bg-[#EA2D49] hover:bg-[#D1233E] text-white py-2 rounded-sm font-bold text-sm flex items-center justify-between px-4 transition-colors">
+                <span>{data.cta || "Comprar Agora"}</span><ChevronRight className="w-4 h-4 bg-white/20 rounded" />
+            </div>
+        </div>
+    </div>
+);
+
+// 7. Amazon
+const AmazonPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
+   <div className={`bg-white text-black rounded-xl border border-slate-200 overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[600px] flex'}`}>
+        {device === 'mobile' && <div className="bg-[#232F3E] text-white pt-2 pb-1 px-4"><MobileStatusBar /></div>}
+        <div className={`${device === 'mobile' ? 'w-full' : 'w-1/2'} p-4 bg-white flex items-center justify-center`}>
+            {userImage ? <img src={userImage} className="max-w-full max-h-64 object-contain" /> : <ImageIcon className="w-16 h-16 text-slate-200"/>}
+        </div>
+        <div className={`${device === 'mobile' ? 'w-full' : 'w-1/2'} p-4 flex flex-col`}>
+             <h3 className="text-sm font-normal text-slate-900 leading-snug mb-2">{data.headline || data.title}</h3>
+             <div className="flex text-yellow-500 text-xs mb-2">★★★★★ <span className="text-slate-500 ml-1">1,234</span></div>
+             <div className="text-2xl font-medium text-slate-900 mb-1">R$ {data.price}</div>
+             <div className="text-xs text-slate-500 mb-4">Entrega GRÁTIS: <span className="font-bold text-slate-800">Segunda-feira</span></div>
+             <button className="bg-[#FFD814] hover:bg-[#F7CA00] text-black border border-[#FCD200] rounded-full py-2 px-4 text-sm font-normal shadow-sm mb-2">Adicionar ao carrinho</button>
+             <button className="bg-[#FFA41C] hover:bg-[#FA8900] text-black border border-[#FF8F00] rounded-full py-2 px-4 text-sm font-normal shadow-sm">Comprar agora</button>
+        </div>
+   </div>
+);
+
+// 8. Pinterest
+const PinterestPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
+    <div className={`bg-white text-black rounded-2xl overflow-hidden font-sans shadow-xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[300px]'}`}>
+         <div className="relative aspect-[3/4] bg-slate-100">
+             {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <div className="flex items-center justify-center h-full"><ImageIcon className="w-12 h-12 text-slate-300"/></div>}
+             <button className="absolute top-4 right-4 bg-[#E60023] text-white px-4 py-2 rounded-full font-bold text-sm hover:bg-[#ad081b]">Salvar</button>
+         </div>
+         <div className="p-3">
+             <h3 className="font-bold text-slate-900 text-sm mb-1">{data.title}</h3>
+             <p className="text-xs text-slate-600 line-clamp-3">{data.description}</p>
+             <div className="flex items-center gap-2 mt-3">
+                 <div className="w-6 h-6 rounded-full bg-slate-200"></div>
+                 <span className="text-xs font-semibold text-slate-800">Sua Loja</span>
+             </div>
+         </div>
+    </div>
+);
+
+// 9. LinkedIn
+const LinkedinPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
+    <div className={`bg-white text-black rounded-lg border border-slate-200 overflow-hidden font-sans shadow-lg mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[500px]'}`}>
+        <div className="p-3 flex gap-2">
+             <div className="w-10 h-10 bg-slate-200 rounded"></div>
+             <div>
+                 <div className="text-sm font-bold text-slate-900 flex items-center gap-1">Sua Empresa <span className="text-slate-500 font-normal">• 1º</span></div>
+                 <div className="text-xs text-slate-500">Promovido</div>
+             </div>
+        </div>
+        <div className="px-3 pb-2 text-sm text-slate-800 whitespace-pre-wrap">{data.body || data.headline}</div>
+        {userImage ? <img src={userImage} className="w-full aspect-video object-cover" /> : <div className="w-full aspect-video bg-slate-100 flex items-center justify-center"><ImageIcon className="w-12 h-12 text-slate-300"/></div>}
+        <div className="bg-[#F3F6F8] p-3 flex justify-between items-center cursor-pointer hover:bg-[#EBEFF3]">
+            <div>
+                <div className="text-sm font-semibold text-slate-900">{data.headline || data.title || "Título do Anúncio"}</div>
+                <div className="text-xs text-slate-500">sualoja.com.br</div>
+            </div>
+            <button className="border border-slate-600 rounded-full px-4 py-1 text-slate-600 font-bold text-sm hover:border-[2px]">Saiba mais</button>
+        </div>
+        <div className="p-2 border-t border-slate-100 flex justify-between text-slate-500">
+             <div className="flex gap-4 px-2">
+                 <span className="flex items-center gap-1 text-sm"><ThumbsUp className="w-4 h-4"/> Gostei</span>
+                 <span className="flex items-center gap-1 text-sm"><MessageSquare className="w-4 h-4"/> Comentar</span>
+             </div>
+        </div>
+    </div>
+);
+
+// 10. Twitter
+const TwitterPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
+    <div className={`bg-black text-white rounded-xl border border-slate-800 overflow-hidden font-sans shadow-xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[500px]'}`}>
+         <div className="p-3 flex gap-3">
+             <div className="w-10 h-10 rounded-full bg-slate-700"></div>
+             <div className="flex-1">
+                 <div className="flex items-center gap-1 mb-0.5">
+                     <span className="font-bold text-sm">Sua Loja</span>
+                     <span className="text-slate-500 text-sm">@sualoja</span>
+                     <span className="text-slate-500 text-sm">· Promovido</span>
+                 </div>
+                 <div className="text-sm text-slate-100 mb-2 whitespace-pre-wrap">{data.text || data.body}</div>
+                 {userImage ? <img src={userImage} className="w-full rounded-xl border border-slate-800 mb-2" /> : null}
+                 <div className="flex justify-between text-slate-500 text-xs pr-8">
+                     <MessageCircle className="w-4 h-4"/>
+                     <RefreshCw className="w-4 h-4"/>
+                     <Heart className="w-4 h-4"/>
+                     <Share2 className="w-4 h-4"/>
+                 </div>
+             </div>
+         </div>
+    </div>
+);
+
+// 11. YouTube
+const YoutubePreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
+    <div className={`bg-white text-black rounded-none md:rounded-xl overflow-hidden font-sans shadow-xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[600px]'}`}>
+        {userImage ? <img src={userImage} className="w-full aspect-video object-cover" /> : <div className="w-full aspect-video bg-black flex items-center justify-center"><Video className="w-16 h-16 text-white"/></div>}
+        <div className="p-3 flex gap-3">
+             <div className="w-9 h-9 rounded-full bg-purple-600 flex-shrink-0"></div>
+             <div className="flex-1">
+                 <h3 className="text-sm font-medium text-slate-900 line-clamp-2 leading-snug mb-1">{data.title}</h3>
+                 <div className="text-xs text-slate-500 flex flex-wrap items-center gap-1">
+                     <span>Sua Loja</span> • <span>120 mil visualizações</span> • <span>há 2 horas</span>
+                 </div>
+                 <div className="mt-2 bg-blue-50 text-blue-700 text-xs font-bold px-2 py-1 inline-block rounded border border-blue-100 uppercase tracking-wide">Saiba Mais</div>
+             </div>
+             <div className="text-slate-400">⋮</div>
+        </div>
+    </div>
+);
 
 // --- NOVO: SELETOR DE PLATAFORMAS (LOGOS REAIS/ESTILIZADOS) ---
 const PlatformSelector = ({ selected, onToggle }: { selected: string[], onToggle: (id: string) => void }) => (
@@ -189,6 +525,10 @@ const SidebarItem = ({ id, conf, active, onClick, userPlan }: any) => (
 );
 
 const CategoryLabel = ({ label }: { label: string }) => (<div className="px-3 mt-4 mb-2 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{label}</div>);
+
+// Auxiliares
+const ArrowLeftIcon = ({className}:{className?:string}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
+const Truck = ({className}:{className?:string}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>;
 
 export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => {
   const [activeModule, setActiveModule] = useState<ModuleId>('home');
@@ -384,17 +724,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
 
   // --- RENDERIZADOR DE PREVIEW ---
   const renderAdPreview = (data: any, platform: string, userImage: string | null, device: 'mobile' | 'desktop') => {
-      // (Mantém os previews existentes - Sem alteração na lógica, apenas uso)
-      // Se necessário, posso incluir o código completo dos previews aqui, mas eles não mudaram da última vez
-      // Vou incluir apenas um placeholder funcional se não tiver dados, ou os componentes reais se estiverem no arquivo (assumindo que sim)
-      return (
-        <div className="text-white">
-           {/* Assume-se que os componentes de preview (InstagramPreview, etc.) estão definidos no arquivo ou importados */}
-           {/* Caso contrário, este bloco falharia. Como estou editando o arquivo todo, vou assumir que a estrutura anterior de previews está mantida no topo do arquivo (não incluída neste diff para brevidade, mas deve estar lá) */}
-           {/* PARA GARANTIR FUNCIONALIDADE NA RESPOSTA, VOU RE-INCLUIR OS COMPONENTES BÁSICOS DE PREVIEW ABAIXO SE NECESSÁRIO, MAS O CÓDIGO ANTERIOR JÁ OS TINHA */}
-           <div className="p-4 text-center">Visualização do Anúncio Gerado</div>
-        </div>
-      );
+      let platformData = data;
+      if (activeModule === 'generator' && data && typeof data === 'object') {
+          platformData = data[platform] || data['facebook'] || data; 
+      }
+      switch (platform) {
+          case 'instagram': return <InstagramPreview data={platformData} userImage={userImage} device={device} />;
+          case 'tiktok': return <TikTokPreview data={platformData} userImage={userImage} device={device} />;
+          case 'shopee': return <ShopeePreview data={platformData} userImage={userImage} device={device} />;
+          case 'amazon': return <AmazonPreview data={platformData} userImage={userImage} device={device} />;
+          case 'mercadolivre': return <MercadoLivrePreview data={platformData} userImage={userImage} device={device} />;
+          case 'olx': return <OLXPreview data={platformData} userImage={userImage} device={device} />;
+          case 'pinterest': return <PinterestPreview data={platformData} userImage={userImage} device={device} />;
+          case 'linkedin': return <LinkedinPreview data={platformData} userImage={userImage} device={device} />;
+          case 'twitter': return <TwitterPreview data={platformData} userImage={userImage} device={device} />;
+          case 'youtube': return <YoutubePreview data={platformData} userImage={userImage} device={device} />;
+          default: return <FacebookPreview data={platformData} userImage={userImage} device={device} />;
+      }
   };
 
   // --- RENDERIZADOR DE HISTÓRICO ---
@@ -528,10 +874,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                      )}
                                      
                                      {activeModule === 'generator' ? (
-                                         // Nota: Reutilizando os componentes de preview existentes. Eles devem estar declarados acima no arquivo real.
-                                         // Assumo que eles já existem no contexto do arquivo.
                                          <div className={`relative transition-all duration-500 ${activeTabColor} border-2 rounded-3xl p-6 bg-black/20 backdrop-blur-sm animate-in zoom-in-95`}>
-                                            {/* Falha silenciosa caso o componente não exista para este exemplo, mas no código real os previews existem */}
                                             {renderAdPreview(result, previewPlatform, adImage, previewDevice)}
                                          </div>
                                      ) : (renderGenericResult(result))}
