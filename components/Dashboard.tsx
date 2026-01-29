@@ -15,7 +15,8 @@ import {
   Save, Smile, AlertTriangle, Music2, Share2, MessageCircle, MapPin, Star,
   Linkedin, Youtube, Facebook, Instagram, ShoppingBag, ShoppingCart, Twitter, Smartphone, Laptop,
   Battery, Wifi, Signal, ThumbsUp, Percent, Truck, Building, RefreshCw, MessageSquare,
-  Sunset, Flame, Waves, Trophy, Cpu, Triangle, Snowflake, Hexagon, Flower2, Disc, CloudRain
+  Sunset, Flame, Waves, Trophy, Cpu, Triangle, Snowflake, Hexagon, Flower2, Disc, CloudRain,
+  ArrowLeft // Importação adicionada
 } from 'lucide-react';
 import { generateCopy } from '@/app/actions/generate-copy';
 import { getUserHistory, deleteHistoryItem } from '@/app/actions/history';
@@ -28,10 +29,13 @@ interface DashboardProps {
   userEmail?: string | null;
 }
 
-// --- CONFIGURAÇÃO GLOBAL ---
+// --- COMPONENTES VISUAIS AUXILIARES ---
+
+// Ícone que faltava nas versões anteriores
+const ArrowLeftIcon = ({className}: {className?: string}) => <ArrowLeft className={className} />;
+
 const MAX_PLATFORMS = 3; 
 
-// LISTA LIMPA - APENAS OS PRINCIPAIS
 const PLATFORM_TABS = [
     { id: 'instagram', label: 'Instagram', icon: Instagram, color: 'text-pink-500', bg: 'bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500', neon: 'shadow-[0_0_30px_rgba(236,72,153,0.3)] border-pink-500/30' },
     { id: 'facebook', label: 'Facebook', icon: Facebook, color: 'text-blue-500', bg: 'bg-blue-600', neon: 'shadow-[0_0_30px_rgba(59,130,246,0.3)] border-blue-500/30' },
@@ -41,11 +45,6 @@ const PLATFORM_TABS = [
     { id: 'amazon', label: 'Amazon', icon: ShoppingCart, color: 'text-yellow-600', bg: 'bg-[#232f3e]', neon: 'shadow-[0_0_30px_rgba(202,138,4,0.3)] border-yellow-600/30' }
 ];
 
-function PinIcon(props: any) {
-    return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>; 
-}
-
-// MODAL DE CONFIRMAÇÃO (Z-INDEX ALTO)
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel }: { isOpen: boolean, title: string, message: string, onConfirm: () => void, onCancel: () => void }) => {
   if (!isOpen) return null;
   return (
@@ -100,9 +99,8 @@ const MobileStatusBar = () => (
     </div>
 );
 
-// --- PREVIEWS (Simplificados para evitar erros de sintaxe) ---
+// --- PREVIEWS ---
 
-// ... (Previews mantidos mas encapsulados corretamente)
 const OLXPreview = ({ data, userImage, device }: any) => (
     <div className={device === 'mobile' ? "bg-[#F4F5F7] text-[#4A4A4A] rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl mx-auto max-w-[320px] aspect-[9/18] relative flex flex-col" : "bg-white text-[#4A4A4A] rounded-lg border border-slate-200 overflow-hidden font-sans shadow-xl mx-auto max-w-[700px] flex"}>
         {device === 'mobile' ? (
@@ -125,7 +123,7 @@ const MercadoLivrePreview = ({ data, userImage, device }: any) => (
         {device === 'mobile' ? (
             <>
              <div className="bg-[#FFE600] text-slate-800 pt-2 pb-1"><MobileStatusBar /></div>
-             <div className="bg-[#FFE600] p-2 flex items-center gap-2 shadow-sm z-10"><div className="flex-1 bg-white h-8 rounded-full flex items-center px-3 text-xs text-slate-400 gap-2"><Search className="w-3 h-3"/> Buscar</div><ShoppingCart className="w-5 h-5 text-slate-700"/></div>
+             <div className="bg-[#FFE600] p-2 flex items-center gap-2 shadow-sm z-10"><ArrowLeftIcon className="w-5 h-5 text-slate-700"/><div className="flex-1 bg-white h-8 rounded-full flex items-center px-3 text-xs text-slate-400 gap-2"><Search className="w-3 h-3"/> Buscar</div><ShoppingCart className="w-5 h-5 text-slate-700"/></div>
              <div className="flex-1 overflow-y-auto bg-white"><div className="p-3"><h3 className="text-sm font-normal text-slate-900 leading-snug mt-1 mb-2">{data.title || data.headline}</h3><div className="aspect-square bg-white flex items-center justify-center mb-4">{userImage ? <img src={userImage} className="max-w-full max-h-full object-contain" /> : <ImageIcon className="w-16 h-16 text-slate-200"/>}</div><div className="text-2xl font-normal text-slate-900">R$ {data.price}</div><div className="text-xs font-bold text-[#00A650] mb-1">Frete Grátis</div><button className="w-full bg-[#3483FA] text-white font-bold py-3 rounded-lg text-sm mt-4">Comprar agora</button></div></div>
             </>
         ) : (
@@ -140,7 +138,7 @@ const MercadoLivrePreview = ({ data, userImage, device }: any) => (
 const ShopeePreview = ({ data, userImage, device }: any) => (
     <div className={`bg-[#F5F5F5] text-black rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px] aspect-[9/18]' : 'max-w-[360px] aspect-[9/18]'}`}>
         <div className="bg-[#EE4D2D] text-white pt-2 pb-1 px-4"><MobileStatusBar /></div>
-        <div className="bg-[#EE4D2D] p-3 flex gap-2 items-center text-white shadow-sm"><div className="bg-white text-orange-500 px-2 py-1 text-xs rounded flex-1">Buscar na Shopee</div><ShoppingCart className="w-5 h-5"/></div>
+        <div className="bg-[#EE4D2D] p-3 flex gap-2 items-center text-white shadow-sm"><div className="bg-white/20 p-1 rounded"><ArrowLeftIcon className="w-4 h-4"/></div><div className="bg-white text-orange-500 px-2 py-1 text-xs rounded flex-1">Buscar na Shopee</div><ShoppingCart className="w-5 h-5"/></div>
         <div className="bg-white h-full overflow-y-auto">
              <div className="aspect-square bg-slate-100 relative flex items-center justify-center">{userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <ImageIcon className="w-12 h-12 text-slate-300"/>}<div className="absolute bottom-0 left-0 bg-[#EE4D2D] text-white text-[10px] px-2 py-0.5">Mall</div></div>
              <div className="p-3"><div className="text-lg font-bold text-[#EE4D2D]">R$ {data.price || "00,00"}</div><h3 className="text-sm text-slate-800 line-clamp-2 leading-snug mb-2">{data.title}</h3><div className="flex gap-1 mb-2"><span className="text-[10px] border border-[#EE4D2D] text-[#EE4D2D] px-1 rounded">Frete Grátis</span></div><div className="text-xs text-slate-500 mb-4 whitespace-pre-wrap">{data.description}</div></div>
@@ -175,9 +173,7 @@ const AmazonPreview = ({ data, userImage, device }: any) => (
 );
 
 const renderAdPreview = (result: any, platform: string, adImage: string | null, device: 'mobile' | 'desktop') => {
-    // Tenta extrair dados específicos da plataforma se disponível, senão usa o objeto raiz
     const data = result && result[platform] ? result[platform] : (result || {});
-    
     switch (platform) {
         case 'olx': return <OLXPreview data={data} userImage={adImage} device={device} />;
         case 'mercadolivre': return <MercadoLivrePreview data={data} userImage={adImage} device={device} />;
@@ -189,7 +185,6 @@ const renderAdPreview = (result: any, platform: string, adImage: string | null, 
     }
 };
 
-// --- COMPONENTES AUXILIARES ---
 const PlatformSelector = ({ selected, onToggle }: { selected: string[], onToggle: (id: string) => void }) => (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 mb-6">
         <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center justify-between">
@@ -384,7 +379,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     try {
         let prompt = "";
         const data = dynamicFormData;
-        // Anti-markdown instruction to avoid ```json
         const antiMarkdown = "Retorne APENAS o JSON puro, sem blocos de código markdown.";
         
         switch (activeModule) {
@@ -405,7 +399,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
             const text = await generateCopy(prompt, activeModule, selectedPlatforms);
             const textStr = typeof text === 'string' ? text : String(text || '');
             try {
-                // Tenta limpar o JSON se vier com markdown
                 const cleanText = textStr.replace(/```json/g, '').replace(/```/g, '').trim();
                 const parsed = JSON.parse(cleanText);
                 setResult(parsed);
@@ -484,7 +477,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
             <div className="flex-1 overflow-y-auto px-3 py-2 custom-scrollbar"><SidebarItem id="home" conf={MODULES.home} active={activeModule === 'home'} onClick={() => { setActiveModule('home'); setMobileMenuOpen(false); }} userPlan={userPlan} />{sidebarOpen && <CategoryLabel label="Criação" />}{['generator', 'video_script', 'studio'].map(k => (<SidebarItem key={k} id={k} conf={MODULES[k as ModuleId]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />))}{sidebarOpen && <CategoryLabel label="Marketing" />}{['email_marketing', 'influencer_dm', 'blog_post'].map(k => (<SidebarItem key={k} id={k} conf={MODULES[k as ModuleId]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />))}{sidebarOpen && <CategoryLabel label="Estratégia" />}{['product_desc', 'persona', 'roas_analyzer', 'headline_optimizer'].map(k => (<SidebarItem key={k} id={k} conf={MODULES[k as ModuleId]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />))}{sidebarOpen && <CategoryLabel label="Sistema" />}{['policy_gen', 'history', 'settings'].map(k => (<SidebarItem key={k} id={k} conf={MODULES[k as ModuleId]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />))}</div>
             <div className="p-3 border-t border-slate-800 bg-[#0B0518]"><button onClick={() => setSidebarOpen(!sidebarOpen)} className="hidden lg:flex w-full items-center justify-center p-2 hover:bg-white/5 rounded-lg text-slate-500 mb-2 transition-colors"><Menu className="w-5 h-5" /></button><button onClick={onLogout} className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-red-400 hover:bg-red-950/30 hover:text-red-300 rounded-lg transition-colors ${!sidebarOpen && 'justify-center'}`}><LogOut className="w-4 h-4" />{(sidebarOpen) && "Sair da Conta"}</button></div>
         </aside>
-      </main>
+      </>
+      
       <main className="flex-1 flex flex-col h-screen overflow-hidden relative z-10 pt-16 lg:pt-0">
           {activeModule === 'home' ? (
               <div key="home" className={`flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 animate-in fade-in slide-in-from-bottom-8 duration-500 ease-out ${activeTheme.class}`}><div className="absolute top-4 right-4 z-20"><ThemeSelector activeTheme={activeTheme} setActiveTheme={handleThemeChange} /></div><div className="max-w-7xl mx-auto pb-20 relative z-10"><div className="mb-10"><h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Olá, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{displayName}</span></h1><p className="text-slate-400">Tudo pronto para vender hoje?</p></div><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">{Object.entries(MODULES).filter(([k, v]) => k !== 'home' && k !== 'settings' && k !== 'history').map(([key, mod]) => (<button key={key} onClick={() => setActiveModule(key as ModuleId)} className="group relative bg-slate-900/40 hover:bg-slate-800/60 border border-slate-800 hover:border-purple-500/30 p-5 rounded-2xl text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-xl overflow-hidden backdrop-blur-sm active:scale-95"><div className="flex justify-between items-start mb-4"><div className="p-3 rounded-xl bg-slate-950 border border-slate-800 group-hover:scale-110 transition-transform duration-300"><mod.icon className={`w-6 h-6 ${mod.color}`} /></div>{mod.isPremium && userPlan === 'free' && <Lock className="w-4 h-4 text-slate-600" />}</div><h3 className="font-bold text-white mb-1 group-hover:text-purple-300 transition-colors">{mod.label}</h3><p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{mod.desc}</p></button>))}</div></div></div>
