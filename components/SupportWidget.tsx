@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, Bot, X, Send, Loader2, Sparkles } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
 
 // CONSTANTES
 const WHATSAPP_NUMBER = "5511999999999"; 
@@ -19,7 +20,10 @@ export const SupportWidget: React.FC = () => {
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [hasLoadedHistory, setHasLoadedHistory] = useState(false);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const supabase = createClient();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -28,6 +32,43 @@ export const SupportWidget: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isOpen]);
+
+  // Carregar histórico ao abrir o widget pela primeira vez
+  useEffect(() => {
+    const loadHistory = async () => {
+      if (hasLoadedHistory) return;
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return; // Se não estiver logado, mantém apenas a msg inicial
+
+      // Busca mensagens ordenadas por data
+      const { data: history, error } = await supabase
+        .from('support_chat_history')
+        .select('role, content, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error("Erro ao carregar histórico:", error);
+        return;
+      }
+
+      if (history && history.length > 0) {
+        // Converte o formato do banco para o formato do componente
+        const formattedMessages = history.map((msg: any) => ({
+          role: msg.role,
+          text: msg.content
+        }));
+        setMessages(formattedMessages);
+      }
+      
+      setHasLoadedHistory(true);
+    };
+
+    if (isOpen) {
+      loadHistory();
+    }
+  }, [isOpen, hasLoadedHistory]);
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
