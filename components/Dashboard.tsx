@@ -52,7 +52,7 @@ function PinIcon(props: any) {
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel }: { isOpen: boolean, title: string, message: string, onConfirm: () => void, onCancel: () => void }) => {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
       <div className="bg-[#1a1025] border border-white/10 p-6 rounded-2xl max-w-sm w-full shadow-2xl shadow-purple-900/20 transform scale-100 animate-in zoom-in-95 duration-300">
         <div className="flex flex-col items-center text-center gap-4">
           <div className="p-3 bg-red-500/10 rounded-full text-red-500 mb-2"><Trash2 className="w-8 h-8" /></div>
@@ -898,7 +898,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                       <div key={item.id} className="bg-[#130b24] border border-white/5 rounded-xl p-4 hover:border-purple-500/30 transition-all group relative">
                           <div className="flex justify-between items-start mb-3">
                               <span className="text-[10px] font-bold text-purple-400 bg-purple-900/20 px-2 py-1 rounded uppercase">{item.module || 'Geral'}</span>
-                              <button onClick={() => { setItemToDelete(item.id); setShowDeleteModal(true); }} className="text-slate-600 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4"/></button>
+                              <button 
+                                onClick={() => { 
+                                    setItemToDelete(item.id); 
+                                    setShowDeleteModal(true); 
+                                }} 
+                                className="text-slate-600 hover:text-red-500 transition-colors p-1"
+                              >
+                                <Trash2 className="w-4 h-4"/>
+                              </button>
                           </div>
                           
                           {item.type === 'image' ? (
