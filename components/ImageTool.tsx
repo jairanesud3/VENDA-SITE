@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Camera, Download, Loader2, Sparkles, AlertTriangle, Lock, Upload, ImagePlus, X, RefreshCw, Palette, Grid3X3, Sun, Moon, Monitor } from 'lucide-react';
+import { Camera, Download, Loader2, Sparkles, AlertTriangle, Lock, Upload, ImagePlus, X, RefreshCw, Palette, Grid3X3, Sun, Moon, Monitor, Leaf, Gem, Box, Aperture } from 'lucide-react';
 import { generateProductImage } from '@/app/actions/generate-image';
 import { Button } from '@/components/ui/button';
 
@@ -19,6 +19,36 @@ const BACKGROUNDS = [
     class: 'bg-[#050505] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-800/20 via-[#050505] to-[#000000]' 
   },
   { 
+    id: 'concrete', 
+    name: 'Concreto Minimal', 
+    icon: Box,
+    class: 'bg-[#1c1c1c] bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-[#333] via-[#1c1c1c] to-[#111]' 
+  },
+  { 
+    id: 'softbox', 
+    name: 'Soft Studio', 
+    icon: Aperture,
+    class: 'bg-[#2a2a2a] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#404040] via-[#2a2a2a] to-[#1a1a1a]' 
+  },
+  { 
+    id: 'emerald', 
+    name: 'Emerald Jungle', 
+    icon: Leaf,
+    class: 'bg-[#0a1f0a] bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-green-900/40 via-[#0a1f0a] to-black' 
+  },
+  { 
+    id: 'velvet', 
+    name: 'Red Velvet', 
+    icon: Gem,
+    class: 'bg-[#1a0505] bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-red-900/30 via-[#1a0505] to-black' 
+  },
+  { 
+    id: 'golden', 
+    name: 'Golden Hour', 
+    icon: Sun,
+    class: 'bg-[#1a0b00] bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-orange-900/20 via-[#1a0b00] to-black' 
+  },
+  { 
     id: 'cyber', 
     name: 'Cyber Grid', 
     icon: Grid3X3,
@@ -29,12 +59,6 @@ const BACKGROUNDS = [
     name: 'Neon Aurora', 
     icon: Sparkles,
     class: 'bg-[#0F0520] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-900/40 via-[#0F0520] to-black' 
-  },
-  { 
-    id: 'golden', 
-    name: 'Golden Hour', 
-    icon: Sun,
-    class: 'bg-[#1a0b00] bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-orange-900/20 via-[#1a0b00] to-black' 
   },
   { 
     id: 'blueprint', 
@@ -227,25 +251,38 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
       </div>
 
       {/* RIGHT PANEL: PREVIEW */}
-      <div className={`flex-1 relative flex items-center justify-center p-8 overflow-hidden transition-all duration-500 ${activeBg.class}`}>
+      <div className={`flex-1 relative flex items-center justify-center p-8 overflow-hidden transition-all duration-700 ease-in-out ${activeBg.class}`}>
          
-         {/* BACKGROUND SELECTOR (FLOATING) */}
-         <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-full p-1.5 flex gap-1 shadow-2xl animate-in slide-in-from-top-5 max-w-[90%] overflow-x-auto custom-scrollbar">
-            {BACKGROUNDS.map((bg) => (
-                <button
-                    key={bg.id}
-                    onClick={() => setActiveBg(bg)}
-                    className={`p-2 rounded-full transition-all group relative ${activeBg.id === bg.id ? 'bg-white/10 text-white' : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'}`}
-                    title={bg.name}
-                >
-                    <bg.icon className="w-4 h-4" />
-                    {activeBg.id === bg.id && (
-                        <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-bold bg-black text-white px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+         {/* BACKGROUND SELECTOR (STABLE & MODERN) */}
+         <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 w-full max-w-[95%] md:max-w-2xl">
+            <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-full p-2 flex items-center gap-2 shadow-2xl overflow-x-auto custom-scrollbar no-scrollbar mx-auto">
+                {BACKGROUNDS.map((bg) => (
+                    <button
+                        key={bg.id}
+                        onClick={() => setActiveBg(bg)}
+                        className={`
+                            relative group flex-shrink-0 p-2.5 rounded-full transition-all duration-300
+                            ${activeBg.id === bg.id 
+                                ? 'bg-white/15 text-white ring-1 ring-white/30 shadow-[0_0_15px_rgba(255,255,255,0.1)]' 
+                                : 'text-slate-400 hover:text-white hover:bg-white/5'}
+                        `}
+                        title={bg.name}
+                    >
+                        <bg.icon className="w-5 h-5" />
+                        
+                        {/* Tooltip Stable - Fade Only */}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 px-2 py-1 bg-black/90 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap border border-white/10 z-50">
                             {bg.name}
-                        </span>
-                    )}
-                </button>
-            ))}
+                        </div>
+                    </button>
+                ))}
+            </div>
+            {/* Active Label (Stable) */}
+            <div className="text-center mt-2">
+                <span className="text-[10px] font-medium text-white/50 tracking-widest uppercase bg-black/20 px-3 py-1 rounded-full backdrop-blur-sm border border-white/5">
+                    Ambiente: <span className="text-white">{activeBg.name}</span>
+                </span>
+            </div>
          </div>
 
          {!imageUrl && !isLoading && (
