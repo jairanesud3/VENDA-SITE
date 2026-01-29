@@ -10,10 +10,10 @@ import {
   Lock, AlertTriangle, X, LayoutTemplate,
   Heart, MessageCircle, Send, Bookmark, MoreHorizontal, Star, ShoppingCart, Truck, MapPin
 } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
 import { generateCopy } from '@/app/actions/generate-copy';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
+import { ImageTool } from './ImageTool';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -425,28 +425,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                 prompt = `Análise financeira dropshipping para: "${input}". 
                 Retorne JSON: { "analysis_summary": "...", "metrics": { "breakeven_cpa": "...", "target_roas": "...", "potential_profit": "..." }, "recommendation": "..." }`;
                 break;
-            case 'studio':
-                prompt = `Professional product photography of ${input}, studio lighting, 4k, advertising standard, centered.`;
-                break;
             default:
                 prompt = `Ajude com: ${input}`;
         }
         
-        if (activeModule === 'studio') {
-             const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
-             if (!apiKey) throw new Error("API Key não encontrada.");
-             const ai = new GoogleGenAI({ apiKey });
-             
-             const response = await ai.models.generateContent({
-                 model: 'gemini-2.5-flash-image',
-                 contents: { parts: [{ text: prompt }] },
-                 config: { imageConfig: { aspectRatio: "1:1" } }
-             });
-             const imgData = response.candidates?.[0]?.content?.parts?.find((p:any) => p.inlineData)?.inlineData?.data;
-             if (imgData) setResult({ type: 'image', url: `data:image/png;base64,${imgData}`, prompt });
-             else throw new Error("Falha ao gerar imagem.");
-        
-        } else {
+        // Studio agora é tratado via componente separado, mas mantemos o fallback aqui por segurança
+        if (activeModule !== 'studio') {
             const text = await generateCopy(prompt, activeModule);
             
             if (text) {
@@ -488,19 +472,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
             case 'OLX': return <OLXPreview data={result} />;
             default: return <FacebookPreview data={result} />;
         }
-    }
-
-    // Default renderer for other modules (Script, SEO, etc)
-    if (result.type === 'image') {
-        return (
-            <div className="bg-slate-900 border border-slate-700 p-3 rounded-2xl shadow-2xl inline-block w-full">
-                <img src={result.url} className="w-full h-auto rounded-xl" />
-                <div className="mt-3 flex justify-between items-center px-2">
-                    <span className="text-[10px] text-slate-500">Gerado por IA (Studio Mode)</span>
-                    <a href={result.url} download="dropai-img.png" className="text-white bg-purple-600 hover:bg-purple-500 px-3 py-1.5 rounded-lg text-xs font-bold flex gap-2 items-center transition-colors"><Download size={14}/> Baixar Imagem</a>
-                </div>
-            </div>
-        );
     }
 
     return (
@@ -676,8 +647,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                     </div>
                   </div>
               </div>
+          ) : activeModule === 'studio' ? (
+              // --- NOVO: STUDIO VIEW (LEONARDO AI) ---
+              <ImageTool userPlan={userPlan} onUpgrade={handleUpgradeClick} />
           ) : (
-              // --- TOOL VIEW ---
+              // --- TOOL VIEW (GEMINI TEXTS) ---
               <div className="flex flex-col lg:flex-row h-full overflow-hidden relative z-10">
                   
                   {/* LEFT: CONTROLS */}

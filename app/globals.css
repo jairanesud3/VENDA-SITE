@@ -10,15 +10,10 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background: #030014; /* Fundo base ultra-dark */
 }
 
-/* Custom Scrollbar para manter consistência com o design original */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -31,4 +26,36 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #581c87;
+}
+
+/* --- ANIMAÇÕES E FUNDOS AVANÇADOS --- */
+
+/* Grid Pattern estilo "Tron/Cyberpunk" */
+.bg-grid-white {
+  background-size: 50px 50px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+}
+
+/* Animação de movimento do background */
+@keyframes move-grid {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(50px); }
+}
+
+.animate-grid {
+  animation: move-grid 3s linear infinite;
+}
+
+/* Input Autofill Fix (Remove o fundo branco feio do Chrome) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px #0f0720 inset !important;
+    -webkit-text-fill-color: white !important;
+    caret-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
 }
