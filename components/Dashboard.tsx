@@ -806,7 +806,40 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     }
   }
 
-  const renderGenericResult = (data: any) => (<div className="space-y-4">{Object.entries(data).map(([key, value]: any, idx) => (<div key={idx} className="bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden shadow-xl animate-in slide-in-from-bottom-2 duration-500"><div className="px-5 py-3 border-b border-white/5 bg-white/5 flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-purple-500 shadow-[0_0_8px_#a855f7]"></div><h3 className="text-xs font-bold text-white uppercase tracking-widest">{key.replace(/_/g, ' ')}</h3></div><div className="p-5">{Array.isArray(value) ? (<ul className="space-y-2">{value.map((v, i) => (<li key={i} className="text-sm text-slate-300 bg-black/20 p-2.5 rounded border border-white/5 font-medium">{typeof v === 'object' ? JSON.stringify(v) : v}</li>))}</ul>) : (<p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap font-medium">{String(value)}</p>)}</div></div>))}</div>);
+  const renderGenericResult = (data: any) => (
+    <div className="space-y-4">
+      {Object.entries(data).map(([key, value]: any, idx) => (
+        <div key={idx} className="bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden shadow-xl animate-in slide-in-from-bottom-2 duration-500">
+          <div className="px-5 py-3 border-b border-white/5 bg-white/5 flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-purple-500 shadow-[0_0_8px_#a855f7]"></div>
+            <h3 className="text-xs font-bold text-white uppercase tracking-widest">{key.replace(/_/g, ' ')}</h3>
+          </div>
+          <div className="p-5">
+            {typeof value === 'object' && value !== null && !Array.isArray(value) ? (
+               <div className="space-y-3">
+                  {Object.entries(value).map(([subKey, subValue]: any) => (
+                      <div key={subKey} className="bg-black/20 p-3 rounded border border-white/5">
+                          <span className="text-[10px] font-bold text-purple-400 uppercase block mb-1">{subKey.replace(/_/g, ' ')}</span>
+                          <p className="text-slate-300 text-sm whitespace-pre-wrap">{String(subValue)}</p>
+                      </div>
+                  ))}
+               </div>
+            ) : Array.isArray(value) ? (
+              <ul className="space-y-2">
+                {value.map((v, i) => (
+                  <li key={i} className="text-sm text-slate-300 bg-black/20 p-2.5 rounded border border-white/5 font-medium">
+                    {typeof v === 'object' ? JSON.stringify(v) : v}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap font-medium">{String(value)}</p>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   // --- RENDERIZADOR DE PREVIEW ---
   const renderAdPreview = (data: any, platform: string, userImage: string | null, device: 'mobile' | 'desktop') => {
