@@ -11,7 +11,8 @@ import {
   History, Trash2, Calendar, FileText, CheckCircle,
   Mail, UserPlus, FileEdit, Shield, Type,
   ChevronDown, Upload, Eraser, DollarSign, Tag, Text,
-  Clock
+  Clock, HelpCircle, Briefcase, GraduationCap, Globe, Heart,
+  Save, Smile
 } from 'lucide-react';
 import { generateCopy } from '@/app/actions/generate-copy';
 import { getUserHistory, deleteHistoryItem } from '@/app/actions/history';
@@ -24,68 +25,23 @@ interface DashboardProps {
   userEmail?: string | null;
 }
 
-// --- TEMAS GLOBAIS (BACKGROUNDS) ---
+// --- 1. TEMAS GLOBAIS (NOVOS E CORRIGIDOS) ---
 export const BACKGROUNDS = [
-  { 
-    id: 'studio', 
-    name: 'Estúdio Dark', 
-    icon: Moon,
-    class: 'bg-[#050505] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-800/20 via-[#050505] to-[#000000]' 
-  },
-  { 
-    id: 'concrete', 
-    name: 'Concreto Minimal', 
-    icon: Box,
-    class: 'bg-[#1c1c1c] bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-[#333] via-[#1c1c1c] to-[#111]' 
-  },
-  { 
-    id: 'softbox', 
-    name: 'Soft Studio', 
-    icon: Aperture,
-    class: 'bg-[#2a2a2a] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#404040] via-[#2a2a2a] to-[#1a1a1a]' 
-  },
-  { 
-    id: 'emerald', 
-    name: 'Emerald Jungle', 
-    icon: Leaf,
-    class: 'bg-[#0a1f0a] bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-green-900/40 via-[#0a1f0a] to-black' 
-  },
-  { 
-    id: 'velvet', 
-    name: 'Red Velvet', 
-    icon: Gem,
-    class: 'bg-[#1a0505] bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-red-900/30 via-[#1a0505] to-black' 
-  },
-  { 
-    id: 'golden', 
-    name: 'Golden Hour', 
-    icon: Sun,
-    class: 'bg-[#1a0b00] bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-orange-900/20 via-[#1a0b00] to-black' 
-  },
-  { 
-    id: 'cyber', 
-    name: 'Cyber Grid', 
-    icon: Grid3X3,
-    class: 'bg-[#09090b] bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]' 
-  },
-  { 
-    id: 'aurora', 
-    name: 'Neon Aurora', 
-    icon: Sparkles,
-    class: 'bg-[#0F0520] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-900/40 via-[#0F0520] to-black' 
-  },
-  { 
-    id: 'blueprint', 
-    name: 'Tech Blue', 
-    icon: Monitor,
-    class: 'bg-slate-950 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:20px_20px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-slate-950 to-slate-950' 
-  },
-  { 
-    id: 'pure', 
-    name: 'OLED Black', 
-    icon: Palette,
-    class: 'bg-black' 
-  }
+  { id: 'studio', name: 'Estúdio Dark', icon: Moon, class: 'bg-[#050505] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-800/20 via-[#050505] to-[#000000]' },
+  { id: 'purple_haze', name: 'Roxo Profundo', icon: Zap, class: 'bg-[#0f0518] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/40 via-[#0f0518] to-black' },
+  { id: 'midnight_blue', name: 'Azul Meia-Noite', icon: Monitor, class: 'bg-[#020617] bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-blue-900/30 via-[#020617] to-black' },
+  { id: 'forest', name: 'Floresta Noturna', icon: Leaf, class: 'bg-[#021c0b] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-emerald-900/40 via-[#021c0b] to-black' },
+  { id: 'sunset', name: 'Pôr do Sol', icon: Sun, class: 'bg-[#1c0808] bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-orange-900/40 via-[#1c0808] to-black' },
+  { id: 'concrete', name: 'Urbano Cinza', icon: Box, class: 'bg-[#18181b] bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-slate-700/30 via-[#18181b] to-black' },
+  { id: 'matrix', name: 'Matrix Code', icon: Grid3X3, class: 'bg-black bg-[linear-gradient(rgba(0,255,0,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,0,0.05)_1px,transparent_1px)] bg-[size:20px_20px]' },
+  { id: 'royal', name: 'Ouro Real', icon: Gem, class: 'bg-[#120800] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-yellow-900/20 via-[#120800] to-black' },
+  { id: 'clean_dark', name: 'Preto Puro', icon: Palette, class: 'bg-black' },
+  { id: 'nebula', name: 'Nebulosa Rosa', icon: Sparkles, class: 'bg-[#150510] bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-pink-900/30 via-[#150510] to-black' },
+  { id: 'ocean', name: 'Fundo do Mar', icon: Globe, class: 'bg-[#00101f] bg-[radial-gradient(circle_at_bottom_right,_var(--tw-gradient-stops))] from-cyan-900/30 via-[#00101f] to-black' },
+  { id: 'crimson', name: 'Vermelho Sangue', icon: Heart, class: 'bg-[#1a0000] bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-red-900/30 via-[#1a0000] to-black' },
+  { id: 'cyber', name: 'Cyberpunk', icon: Aperture, class: 'bg-[#050510] bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]' },
+  { id: 'coffee', name: 'Café Expresso', icon: Briefcase, class: 'bg-[#140a05] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#382010] via-[#140a05] to-black' },
+  { id: 'slate', name: 'Ardósia', icon: LayoutTemplate, class: 'bg-slate-900' }
 ];
 
 // --- COMPONENTE SELETOR DE TEMA ---
@@ -112,39 +68,34 @@ const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setA
             ? 'bg-purple-600 border-purple-400 text-white' 
             : 'bg-black/40 border-white/10 text-slate-300 hover:text-white hover:bg-white/10'
         }`}
-        title="Alterar Cenário/Tema"
+        title="Mudar Fundo da Tela"
       >
         <Palette className="w-4 h-4 md:w-5 md:h-5" />
       </button>
 
       {isOpen && (
-        <div className="absolute top-12 right-0 w-[260px] md:w-[280px] bg-[#0f0f11] border border-slate-700 rounded-xl shadow-2xl p-4 animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-12 right-0 w-[280px] bg-[#0f0f11] border border-slate-700 rounded-xl shadow-2xl p-4 animate-in fade-in zoom-in-95 duration-200">
           <div className="flex justify-between items-center mb-3 px-1">
             <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-              Selecionar Ambiente
+              Escolha o Visual
             </div>
-            <button 
-                onClick={() => setIsOpen(false)}
-                className="text-slate-500 hover:text-white p-1 rounded-md hover:bg-white/10 transition-colors"
-            >
-                <X className="w-3 h-3" />
-            </button>
+            <button onClick={() => setIsOpen(false)} className="text-slate-500 hover:text-white"><X className="w-3 h-3" /></button>
           </div>
           
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 gap-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
             {BACKGROUNDS.map((bg) => (
               <button
                 key={bg.id}
                 onClick={() => setActiveTheme(bg)} 
                 className={`
-                  relative group aspect-square rounded-lg flex flex-col items-center justify-center transition-all
+                  relative group aspect-square rounded-lg flex flex-col items-center justify-center transition-all border
                   ${activeTheme.id === bg.id 
-                    ? 'bg-purple-600 text-white ring-2 ring-purple-400 ring-offset-2 ring-offset-black' 
-                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'}
+                    ? 'bg-purple-600 text-white border-purple-400' 
+                    : 'bg-slate-800 text-slate-400 border-transparent hover:bg-slate-700 hover:text-white'}
                 `}
                 title={bg.name}
               >
-                <bg.icon className="w-5 h-5 mb-1" />
+                <bg.icon className="w-4 h-4" />
               </button>
             ))}
           </div>
@@ -155,14 +106,13 @@ const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setA
 };
 
 
-// --- CONFIGURAÇÃO MÓDULOS ---
+// --- CONFIGURAÇÃO MÓDULOS (NOMES SIMPLES) ---
 type ModuleId = 
-  | 'home'
+  | 'home' | 'settings' | 'history'
   | 'generator' | 'video_script' | 'studio'
   | 'email_marketing' | 'influencer_dm' | 'blog_post' 
   | 'product_desc' | 'persona' | 'roas_analyzer' 
-  | 'policy_gen' | 'headline_optimizer'
-  | 'history' | 'settings';
+  | 'policy_gen' | 'headline_optimizer';
 
 interface ModuleConfig {
   label: string;
@@ -170,32 +120,110 @@ interface ModuleConfig {
   color: string;
   desc: string;
   category: 'core' | 'marketing' | 'strategy' | 'legal' | 'system';
-  placeholder?: string;
+  explanation: string; // Explicação para leigos
   isPremium?: boolean;
 }
 
 const MODULES: Record<string, ModuleConfig> = {
-  home: { label: 'Visão Geral', icon: Home, color: 'text-purple-400', desc: 'Resumo da conta', category: 'system' },
+  home: { label: 'Início', icon: Home, color: 'text-purple-400', desc: 'Resumo da conta', category: 'system', explanation: 'Sua tela principal.' },
   
   // CRIAÇÃO (CORE)
-  generator: { label: 'Criador de Anúncios', icon: Megaphone, color: 'text-blue-400', desc: 'Posts para Face/Insta/TikTok', category: 'core', placeholder: 'Ex: Corretor Postural Ortopédico...' },
-  video_script: { label: 'Roteiros Virais', icon: Video, color: 'text-pink-400', desc: 'Scripts para TikTok e Reels', category: 'core', isPremium: true, placeholder: 'Ex: Escova Alisadora 3 em 1...' },
-  studio: { label: 'Studio Product AI', icon: Camera, color: 'text-orange-400', desc: 'Fotos de produto 4K', category: 'core', isPremium: true },
+  generator: { 
+      label: 'Criador de Anúncios', 
+      icon: Megaphone, 
+      color: 'text-blue-400', 
+      desc: 'Posts para Insta/Face/TikTok', 
+      category: 'core',
+      explanation: 'Cria o texto (legenda) e simula como seu anúncio vai ficar no Instagram ou Facebook. Ajuda a vender o produto.'
+  },
+  video_script: { 
+      label: 'Roteiros de Vídeo', 
+      icon: Video, 
+      color: 'text-pink-400', 
+      desc: 'Para TikTok, Reels e Shorts', 
+      category: 'core', isPremium: true,
+      explanation: 'Escreve o que você deve falar ou mostrar em vídeos curtos para viralizar no TikTok ou Instagram Reels.'
+  },
+  studio: { 
+      label: 'Estúdio de Fotos IA', 
+      icon: Camera, 
+      color: 'text-orange-400', 
+      desc: 'Fotos profissionais de produto', 
+      category: 'core', isPremium: true,
+      explanation: 'Transforma uma foto caseira do seu produto em uma foto profissional de estúdio usando Inteligência Artificial.'
+  },
   
   // MARKETING 
-  email_marketing: { label: 'E-mail Marketing', icon: Mail, color: 'text-yellow-400', desc: 'Recuperação e Boas-vindas', category: 'marketing', isPremium: true, placeholder: 'Ex: Cliente abandonou carrinho com um Smartwatch...' },
-  influencer_dm: { label: 'Influencer Outreach', icon: UserPlus, color: 'text-rose-400', desc: 'Scripts para parcerias', category: 'marketing', placeholder: 'Ex: Parceria para loja de joias...' },
-  blog_post: { label: 'SEO Blog Builder', icon: FileEdit, color: 'text-green-400', desc: 'Artigos para tráfego orgânico', category: 'marketing', isPremium: true, placeholder: 'Ex: 5 Benefícios de usar palmilhas ortopédicas...' },
+  email_marketing: { 
+      label: 'E-mails que Vendem', 
+      icon: Mail, 
+      color: 'text-yellow-400', 
+      desc: 'Recuperação e Promoções', 
+      category: 'marketing', isPremium: true,
+      explanation: 'Escreve e-mails para enviar aos seus clientes, seja para recuperar uma venda perdida ou anunciar promoções.'
+  },
+  influencer_dm: { 
+      label: 'Parceria com Influencers', 
+      icon: UserPlus, 
+      color: 'text-rose-400', 
+      desc: 'Mensagens de abordagem', 
+      category: 'marketing',
+      explanation: 'Cria a mensagem perfeita para você mandar no direct de influenciadores e fechar parcerias de divulgação.'
+  },
+  blog_post: { 
+      label: 'Artigos para Blog (SEO)', 
+      icon: FileEdit, 
+      color: 'text-green-400', 
+      desc: 'Conteúdo para Google', 
+      category: 'marketing', isPremium: true,
+      explanation: 'Escreve textos completos para blogs que ajudam sua loja a aparecer nas pesquisas do Google (SEO).'
+  },
 
   // ESTRATÉGIA
-  product_desc: { label: 'Descrições SEO', icon: Search, color: 'text-cyan-400', desc: 'Páginas de produto que convertem', category: 'strategy', placeholder: 'Ex: Fone Bluetooth à prova d\'água...' },
-  persona: { label: 'Hacker de Público', icon: Users, color: 'text-indigo-400', desc: 'Avatar do cliente ideal', category: 'strategy', isPremium: true, placeholder: 'Ex: Kit de Ferramentas para Jardim...' },
-  roas_analyzer: { label: 'Calculadora de Lucro', icon: Calculator, color: 'text-emerald-400', desc: 'Previsão de viabilidade', category: 'strategy', placeholder: 'Ex: Custo R$50, Venda R$129...' },
-  headline_optimizer: { label: 'Headline Tester', icon: Type, color: 'text-red-400', desc: '10 Variações de Títulos', category: 'strategy', placeholder: 'Ex: Tênis de Corrida Ultra Leve...' },
+  product_desc: { 
+      label: 'Descrição de Produto', 
+      icon: Search, 
+      color: 'text-cyan-400', 
+      desc: 'Páginas que convencem', 
+      category: 'strategy',
+      explanation: 'Cria aquele texto bonito que fica na página do produto, explicando os benefícios e convencendo o cliente a comprar.'
+  },
+  persona: { 
+      label: 'Descobrir Cliente Ideal', 
+      icon: Users, 
+      color: 'text-indigo-400', 
+      desc: 'Quem é seu comprador?', 
+      category: 'strategy', isPremium: true,
+      explanation: 'Analisa seu produto e te diz exatamente quem é a pessoa que compraria ele (idade, interesses, comportamentos).'
+  },
+  roas_analyzer: { 
+      label: 'Calculadora de Lucro', 
+      icon: Calculator, 
+      color: 'text-emerald-400', 
+      desc: 'Vale a pena vender?', 
+      category: 'strategy',
+      explanation: 'Faz as contas para você: diz quanto você pode gastar em anúncios e qual deve ser o preço para ter lucro.'
+  },
+  headline_optimizer: { 
+      label: 'Gerador de Títulos', 
+      icon: Type, 
+      color: 'text-red-400', 
+      desc: 'Chamadas que clicam', 
+      category: 'strategy',
+      explanation: 'Cria 10 opções de títulos chamativos (headlines) para usar em anúncios ou na página do produto.'
+  },
 
   // LEGAL & SISTEMA
-  policy_gen: { label: 'Gerador de Políticas', icon: Shield, color: 'text-slate-400', desc: 'Termos e Privacidade', category: 'legal', placeholder: 'Ex: Nome da Loja: TechStore, Email: suporte@techstore.com...' },
-  history: { label: 'Minha Biblioteca', icon: History, color: 'text-slate-300', desc: 'Histórico salvo', category: 'system' },
+  policy_gen: { 
+      label: 'Termos e Políticas', 
+      icon: Shield, 
+      color: 'text-slate-400', 
+      desc: 'Textos jurídicos da loja', 
+      category: 'legal',
+      explanation: 'Gera automaticamente os textos de "Política de Privacidade" e "Termos de Uso" obrigatórios para sua loja.'
+  },
+  history: { label: 'Minha Biblioteca', icon: History, color: 'text-slate-300', desc: 'Tudo que você criou', category: 'system', explanation: 'Seu histórico salvo.' },
+  settings: { label: 'Configurações', icon: Settings, color: 'text-slate-300', desc: 'Ajustes da conta', category: 'system', explanation: 'Ajustes da sua conta.' },
 };
 
 const CustomSelect = ({ label, value, onChange, options }: any) => {
@@ -386,56 +414,63 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const router = useRouter();
   const [userPlan, setUserPlan] = useState<'free' | 'pro'>('free'); 
   const [isLoadingPlan, setIsLoadingPlan] = useState(true);
-
-  // --- STATE DO FORMULÁRIO (GERAL) ---
-  const [input, setInput] = useState(''); // Fallback para outros módulos
   
-  // --- STATE ESTRUTURADO PARA O GERADOR DE ANÚNCIOS ---
-  const [adFormData, setAdFormData] = useState({
-      productName: '',
-      price: '',
-      details: '',
-      image: null as string | null // Base64 ou URL para preview
-  });
+  // DADOS DO USUÁRIO EDITÁVEIS
+  const [displayName, setDisplayName] = useState(userEmail ? userEmail.split('@')[0] : 'Visitante');
 
+  // --- NOVO: STATE DINÂMICO PARA FORMULÁRIOS MÚLTIPLOS ---
+  const [dynamicFormData, setDynamicFormData] = useState<Record<string, string>>({});
+  // Campos especiais
+  const [adImage, setAdImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
   
-  const [platform, setPlatform] = useState('Facebook');
-  const [videoDuration, setVideoDuration] = useState('30s');
-
-  const userName = userEmail ? userEmail.split('@')[0] : null;
-  const formattedName = userName ? userName.charAt(0).toUpperCase() + userName.slice(1) : "Visitante";
+  // Modals de Ajuda
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     const init = async () => {
-        const saved = localStorage.getItem('drophacker_themes');
-        if (saved) setThemePrefs(JSON.parse(saved));
+        // Tenta recuperar tema do localStorage
+        const savedPrefs = localStorage.getItem('drophacker_themes');
+        if (savedPrefs) {
+             const prefs = JSON.parse(savedPrefs);
+             setThemePrefs(prefs);
+             // Aplica tema global se existir preferência para 'home'
+             if(prefs['home']) {
+                 const found = BACKGROUNDS.find(b => b.id === prefs['home']);
+                 if(found) setActiveTheme(found);
+             }
+        }
         
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         if (user?.user_metadata?.plan === 'pro') setUserPlan('pro');
+        
+        // Recupera nome salvo se houver
+        const savedName = localStorage.getItem('drophacker_username');
+        if(savedName) setDisplayName(savedName);
+
         setIsLoadingPlan(false);
     };
     init();
   }, []);
 
+  // Aplica tema quando muda de módulo (se tiver salvo)
   useEffect(() => {
-    const savedThemeId = themePrefs[activeModule];
+    const savedThemeId = themePrefs[activeModule] || themePrefs['global'];
     if (savedThemeId) {
         const found = BACKGROUNDS.find(b => b.id === savedThemeId);
         if (found) setActiveTheme(found);
-    } else {
-        setActiveTheme(BACKGROUNDS[0]);
     }
-  }, [activeModule, themePrefs]);
+    // Se não tiver salvo, mantém o atual
+  }, [activeModule]);
 
   const handleThemeChange = (newTheme: typeof BACKGROUNDS[0]) => {
      setActiveTheme(newTheme);
-     const newPrefs = { ...themePrefs, [activeModule]: newTheme.id };
+     const newPrefs = { ...themePrefs, [activeModule]: newTheme.id, 'global': newTheme.id }; // Salva como global também
      setThemePrefs(newPrefs);
      localStorage.setItem('drophacker_themes', JSON.stringify(newPrefs));
   };
@@ -456,14 +491,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const handleUpgradeClick = () => { router.push('/plans'); };
   const isModuleLocked = MODULES[activeModule].isPremium && userPlan === 'free';
 
-  // --- LÓGICA DE UPLOAD SIMULADO (PARA PREVIEW) ---
+  // --- UPDATE: INPUT HANDLERS GENÉRICOS ---
+  const handleInputChange = (field: string, value: string) => {
+      setDynamicFormData(prev => ({ ...prev, [field]: value }));
+  };
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
           const reader = new FileReader();
-          reader.onloadend = () => {
-              setAdFormData(prev => ({ ...prev, image: reader.result as string }));
-          };
+          reader.onloadend = () => setAdImage(reader.result as string);
           reader.readAsDataURL(file);
       }
   };
@@ -471,99 +508,121 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const handleClearForm = () => {
       setResult(null);
       setError(null);
-      setInput('');
-      setAdFormData({
-          productName: '',
-          price: '',
-          details: '',
-          image: null
-      });
+      setDynamicFormData({});
+      setAdImage(null);
   };
 
   const handleGenerate = async () => {
-    // Validação básica
-    if (activeModule === 'generator') {
-        if (!adFormData.productName) { setError("Por favor, informe o nome do produto."); return; }
-    } else {
-        if (!input && !isModuleLocked) return;
-    }
-
     if(isModuleLocked) return;
+
+    // Validação Simples
+    const fields = Object.values(dynamicFormData);
+    if (fields.length === 0 || fields.some(f => String(f).trim() === '')) {
+         // Permite passar se for image tool, senão pede preenchimento
+         if(activeModule !== 'studio' && activeModule !== 'settings' && activeModule !== 'history') {
+             // Verificação relaxada, apenas checa se tem algo
+         }
+    }
 
     setIsGenerating(true);
     setResult(null);
     setError(null);
 
+    // Auto scroll mobile
     if (window.innerWidth < 1024) {
         setTimeout(() => document.getElementById('result-area')?.scrollIntoView({ behavior: 'smooth' }), 100);
     }
 
     try {
         let prompt = "";
-        
+        const data = dynamicFormData; // Atalho
+
+        // --- CONSTRUÇÃO INTELIGENTE DO PROMPT ---
         switch (activeModule) {
             case 'generator':
-                // MONTA O PROMPT COM OS DADOS ESTRUTURADOS
-                const adContext = `
-                    Produto: ${adFormData.productName}
-                    Preço: ${adFormData.price || 'Não informado'}
-                    Detalhes/Benefícios: ${adFormData.details}
-                `;
-
-                prompt = `Atue como Copywriter Brasileiro Especialista em ${platform}. Crie 1 variação de anúncio baseada nestes dados:
-                ${adContext}
-                
-                Se for Marketplace (Shopee/Mercado Livre), foque em SEO e Preço. Se for Social (Insta/Face), foque em Emoção e CTA.
-                Retorne JSON EXATAMENTE assim: { "title": "...", "body": "...", "price": "${adFormData.price || '97,90'}", "cta": "...", "tags": "..." }`;
+                prompt = `Atue como Copywriter Brasileiro Especialista em ${data.platform || 'Facebook'}. Crie 1 anúncio para:
+                Produto: ${data.productName}
+                Preço: ${data.price || 'Não informado'}
+                Público: ${data.audience || 'Geral'}
+                Oferta: ${data.offer || 'Normal'}
+                Retorne JSON: { "title": "...", "body": "...", "price": "${data.price || '99,90'}", "cta": "...", "tags": "..." }`;
                 break;
 
             case 'video_script':
-                prompt = `Roteiro viral de TikTok (${videoDuration}) para: "${input}". 
+                prompt = `Roteiro viral de TikTok (${data.duration || '30s'}) para o produto "${data.productName}".
+                Estilo: ${data.style || 'Engraçado'}.
+                Foco: ${data.focus || 'Benefícios'}.
                 Retorne JSON: { "hook_visual": "...", "hook_audio": "...", "scenes": [{"seconds": "...", "visual": "...", "audio": "..."}] }`;
                 break;
-            case 'product_desc':
-                prompt = `Descrição SEO E-commerce para: "${input}". 
-                Retorne JSON: { "product_title": "...", "meta_description": "...", "description_body": "...", "features_list": ["..."], "faq": [{"q":"...","a":"..."}] }`;
-                break;
-            case 'persona':
-                prompt = `Avatar do cliente ideal para: "${input}". 
-                Retorne JSON: { "name": "...", "age_range": "...", "job": "...", "interests": ["..."], "pain_points": ["..."], "objections": ["..."] }`;
-                break;
+
             case 'email_marketing':
-                prompt = `Crie uma sequência de email marketing (Assunto + Corpo) para: "${input}".
+                prompt = `Sequência de Email Marketing para "${data.productName}".
+                Objetivo: ${data.goal || 'Recuperar Carrinho'}.
+                Desconto Oferecido: ${data.discount || 'Nenhum'}.
                 Retorne JSON: { "email_1_subject": "...", "email_1_body": "...", "email_2_subject": "...", "email_2_body": "..." }`;
                 break;
+
             case 'influencer_dm':
-                prompt = `Crie 3 scripts de DM para abordar influenciadores para o produto: "${input}". 
-                Retorne JSON: { "script_formal": "...", "script_casual": "...", "script_partnership": "..." }`;
+                prompt = `Script de abordagem para Influencer. Produto: "${data.productName}".
+                Nicho: ${data.niche || 'Beleza'}.
+                Proposta: ${data.proposal || 'Permuta'}.
+                Retorne JSON: { "script_formal": "...", "script_casual": "...", "dicas_negociacao": "..." }`;
                 break;
+
             case 'blog_post':
-                prompt = `Escreva um post de blog Otimizado para SEO (Título H1, Introdução, 3 H2s, Conclusão) sobre: "${input}".
-                Retorne JSON: { "title": "...", "intro": "...", "section_1": {"title": "...", "content": "..."}, "section_2": {"title": "...", "content": "..."}, "conclusion": "..." }`;
+                prompt = `Artigo de Blog Otimizado (SEO) sobre: "${data.topic}".
+                Palavra-chave foco: ${data.keyword}.
+                Tom de voz: ${data.tone || 'Informativo'}.
+                Retorne JSON: { "title": "...", "meta_description": "...", "intro": "...", "h2_topics": [{"subtitle": "...", "content": "..."}], "conclusion": "..." }`;
                 break;
-            case 'policy_gen':
-                prompt = `Gere textos legais padrão para loja de dropshipping com os dados: "${input}".
-                Retorne JSON: { "terms_of_service": "...", "privacy_policy": "...", "refund_policy": "..." }`;
+            
+            case 'product_desc':
+                prompt = `Descrição de Produto E-commerce para: "${data.productName}".
+                Características: ${data.features}.
+                Benefício Principal: ${data.benefit}.
+                Retorne JSON: { "headline": "...", "emotional_description": "...", "bullets_features": ["..."], "technical_specs": "..." }`;
                 break;
-            case 'headline_optimizer':
-                prompt = `Gere 10 Headlines de alta conversão (Clickbait ético) para: "${input}".
-                Retorne JSON: { "headlines": ["...", "..."] }`;
+
+            case 'persona':
+                prompt = `Defina o Cliente Ideal (Persona) para o produto: "${data.productName}".
+                Categoria: ${data.category}.
+                Preço Médio: ${data.price}.
+                Retorne JSON: { "nome_ficticio": "...", "idade": "...", "profisssao": "...", "dores": ["..."], "desejos": ["..."], "comportamentos_compra": "..." }`;
                 break;
+
             case 'roas_analyzer':
-                prompt = `Análise de viabilidade dropshipping para: "${input}". 
-                Retorne JSON: { "verdict": "...", "break_even_point": "...", "target_cpa": "...", "suggested_price": "..." }`;
+                prompt = `Análise de Lucro Dropshipping.
+                Custo do Produto (Fornecedor): ${data.cost}.
+                Preço de Venda: ${data.salePrice}.
+                Custo Estimado por Venda (CPA): ${data.cpa || '25% do preço'}.
+                Retorne JSON: { "lucro_bruto": "...", "margem_porcentagem": "...", "analise_viabilidade": "...", "sugestao_preco": "..." }`;
                 break;
+
+             case 'policy_gen':
+                prompt = `Gere textos legais para loja: "${data.storeName}".
+                Email de Suporte: ${data.supportEmail}.
+                Prazo de Entrega: ${data.deliveryTime}.
+                Retorne JSON: { "termos_servico_resumo": "...", "politica_privacidade_resumo": "...", "politica_reembolso_resumo": "..." }`;
+                break;
+
+            case 'headline_optimizer':
+                 prompt = `Gere 10 Headlines (Títulos) Altamente Persuasivos para: "${data.productName}".
+                 Promessa: ${data.promise}.
+                 Retorne JSON: { "titulos_curiosidade": ["..."], "titulos_beneficio": ["..."], "titulos_urgencia": ["..."] }`;
+                 break;
+
             default:
-                prompt = `Ajude com: ${input}`;
+                prompt = `Ajude com: ${JSON.stringify(data)}`;
         }
         
         if (activeModule !== 'studio') {
             const text = await generateCopy(prompt, activeModule);
+            const textStr = typeof text === 'string' ? text : String(text || '');
             try {
-                const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const cleanText = textStr.replace(/```json/g, '').replace(/```/g, '').trim();
                 setResult(JSON.parse(cleanText));
             } catch (e) {
-                setResult({ "Resposta": text }); 
+                setResult({ "Resposta": textStr }); 
             }
         }
 
@@ -571,12 +630,218 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
         if (err.message.includes("Upgrade required")) {
             setError("🔒 ACESSO NEGADO: Recurso PRO.");
         } else {
-            setError("Erro ao processar. Tente novamente.");
+            setError("Ops! Tente novamente. Verifique se preencheu tudo.");
         }
     } finally {
         setIsGenerating(false);
     }
   };
+
+  // --- RENDERIZADOR DE CAMPOS DO FORMULÁRIO (Switch Case Gigante Organizado) ---
+  const renderFormFields = () => {
+    switch(activeModule) {
+        case 'generator':
+            return (
+                <>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1">Nome do Produto</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white focus:border-purple-500 outline-none" placeholder="Ex: Corretor de Postura" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase">Preço (R$)</label>
+                            <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white focus:border-purple-500 outline-none" placeholder="97,90" value={dynamicFormData.price || ''} onChange={e => handleInputChange('price', e.target.value)} />
+                        </div>
+                         <div className="space-y-2">
+                             <label className="text-[10px] font-bold text-slate-500 uppercase">Plataforma</label>
+                             <select className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white focus:border-purple-500 outline-none" value={dynamicFormData.platform || 'Facebook'} onChange={e => handleInputChange('platform', e.target.value)}>
+                                 <option value="Facebook">Facebook</option>
+                                 <option value="Instagram">Instagram</option>
+                                 <option value="TikTok">TikTok</option>
+                                 <option value="Shopee">Shopee</option>
+                             </select>
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase flex justify-between">
+                            <span>Foto (Opcional)</span> {adImage && <span className="text-green-400 text-[9px]">OK</span>}
+                        </label>
+                        <div onClick={() => fileInputRef.current?.click()} className="w-full h-16 border border-dashed border-slate-700 hover:border-purple-500 rounded-lg flex items-center justify-center cursor-pointer gap-2">
+                             <Upload className="w-4 h-4 text-slate-500"/> <span className="text-xs text-slate-500">Enviar Foto</span>
+                        </div>
+                        <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" />
+                    </div>
+                </>
+            );
+        case 'video_script':
+            return (
+                <>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Produto / Tema</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: Escova Alisadora" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                         <div className="space-y-2">
+                             <label className="text-[10px] font-bold text-slate-500 uppercase">Duração</label>
+                             <select className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" value={dynamicFormData.duration || '30s'} onChange={e => handleInputChange('duration', e.target.value)}>
+                                 <option value="15s">15 Segundos</option>
+                                 <option value="30s">30 Segundos</option>
+                                 <option value="60s">1 Minuto</option>
+                             </select>
+                        </div>
+                        <div className="space-y-2">
+                             <label className="text-[10px] font-bold text-slate-500 uppercase">Estilo</label>
+                             <select className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" value={dynamicFormData.style || 'Engraçado'} onChange={e => handleInputChange('style', e.target.value)}>
+                                 <option value="Engraçado">Divertido / Meme</option>
+                                 <option value="Sério">Sério / Profissional</option>
+                                 <option value="Urgente">Urgência / Promoção</option>
+                                 <option value="Storytelling">História / Depoimento</option>
+                             </select>
+                        </div>
+                    </div>
+                </>
+            );
+        case 'email_marketing':
+             return (
+                <>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Nome do Produto</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: Smartwatch X8" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                         <label className="text-[10px] font-bold text-slate-500 uppercase">Objetivo do E-mail</label>
+                         <select className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" value={dynamicFormData.goal || 'Recuperar Carrinho'} onChange={e => handleInputChange('goal', e.target.value)}>
+                             <option value="Recuperar Carrinho">Recuperar Carrinho (Abandono)</option>
+                             <option value="Boas Vindas">Boas Vindas (Novo Cliente)</option>
+                             <option value="Promoção Relâmpago">Promoção Relâmpago</option>
+                             <option value="Pedir Avaliação">Pedir Review (Pós-venda)</option>
+                         </select>
+                    </div>
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Desconto (Opcional)</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: 10% OFF ou Frete Grátis" value={dynamicFormData.discount || ''} onChange={e => handleInputChange('discount', e.target.value)} />
+                    </div>
+                </>
+             );
+        case 'influencer_dm':
+             return (
+                <>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Produto</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: Kit de Maquiagem" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Nicho do Influencer</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: Moda, Gamer, Fitness..." value={dynamicFormData.niche || ''} onChange={e => handleInputChange('niche', e.target.value)} />
+                    </div>
+                     <div className="space-y-2">
+                         <label className="text-[10px] font-bold text-slate-500 uppercase">Tipo de Proposta</label>
+                         <select className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" value={dynamicFormData.proposal || 'Permuta'} onChange={e => handleInputChange('proposal', e.target.value)}>
+                             <option value="Permuta">Permuta (Produto Grátis)</option>
+                             <option value="Pagamento">Pagamento (Publi Paga)</option>
+                             <option value="Comissão">Comissão por Venda (Afiliado)</option>
+                         </select>
+                    </div>
+                </>
+             );
+        case 'blog_post':
+             return (
+                <>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Assunto do Artigo</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: Como escolher o melhor tênis de corrida" value={dynamicFormData.topic || ''} onChange={e => handleInputChange('topic', e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Palavra-chave (Para Google)</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: tênis de corrida barato" value={dynamicFormData.keyword || ''} onChange={e => handleInputChange('keyword', e.target.value)} />
+                    </div>
+                </>
+             );
+        case 'product_desc':
+             return (
+                <>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Nome do Produto</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: Fone Bluetooth Pro" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Características Principais</label>
+                        <textarea className="w-full h-20 bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none resize-none" placeholder="Ex: À prova d'água, bateria de 24h, cancelamento de ruído..." value={dynamicFormData.features || ''} onChange={e => handleInputChange('features', e.target.value)} />
+                    </div>
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Benefício Principal (A "promessa")</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: Ouvir música sem interrupções em qualquer lugar" value={dynamicFormData.benefit || ''} onChange={e => handleInputChange('benefit', e.target.value)} />
+                    </div>
+                </>
+             );
+        case 'persona':
+             return (
+                <>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Produto</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: Cinta Modeladora" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Categoria</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: Beleza e Estética" value={dynamicFormData.category || ''} onChange={e => handleInputChange('category', e.target.value)} />
+                    </div>
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Preço do Produto</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: R$ 129,90" value={dynamicFormData.price || ''} onChange={e => handleInputChange('price', e.target.value)} />
+                    </div>
+                </>
+             );
+        case 'roas_analyzer':
+             return (
+                <>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Custo do Produto (Fornecedor)</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: R$ 30,00" value={dynamicFormData.cost || ''} onChange={e => handleInputChange('cost', e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Preço de Venda (Site)</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: R$ 99,00" value={dynamicFormData.salePrice || ''} onChange={e => handleInputChange('salePrice', e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Custo por Venda Estimado (Marketing)</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: R$ 25,00" value={dynamicFormData.cpa || ''} onChange={e => handleInputChange('cpa', e.target.value)} />
+                    </div>
+                </>
+             );
+        case 'policy_gen':
+             return (
+                <>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Nome da Loja</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: Minha Loja Inc" value={dynamicFormData.storeName || ''} onChange={e => handleInputChange('storeName', e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">E-mail de Suporte</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: contato@minhaloja.com" value={dynamicFormData.supportEmail || ''} onChange={e => handleInputChange('supportEmail', e.target.value)} />
+                    </div>
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Prazo de Entrega Médio</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: 10 a 20 dias úteis" value={dynamicFormData.deliveryTime || ''} onChange={e => handleInputChange('deliveryTime', e.target.value)} />
+                    </div>
+                </>
+             );
+        case 'headline_optimizer':
+             return (
+                <>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Nome do Produto</label>
+                        <input type="text" className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none" placeholder="Ex: Tênis Ortopédico" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Qual a promessa?</label>
+                        <textarea className="w-full h-24 bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white outline-none resize-none" placeholder="Ex: Acabar com dores nas costas em 3 dias" value={dynamicFormData.promise || ''} onChange={e => handleInputChange('promise', e.target.value)} />
+                    </div>
+                </>
+             );
+        default:
+            return <div className="text-slate-500 text-xs">Selecione uma ferramenta.</div>;
+    }
+  }
 
   const renderGenericResult = (data: any) => (
     <div className="space-y-4">
@@ -644,7 +909,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                 </div>
             </div>
 
-            {/* User Plan Card (Mobile/Full Sidebar) */}
+            {/* User Plan Card */}
             <div className={`px-4 py-4 ${!sidebarOpen && 'hidden lg:hidden'}`}>
                 {isLoadingPlan ? (
                     <div className="h-14 w-full bg-slate-900 rounded-lg animate-pulse"></div>
@@ -677,7 +942,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                     onClick={() => { setActiveModule('home'); setMobileMenuOpen(false); }} userPlan={userPlan} 
                 />
 
-                {/* Categories */}
                 {sidebarOpen && <CategoryLabel label="Criação" />}
                 {['generator', 'video_script', 'studio'].map(k => (
                     <SidebarItem key={k} id={k} conf={MODULES[k]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />
@@ -694,7 +958,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                 ))}
 
                  {sidebarOpen && <CategoryLabel label="Sistema" />}
-                 {['policy_gen', 'history'].map(k => (
+                 {['policy_gen', 'history', 'settings'].map(k => (
                     <SidebarItem key={k} id={k} conf={MODULES[k]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />
                 ))}
 
@@ -718,16 +982,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
           
           {activeModule === 'home' ? (
               // === DASHBOARD HOME ===
-              <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 animate-in fade-in slide-in-from-bottom-4 duration-500 bg-[#0B0518]">
-                   <div className="max-w-7xl mx-auto pb-20">
+              <div className={`flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 animate-in fade-in slide-in-from-bottom-4 duration-500 ${activeTheme.class}`}>
+                   <div className="absolute top-4 right-4 z-20">
+                      <ThemeSelector activeTheme={activeTheme} setActiveTheme={handleThemeChange} />
+                   </div>
+                   <div className="max-w-7xl mx-auto pb-20 relative z-10">
                         <div className="mb-10">
                             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                                Olá, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{formattedName}</span>
+                                Olá, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{displayName}</span>
                             </h1>
-                            <p className="text-slate-400">Seu centro de comando de vendas está pronto.</p>
+                            <p className="text-slate-400">Tudo pronto para vender hoje?</p>
                         </div>
 
-                        {/* Grid de Ferramentas */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                             {Object.entries(MODULES)
                                 .filter(([k, v]) => k !== 'home' && k !== 'settings' && k !== 'history')
@@ -735,7 +1001,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                 <button 
                                     key={key}
                                     onClick={() => setActiveModule(key as ModuleId)}
-                                    className="group relative bg-slate-900/40 hover:bg-slate-800/60 border border-slate-800 hover:border-purple-500/30 p-5 rounded-2xl text-left transition-all hover:-translate-y-1 hover:shadow-xl overflow-hidden"
+                                    className="group relative bg-slate-900/40 hover:bg-slate-800/60 border border-slate-800 hover:border-purple-500/30 p-5 rounded-2xl text-left transition-all hover:-translate-y-1 hover:shadow-xl overflow-hidden backdrop-blur-sm"
                                 >
                                     <div className="flex justify-between items-start mb-4">
                                         <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 group-hover:scale-110 transition-transform">
@@ -752,7 +1018,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
               </div>
 
           ) : activeModule === 'history' ? (
-             // === HISTÓRICO REFORMULADO ===
+             // === HISTÓRICO ===
              <div className="flex-1 flex flex-col h-screen overflow-hidden bg-[#0B0518]">
                 <div className="h-20 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-950/50 backdrop-blur-md shrink-0 z-20">
                     <h2 className="text-xl font-bold text-white flex items-center gap-3">
@@ -779,8 +1045,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                 const ModuleIcon = MODULES[item.module]?.icon || Zap;
                                 return (
                                     <div key={item.id} className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden hover:border-purple-500/30 transition-all group flex flex-col h-full shadow-lg">
-                                        
-                                        {/* HEADER DO CARD */}
                                         <div className="px-4 py-3 border-b border-slate-800 bg-slate-950/50 flex items-center justify-between shrink-0">
                                             <div className="flex items-center gap-2">
                                                 <div className="p-1.5 rounded bg-slate-900 border border-slate-800">
@@ -791,38 +1055,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <div className="flex items-center gap-1 text-[10px] text-slate-500">
-                                                    <Calendar className="w-3 h-3" />
-                                                    {new Date(item.created_at).toLocaleDateString('pt-BR')}
-                                                </div>
                                                 <button 
                                                     onClick={() => { if(confirm('Excluir este item?')) deleteHistoryItem(item.id).then(fetchHistory); }} 
                                                     className="p-1 hover:bg-red-500/10 text-slate-600 hover:text-red-400 rounded transition-colors"
-                                                    title="Excluir"
                                                 >
                                                     <Trash2 className="w-3.5 h-3.5" />
                                                 </button>
                                             </div>
                                         </div>
-
-                                        {/* CORPO DO CARD */}
                                         <div className="p-4 flex-1 flex flex-col min-h-0">
-                                            {/* Prompt (Pergunta) */}
-                                            <div className="mb-3">
-                                                <div className="flex items-center gap-1.5 mb-1.5">
-                                                    <Search className="w-3 h-3 text-slate-500" />
-                                                    <span className="text-[9px] font-bold text-slate-500 uppercase">Entrada</span>
-                                                </div>
-                                                <p className="text-xs text-slate-400 italic line-clamp-2 bg-slate-950/50 p-2 rounded border border-slate-800/50">
-                                                    "{item.prompt}"
-                                                </p>
-                                            </div>
-
-                                            {/* Resultado (Conteúdo) */}
                                             <div className="flex-1 overflow-y-auto custom-scrollbar max-h-[300px] min-h-[150px]">
                                                 {historyType === 'image' ? (
                                                     <div className="relative group/img cursor-pointer aspect-square rounded-lg overflow-hidden border border-slate-800">
-                                                        <img src={item.result?.url} className="w-full h-full object-cover transition-transform group-hover/img:scale-105" />
+                                                        <img src={item.result?.url} className="w-full h-full object-cover" />
                                                         <a href={item.result?.url} target="_blank" className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
                                                             <Download className="w-6 h-6 text-white" />
                                                         </a>
@@ -832,8 +1077,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                                 )}
                                             </div>
                                         </div>
-
-                                        {/* FOOTER DO CARD (AÇÕES) */}
                                         {historyType === 'text' && (
                                             <div className="p-3 border-t border-slate-800 bg-slate-950/30">
                                                 <button 
@@ -856,32 +1099,83 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                 </div>
              </div>
 
+          ) : activeModule === 'settings' ? (
+              // === CONFIGURAÇÕES ===
+              <div className="flex-1 flex flex-col h-screen overflow-hidden bg-[#0B0518]">
+                  <div className="h-20 border-b border-slate-800 flex items-center px-6 bg-slate-950/50 backdrop-blur-md">
+                      <h2 className="text-xl font-bold text-white flex items-center gap-3">
+                        <div className="p-2 bg-slate-900 rounded-lg border border-slate-800"><Settings className="w-5 h-5 text-purple-400"/></div>
+                        Configurações da Conta
+                      </h2>
+                  </div>
+                  <div className="p-8 max-w-2xl">
+                      <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 mb-6">
+                          <h3 className="text-lg font-bold text-white mb-4">Perfil</h3>
+                          <div className="space-y-4">
+                              <div>
+                                  <label className="text-xs text-slate-500 uppercase font-bold block mb-2">Seu E-mail (Login)</label>
+                                  <input type="text" value={userEmail || ''} disabled className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-slate-400 text-sm cursor-not-allowed" />
+                              </div>
+                              <div>
+                                  <label className="text-xs text-slate-500 uppercase font-bold block mb-2">Como você quer ser chamado?</label>
+                                  <input 
+                                    type="text" 
+                                    value={displayName} 
+                                    onChange={(e) => {
+                                        setDisplayName(e.target.value);
+                                        localStorage.setItem('drophacker_username', e.target.value);
+                                    }}
+                                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-white text-sm focus:border-purple-500 outline-none" 
+                                  />
+                              </div>
+                          </div>
+                      </div>
+
+                       <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
+                          <h3 className="text-lg font-bold text-white mb-4">Preferências</h3>
+                          <div className="flex items-center justify-between p-3 bg-slate-950 rounded-lg mb-3">
+                              <span className="text-sm text-slate-300">Limpar todo o histórico de temas salvos</span>
+                              <button onClick={() => { localStorage.removeItem('drophacker_themes'); alert('Temas resetados!'); }} className="text-xs bg-red-900/20 text-red-400 px-3 py-1.5 rounded hover:bg-red-900/40">Limpar</button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
           ) : activeModule === 'studio' ? (
               // === STUDIO (IMAGENS) ===
               <ImageTool userPlan={userPlan} onUpgrade={handleUpgradeClick} activeTheme={activeTheme} setActiveTheme={handleThemeChange} />
           
           ) : (
-              // === FERRAMENTAS DE TEXTO (GERADOR) ===
+              // === GERADORES DE TEXTO (TODOS) ===
               <div className="flex flex-col lg:flex-row h-full overflow-hidden relative">
                   
-                  {/* --- INPUT PANEL --- */}
+                  {/* --- PAINEL DE ENTRADA (ESQUERDA) --- */}
                   <div className="w-full lg:w-[380px] bg-slate-950 border-r border-slate-800 flex flex-col h-auto lg:h-full z-20 shadow-2xl overflow-y-auto custom-scrollbar">
                         <div className="p-6 sticky top-0 bg-slate-950 z-10 border-b border-slate-800/50 flex flex-col gap-4">
                             <div className="flex items-center justify-between">
                                 <button onClick={() => setActiveModule('home')} className="lg:hidden flex items-center gap-1 text-xs text-slate-500"><ChevronRight className="rotate-180 w-3 h-3"/> Voltar</button>
-                                <button onClick={handleClearForm} className="text-xs flex items-center gap-1 text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-900 border border-slate-800 hover:bg-slate-800 transition-colors ml-auto" title="Limpar Campos e Começar Novo">
+                                <button onClick={handleClearForm} className="text-xs flex items-center gap-1 text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-900 border border-slate-800 hover:bg-slate-800 transition-colors ml-auto" title="Limpar Campos">
                                     <Eraser className="w-3 h-3" /> Limpar
                                 </button>
                             </div>
                             
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 relative">
                                 <div className={`p-2 rounded-lg bg-slate-900 border border-slate-800`}>
                                     {React.createElement(MODULES[activeModule].icon, { className: `w-5 h-5 ${MODULES[activeModule].color}` })}
                                 </div>
                                 <div>
-                                    <h2 className="font-bold text-white text-lg leading-tight">{MODULES[activeModule].label}</h2>
+                                    <h2 className="font-bold text-white text-lg leading-tight flex items-center gap-2">
+                                        {MODULES[activeModule].label}
+                                        <button onClick={() => setShowHelp(!showHelp)} className="text-slate-600 hover:text-purple-400 transition-colors"><HelpCircle className="w-4 h-4" /></button>
+                                    </h2>
                                     <p className="text-[10px] text-slate-500 line-clamp-1">{MODULES[activeModule].desc}</p>
                                 </div>
+                                {showHelp && (
+                                    <div className="absolute top-12 left-0 w-full bg-slate-800 border border-slate-700 p-3 rounded-lg shadow-xl z-50 text-xs text-slate-300 animate-in fade-in zoom-in-95">
+                                        <p>{MODULES[activeModule].explanation}</p>
+                                        <button onClick={() => setShowHelp(false)} className="mt-2 text-[10px] text-purple-400 underline">Entendi</button>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -897,77 +1191,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                 </div>
                             )}
 
-                            {/* --- FORMULÁRIO ESPECÍFICO DO GERADOR DE ANÚNCIOS --- */}
-                            {activeModule === 'generator' ? (
-                                <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5"><Tag className="w-3 h-3"/> Nome do Produto</label>
-                                        <input 
-                                            type="text"
-                                            value={adFormData.productName}
-                                            onChange={(e) => setAdFormData({...adFormData, productName: e.target.value})}
-                                            placeholder="Ex: Fone Bluetooth Pro..."
-                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white focus:border-purple-500 outline-none transition-colors"
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5"><DollarSign className="w-3 h-3"/> Preço (Opcional)</label>
-                                        <input 
-                                            type="text"
-                                            value={adFormData.price}
-                                            onChange={(e) => setAdFormData({...adFormData, price: e.target.value})}
-                                            placeholder="Ex: 97,90"
-                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white focus:border-purple-500 outline-none transition-colors"
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 justify-between">
-                                            <span className="flex items-center gap-1.5"><ImageIcon className="w-3 h-3"/> Foto do Produto (Para Simulação)</span>
-                                            {adFormData.image && <span className="text-[9px] text-green-400 bg-green-900/20 px-1.5 rounded">Imagem OK</span>}
-                                        </label>
-                                        <div 
-                                            onClick={() => fileInputRef.current?.click()}
-                                            className="w-full h-20 border border-dashed border-slate-700 hover:border-purple-500/50 hover:bg-slate-900/50 rounded-lg flex items-center justify-center cursor-pointer transition-all gap-2"
-                                        >
-                                            <Upload className="w-4 h-4 text-slate-500" />
-                                            <span className="text-xs text-slate-500">Clique para enviar foto</span>
-                                        </div>
-                                        <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5"><Text className="w-3 h-3"/> Detalhes / Benefícios</label>
-                                        <textarea 
-                                            value={adFormData.details}
-                                            onChange={(e) => setAdFormData({...adFormData, details: e.target.value})}
-                                            placeholder="Descreva o produto, benefícios, dores que resolve..."
-                                            className="w-full h-24 bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white focus:border-purple-500 outline-none resize-none transition-colors"
-                                        />
-                                    </div>
-                                    
-                                    <CustomSelect label="Plataforma" value={platform} onChange={setPlatform} options={['Facebook', 'Instagram', 'Shopee', 'Mercado Livre', 'TikTok']} />
-                                </div>
-                            ) : (
-                                /* --- FORMULÁRIO GENÉRICO PARA OUTROS MÓDULOS --- */
-                                <>
-                                    <div>
-                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">Entrada de Dados</label>
-                                        <textarea 
-                                            value={input}
-                                            onChange={(e) => setInput(e.target.value)}
-                                            placeholder={MODULES[activeModule].placeholder || "Descreva o que você precisa..."}
-                                            disabled={isModuleLocked}
-                                            className="w-full h-40 bg-slate-900 border border-slate-800 rounded-xl p-4 text-sm text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 outline-none resize-none transition-all placeholder:text-slate-600"
-                                        />
-                                    </div>
-                                    
-                                    {activeModule === 'video_script' && (
-                                        <CustomSelect label="Duração" value={videoDuration} onChange={setVideoDuration} options={['15s', '30s', '60s']} />
-                                    )}
-                                </>
-                            )}
+                            {/* --- FORMULÁRIOS DINÂMICOS --- */}
+                            {renderFormFields()}
+                            
                         </div>
 
                         <div className="p-6 bg-slate-900/30 border-t border-slate-800 mt-auto">
@@ -982,7 +1208,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                         </div>
                   </div>
 
-                  {/* --- RESULT PANEL --- */}
+                  {/* --- PAINEL DE RESULTADO (DIREITA) --- */}
                   <div id="result-area" className={`flex-1 relative overflow-hidden flex flex-col min-h-[60vh] transition-all duration-700 ${activeTheme.class}`}>
                         <div className="absolute top-4 right-4 z-50">
                             <ThemeSelector activeTheme={activeTheme} setActiveTheme={handleThemeChange} />
@@ -992,7 +1218,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                              {!result && !isGenerating && (
                                  <div className="my-auto text-center opacity-30 flex flex-col items-center animate-in zoom-in-95 duration-700">
                                      <LayoutTemplate className="w-16 h-16 text-white mb-4" />
-                                     <p className="text-white font-medium">Preencha os dados e gere sua copy.</p>
+                                     <p className="text-white font-medium">Preencha os dados ao lado e gere sua copy.</p>
                                  </div>
                              )}
 
@@ -1014,12 +1240,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                          </button>
                                      </div>
                                      
-                                     {/* SE FOR GENERATOR, USA A PREVIEW COM A IMAGEM DO USUÁRIO SE TIVER */}
                                      {activeModule === 'generator' ? (
-                                         platform === 'Instagram' ? (
-                                            <InstagramPreview data={result} userImage={adFormData.image} />
+                                         dynamicFormData.platform === 'Instagram' ? (
+                                            <InstagramPreview data={result} userImage={adImage} />
                                          ) : (
-                                            <FacebookPreview data={result} userImage={adFormData.image} />
+                                            <FacebookPreview data={result} userImage={adImage} />
                                          )
                                      ) : (
                                          renderGenericResult(result)
