@@ -81,24 +81,38 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
   const [error, setError] = useState<string | null>(null);
   const [activeBg, setActiveBg] = useState(BACKGROUNDS[0]);
   
-  // Estado para Imagem de Referência
-  const [referenceImage, setReferenceImage] = useState<string | null>(null);
+  // Estado para Visualização (Preview)
+  const [referenceImagePreview, setReferenceImagePreview] = useState<string | null>(null);
+  // Estado para Arquivo Real (File)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        setError("A imagem deve ter no máximo 5MB.");
+      if (file.size > 9 * 1024 * 1024) { // 9MB limit (segurança antes do server)
+        setError("A imagem deve ter no máximo 9MB.");
         return;
       }
+      
+      // Armazena o arquivo real para envio
+      setSelectedFile(file);
+
+      // Cria preview para UI
       const reader = new FileReader();
       reader.onloadend = () => {
-        setReferenceImage(reader.result as string);
+        setReferenceImagePreview(reader.result as string);
         setError(null);
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleRemoveImage = () => {
+    setReferenceImagePreview(null);
+    setSelectedFile(null);
+    if(fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleGenerate = async () => {
@@ -112,8 +126,16 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
     setImageUrl(null);
 
     try {
-      // Passa a imagem de referência (se houver) para a Server Action
-      const url = await generateProductImage(prompt, referenceImage || undefined);
+      // Cria FormData para enviar arquivo e texto
+      const formData = new FormData();
+      formData.append('prompt', prompt);
+      
+      if (selectedFile) {
+        formData.append('image', selectedFile);
+      }
+
+      // Chama a Server Action
+      const url = await generateProductImage(formData);
       setImageUrl(url);
     } catch (err: any) {
       console.error(err);
@@ -141,38 +163,16 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
           </p>
         </div>
 
-        {/* 
-            BANNER DE BLOQUEIO PARA VISITANTES (FREE)
-            (Descomentar quando quiser bloquear o uso gratuito)
-        */}
-        {/* {userPlan === 'free' && (
-           <div className="mb-6 p-4 bg-slate-900/80 border border-yellow-500/30 rounded-xl relative overflow-hidden group animate-in fade-in slide-in-from-top-2">
-              <div className="absolute inset-0 bg-yellow-500/5 animate-pulse"></div>
-              <div className="relative z-10 flex flex-col gap-2">
-                 <div className="flex items-center gap-2 text-yellow-400 font-bold text-sm">
-                    <Lock className="w-4 h-4" /> Recurso Exclusivo
-                 </div>
-                 <p className="text-xs text-slate-300 leading-relaxed">
-                    Este modelo de IA (Kino XL) é exclusivo para assinantes. 
-                    Disponível no plano <span className="text-white font-bold">Iniciante</span> (pacote básico) e <span className="text-purple-400 font-bold">PRO</span> (potência máxima).
-                 </p>
-                 <button onClick={onUpgrade} className="mt-2 bg-gradient-to-r from-yellow-600 to-orange-600 text-white text-xs font-bold py-2.5 rounded-lg hover:brightness-110 transition-all shadow-lg shadow-orange-900/20">
-                    Liberar Acesso Agora
-                 </button>
-              </div>
-           </div>
-        )} */}
-
         <div className="space-y-6 flex-1">
           
           {/* AREA DE UPLOAD DE IMAGEM */}
           <div>
             <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block flex justify-between">
               <span>1. Foto do Produto (Opcional)</span>
-              {referenceImage && <span className="text-green-400">Imagem carregada</span>}
+              {referenceImagePreview && <span className="text-green-400">Imagem carregada</span>}
             </label>
             
-            {!referenceImage ? (
+            {!referenceImagePreview ? (
                 <div 
                     onClick={() => fileInputRef.current?.click()}
                     className="w-full h-32 border-2 border-dashed border-slate-700 hover:border-orange-500/50 hover:bg-slate-900/50 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all group"
@@ -181,13 +181,13 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
                         <Upload className="w-5 h-5 text-slate-400 group-hover:text-orange-400" />
                     </div>
                     <span className="text-xs text-slate-400 group-hover:text-white font-medium">Clique para enviar foto</span>
-                    <span className="text-[10px] text-slate-600 mt-1">PNG ou JPG (Max 5MB)</span>
+                    <span className="text-[10px] text-slate-600 mt-1">PNG ou JPG (Max 9MB)</span>
                 </div>
             ) : (
                 <div className="relative w-full h-32 rounded-xl overflow-hidden border border-slate-700 group">
-                    <img src={referenceImage} alt="Referência" className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" />
+                    <img src={referenceImagePreview} alt="Referência" className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" />
                     <button 
-                        onClick={() => { setReferenceImage(null); if(fileInputRef.current) fileInputRef.current.value = ''; }}
+                        onClick={handleRemoveImage}
                         className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500/80 text-white rounded-full transition-colors backdrop-blur-sm"
                     >
                         <X className="w-4 h-4" />
@@ -215,7 +215,7 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               disabled={isLoading}
-              placeholder={referenceImage 
+              placeholder={referenceImagePreview 
                 ? "Ex: Coloque este produto em cima de uma pedra de mármore, fundo desfocado de luxo, iluminação de cinema..."
                 : "Ex: Uma garrafa térmica preta moderna em cima de uma mesa de madeira rústica..."
               }
@@ -242,8 +242,8 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
                </div>
             ) : (
                <div className="flex items-center gap-2">
-                 {referenceImage ? <RefreshCw className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
-                 <span>{referenceImage ? 'TRANSFORMAR PRODUTO' : 'GERAR DO ZERO'}</span>
+                 {referenceImagePreview ? <RefreshCw className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
+                 <span>{referenceImagePreview ? 'TRANSFORMAR PRODUTO' : 'GERAR DO ZERO'}</span>
                </div>
             )}
           </Button>
@@ -292,7 +292,7 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
                   <ImagePlus className="w-20 h-20 mb-4 text-white/50 relative z-10" />
                </div>
                <p className="text-lg text-white/50 font-medium max-w-xs">
-                 {referenceImage ? "Descreva o cenário e clique em Transformar." : "Faça upload de um produto ou descreva um do zero."}
+                 {referenceImagePreview ? "Descreva o cenário e clique em Transformar." : "Faça upload de um produto ou descreva um do zero."}
                </p>
             </div>
          )}
@@ -303,9 +303,9 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
                   <div className="absolute inset-0 border-t-2 border-orange-500/50 rounded-full animate-spin"></div>
                   <div className="absolute inset-2 border-r-2 border-purple-500/50 rounded-full animate-spin-slow"></div>
                   
-                  {referenceImage && (
+                  {referenceImagePreview && (
                     <div className="absolute inset-6 rounded-full overflow-hidden border border-white/10 opacity-50 animate-pulse">
-                         <img src={referenceImage} className="w-full h-full object-cover grayscale" />
+                         <img src={referenceImagePreview} className="w-full h-full object-cover grayscale" />
                     </div>
                   )}
                   
@@ -314,7 +314,7 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
                   </div>
                </div>
                <p className="text-orange-400 text-sm font-bold tracking-widest animate-pulse">
-                   {referenceImage ? 'FUNDINDO IMAGEM...' : 'RENDERIZANDO 4K...'}
+                   {referenceImagePreview ? 'FUNDINDO IMAGEM...' : 'RENDERIZANDO 4K...'}
                </p>
             </div>
          )}

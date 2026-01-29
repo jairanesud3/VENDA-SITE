@@ -2,8 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   // CRITICAL FIX: Expose the API_KEY to the client-side bundle.
-  // This allows the existing components (Dashboard, SupportWidget) to access process.env.API_KEY
-  // directly in the browser, replicating the behavior of the previous Vite app.
   env: {
     API_KEY: process.env.API_KEY,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
@@ -12,8 +10,14 @@ const nextConfig = {
     domains: [
       'images.unsplash.com', 
       'grainy-gradients.vercel.app', 
-      'source.unsplash.com'
+      'source.unsplash.com',
+      'cdn.leonardo.ai'
     ],
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
   },
   typescript: {
     ignoreBuildErrors: true,

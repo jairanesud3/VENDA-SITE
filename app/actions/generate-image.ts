@@ -7,9 +7,11 @@ import { Buffer } from "buffer";
 const LEONARDO_API_URL = "https://cloud.leonardo.ai/api/rest/v1";
 const MODEL_ID = "aa77f04e-3eec-4034-9c07-d0f619684628"; // Leonardo Kino XL
 
-// Função auxiliar para fazer upload da imagem de referência para a Leonardo AI
-async function uploadInitImage(apiKey: string, base64Image: string, extension: string) {
+// Função auxiliar para fazer upload da imagem para a Leonardo AI
+async function uploadToLeonardo(apiKey: string, imageFile: File) {
   try {
+    const extension = imageFile.name.split('.').pop() || 'jpg';
+
     // 1. Solicitar URL pré-assinada (Presigned URL)
     const initResponse = await fetch(`${LEONARDO_API_URL}/init-image`, {
       method: 'POST',
@@ -21,21 +23,30 @@ async function uploadInitImage(apiKey: string, base64Image: string, extension: s
       body: JSON.stringify({ extension })
     });
 
-    if (!initResponse.ok) throw new Error("Falha ao iniciar upload de imagem.");
+    if (!initResponse.ok) {
+        const errorText = await initResponse.text();
+        throw new Error(`Falha ao iniciar upload: ${errorText}`);
+    }
+    
     const initData = await initResponse.json();
     const { uploadUrl, id } = initData.uploadInitImage;
 
     // 2. Fazer Upload dos dados binários (PUT)
-    // Remove o header do base64 (ex: "data:image/jpeg;base64,") para enviar apenas o buffer
-    const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, "");
-    const buffer = Buffer.from(base64Data, 'base64');
+    const arrayBuffer = await imageFile.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
     const uploadResponse = await fetch(uploadUrl, {
       method: 'PUT',
-      body: buffer
+      body: buffer,
+      headers: {
+        'Content-Type': imageFile.type || 'image/jpeg',
+        // 'Content-Length' é gerenciado automaticamente pelo fetch/node
+      }
     });
 
-    if (!uploadResponse.ok) throw new Error("Falha ao enviar imagem para o servidor da IA.");
+    if (!uploadResponse.ok) {
+        throw new Error("Falha ao enviar binário da imagem para o servidor.");
+    }
 
     return id; // Retorna o ID da imagem para usar na geração
   } catch (error) {
@@ -44,8 +55,14 @@ async function uploadInitImage(apiKey: string, base64Image: string, extension: s
   }
 }
 
-export async function generateProductImage(prompt: string, imageBase64?: string) {
-  // 1. SEGURANÇA E AUTENTICAÇÃO
+export async function generateProductImage(formData: FormData) {
+  // 1. EXTRAÇÃO DE DADOS
+  const prompt = formData.get('prompt') as string;
+  const imageFile = formData.get('image') as File | null;
+
+  if (!prompt) throw new Error("Prompt é obrigatório.");
+
+  // 2. SEGURANÇA E AUTENTICAÇÃO
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -55,13 +72,7 @@ export async function generateProductImage(prompt: string, imageBase64?: string)
 
   // Verificar Plano
   const userPlan = user.user_metadata?.plan || 'free';
-  
-  // --- MODO TESTE (DEV): TRAVA DE PLANO DESATIVADA TEMPORARIAMENTE ---
-  /*
-  if (userPlan !== 'pro') {
-    throw new Error("🔒 Recurso exclusivo PRO. Faça upgrade para gerar imagens de estúdio.");
-  }
-  */
+  // Lógica de restrição de plano pode ser reativada aqui se necessário
 
   // Rate Limit
   const isAllowed = checkRateLimit(user.id);
@@ -77,14 +88,13 @@ export async function generateProductImage(prompt: string, imageBase64?: string)
   try {
     let initImageId = null;
 
-    // 2. SE HOUVER IMAGEM DE REFERÊNCIA, FAZER UPLOAD PRIMEIRO
-    if (imageBase64) {
-      // Detectar extensão simples (assumindo jpg ou png baseada no header, ou default jpg)
-      const extension = imageBase64.substring("data:image/".length, imageBase64.indexOf(";base64")) || "jpg";
-      initImageId = await uploadInitImage(apiKey, imageBase64, extension);
+    // 3. SE HOUVER ARQUIVO, FAZER UPLOAD
+    if (imageFile && imageFile.size > 0) {
+      console.log("Iniciando upload de imagem de referência...");
+      initImageId = await uploadToLeonardo(apiKey, imageFile);
     }
 
-    // 3. CONFIGURAR PAYLOAD DA GERAÇÃO
+    // 4. CONFIGURAR PAYLOAD DA GERAÇÃO
     const payload: any = {
       height: 1024,
       width: 1024,
@@ -94,15 +104,19 @@ export async function generateProductImage(prompt: string, imageBase64?: string)
       public: false,
     };
 
-    // Se tiver imagem, adiciona os parâmetros de Image-to-Image
+    // Configuração Image-to-Image
     if (initImageId) {
       payload.init_image_id = initImageId;
-      payload.init_strength = 0.4; // 0.1 a 0.9 (Quanto maior, mais fiel à imagem original. 0.4 permite mudar o fundo mantendo a forma)
-      payload.prompt = `(product shot) ${prompt}, maintaining the product shape perfectly, cinematic lighting`;
+      // init_strength controla quanto a IA deve respeitar a imagem original vs o prompt.
+      // 0.35 dá liberdade criativa para mudar o fundo mantendo a essência do produto.
+      payload.init_strength = 0.35; 
+      
+      // Reforça o prompt para garantir que o cenário mude
+      payload.prompt = `(product shot) ${prompt}, maintaining the product shape perfectly, cinematic lighting, 8k resolution`;
     }
 
-    // 4. INICIAR GERAÇÃO (POST)
-    const initResponse = await fetch(`${LEONARDO_API_URL}/generations`, {
+    // 5. INICIAR GERAÇÃO (POST)
+    const generationResponse = await fetch(`${LEONARDO_API_URL}/generations`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -112,19 +126,19 @@ export async function generateProductImage(prompt: string, imageBase64?: string)
       body: JSON.stringify(payload)
     });
 
-    if (!initResponse.ok) {
-      const err = await initResponse.json();
+    if (!generationResponse.ok) {
+      const err = await generationResponse.json();
       throw new Error(`Erro Leonardo AI: ${JSON.stringify(err)}`);
     }
 
-    const initData = await initResponse.json();
-    const generationId = initData.sdGenerationJob?.generationId;
+    const generationData = await generationResponse.json();
+    const generationId = generationData.sdGenerationJob?.generationId;
 
     if (!generationId) {
       throw new Error("Falha ao obter ID da geração.");
     }
 
-    // 5. POLLING LOOP (ESPERAR IMAGEM FICAR PRONTA)
+    // 6. POLLING LOOP (ESPERAR IMAGEM FICAR PRONTA)
     let imageUrl = null;
     let attempts = 0;
     const maxAttempts = 30; // 60 segundos máx
