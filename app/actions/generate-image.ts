@@ -2,114 +2,107 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { checkRateLimit } from "@/utils/rate-limit";
-import { Buffer } from "buffer";
+import { GoogleGenAI } from "@google/genai";
+import { Buffer } from "node:buffer";
 
 const LEONARDO_API_URL = "https://cloud.leonardo.ai/api/rest/v1";
-const MODEL_ID = "aa77f04e-3eec-4034-9c07-d0f619684628"; // Leonardo Kino XL
-
-// Função auxiliar para fazer upload da imagem para a Leonardo AI
-async function uploadToLeonardo(apiKey: string, imageFile: File) {
-  try {
-    const extension = imageFile.name.split('.').pop() || 'jpg';
-
-    // 1. Solicitar URL pré-assinada (Presigned URL)
-    const initResponse = await fetch(`${LEONARDO_API_URL}/init-image`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({ extension })
-    });
-
-    if (!initResponse.ok) {
-        const errorText = await initResponse.text();
-        throw new Error(`Falha ao iniciar upload: ${errorText}`);
-    }
-    
-    const initData = await initResponse.json();
-    const { uploadUrl, id } = initData.uploadInitImage;
-
-    // 2. Fazer Upload dos dados binários (PUT)
-    const arrayBuffer = await imageFile.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    const uploadResponse = await fetch(uploadUrl, {
-      method: 'PUT',
-      body: buffer,
-      headers: {
-        'Content-Type': imageFile.type || 'image/jpeg',
-      }
-    });
-
-    if (!uploadResponse.ok) {
-        throw new Error("Falha ao enviar binário da imagem para o servidor.");
-    }
-
-    return id; // Retorna o ID da imagem para usar na geração
-  } catch (error) {
-    console.error("Erro no upload de imagem:", error);
-    throw error;
-  }
-}
+// Modelo Leonardo Kino XL (Fotorealismo de alto nível)
+const LEONARDO_MODEL_ID = "aa77f04e-3eec-4034-9c07-d0f619684628"; 
 
 export async function generateProductImage(formData: FormData) {
   try {
-    // 1. EXTRAÇÃO DE DADOS
-    const prompt = formData.get('prompt') as string;
+    // 1. EXTRAÇÃO E SEGURANÇA
+    const promptUsuario = formData.get('prompt') as string;
     const imageFile = formData.get('image') as File | null;
 
-    if (!prompt) throw new Error("Prompt é obrigatório.");
+    if (!promptUsuario) throw new Error("Por favor, descreva o cenário.");
 
-    // 2. SEGURANÇA E AUTENTICAÇÃO
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user) {
-      throw new Error("Usuário não autenticado.");
-    }
+    if (!user) throw new Error("Sessão expirada. Faça login novamente.");
 
-    const userPlan = user.user_metadata?.plan || 'free';
     const isAllowed = checkRateLimit(user.id);
-    if (!isAllowed) {
-      throw new Error("⏳ Muitas requisições. Aguarde um momento.");
+    if (!isAllowed) throw new Error("⏳ Limite de requisições atingido. Aguarde 1 minuto.");
+
+    const leoApiKey = process.env.LEONARDO_API_KEY;
+    const geminiApiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+
+    if (!leoApiKey || !geminiApiKey) {
+      throw new Error("Erro de configuração de API no servidor.");
     }
 
-    const apiKey = process.env.LEONARDO_API_KEY;
-    if (!apiKey) {
-      throw new Error("Erro de configuração: LEONARDO_API_KEY ausente.");
-    }
+    let finalPrompt = promptUsuario;
 
-    let initImageId = null;
-
-    // 3. SE HOUVER ARQUIVO, FAZER UPLOAD
+    // 2. ESTRATÉGIA VISION: SE TIVER IMAGEM, O GEMINI ANALISA
     if (imageFile && imageFile.size > 0) {
-      console.log("Iniciando upload de imagem de referência...");
-      initImageId = await uploadToLeonardo(apiKey, imageFile);
+        console.log("📸 Iniciando análise visual com Gemini...");
+        
+        const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+        
+        // Converter File para Base64
+        const arrayBuffer = await imageFile.arrayBuffer();
+        const base64Data = Buffer.from(arrayBuffer).toString('base64');
+        const mimeType = imageFile.type || 'image/jpeg';
+
+        // Prompt de Engenharia para o Gemini descrever o produto
+        const visionPrompt = `
+            Analise esta imagem. Descreva o produto visualmente com extrema precisão (materiais, cores, formato, texturas).
+            Combine essa descrição técnica do produto com o seguinte pedido de cenário do usuário: "${promptUsuario}".
+            
+            Com base nisso, crie um PROMPT FINAL EM INGLÊS otimizado para a Leonardo AI gerar uma imagem fotorealista.
+            
+            Estrutura obrigatória do output:
+            [Descrição Detalhada do Produto] in [Cenário Solicitado], cinematic lighting, 8k resolution, photorealistic, commercial photography, depth of field.
+            
+            Retorne APENAS o prompt em inglês.
+        `;
+
+        const visionResponse = await ai.models.generateContent({
+            model: 'gemini-flash-lite-latest',
+            contents: {
+              parts: [
+                  { 
+                      inlineData: { 
+                          mimeType: mimeType, 
+                          data: base64Data 
+                      } 
+                  },
+                  { text: visionPrompt }
+              ]
+            }
+        });
+
+        finalPrompt = visionResponse.text || `${promptUsuario}, high quality product photography`;
+        console.log("✨ Prompt Gerado pelo Gemini:", finalPrompt);
+    } else {
+        // Se não tem imagem, apenas traduz/melhora o prompt do usuário
+        const ai = new GoogleGenAI({ apiKey: geminiApiKey });
+        const textResponse = await ai.models.generateContent({
+            model: 'gemini-flash-lite-latest',
+            contents: `Melhore este prompt para um gerador de imagens (Leonardo AI). Traduza para Inglês e adicione termos de qualidade fotográfica: "${promptUsuario}". Retorne APENAS o prompt em inglês.`
+        });
+        finalPrompt = textResponse.text || promptUsuario;
     }
 
-    // 4. CONFIGURAR PAYLOAD DA GERAÇÃO
-    const payload: any = {
+    // 3. ENVIAR PARA LEONARDO AI (TEXT-TO-IMAGE)
+    // Agora enviamos apenas texto, o que é 100% estável e não depende de upload de init_image
+    const payload = {
       height: 1024,
       width: 1024,
-      modelId: MODEL_ID,
-      prompt: `${prompt}, professional product photography, high detail, 8k, realistic lighting`,
+      modelId: LEONARDO_MODEL_ID,
+      prompt: finalPrompt,
       num_images: 1,
       public: false,
+      alchemy: true, // Qualidade máxima
+      photoReal: true, // Modo fotorealista
+      presetStyle: "CINEMATIC"
     };
 
-    if (initImageId) {
-      payload.init_image_id = initImageId;
-      payload.init_strength = 0.35; 
-      payload.prompt = `(product shot) ${prompt}, maintaining the product shape perfectly, cinematic lighting, 8k resolution`;
-    }
-
-    // 5. INICIAR GERAÇÃO (POST)
     const generationResponse = await fetch(`${LEONARDO_API_URL}/generations`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${leoApiKey}`,
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
@@ -117,32 +110,27 @@ export async function generateProductImage(formData: FormData) {
     });
 
     if (!generationResponse.ok) {
-      const err = await generationResponse.json();
-      throw new Error(`Erro Leonardo AI: ${JSON.stringify(err)}`);
+        const errText = await generationResponse.text();
+        console.error("Erro Leonardo:", errText);
+        throw new Error("A IA de imagem está sobrecarregada. Tente novamente em 30s.");
     }
 
     const generationData = await generationResponse.json();
     const generationId = generationData.sdGenerationJob?.generationId;
 
-    if (!generationId) {
-      throw new Error("Falha ao obter ID da geração.");
-    }
+    if (!generationId) throw new Error("Falha ao iniciar geração de imagem.");
 
-    // 6. POLLING LOOP (Espera a imagem ficar pronta)
-    // Ajustado para não estourar o tempo da Vercel (Max 50s de espera ativa)
+    // 4. POLLING (ESPERA ATIVA)
     let imageUrl = null;
     let attempts = 0;
-    const maxAttempts = 25; // 25 * 2s = 50s
+    const maxAttempts = 30; // 60 segundos máx
 
     while (attempts < maxAttempts) {
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       const checkResponse = await fetch(`${LEONARDO_API_URL}/generations/${generationId}`, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Accept': 'application/json'
-        }
+        headers: { 'Authorization': `Bearer ${leoApiKey}` }
       });
 
       if (checkResponse.ok) {
@@ -153,34 +141,31 @@ export async function generateProductImage(formData: FormData) {
           imageUrl = checkData.generations_by_pk?.generated_images?.[0]?.url;
           break;
         } else if (status === 'FAILED') {
-          throw new Error("A geração da imagem falhou no servidor da IA.");
+          throw new Error("A geração falhou no servidor da Leonardo AI.");
         }
       }
       attempts++;
     }
 
-    if (!imageUrl) {
-      throw new Error("A geração demorou muito. Tente novamente em instantes.");
-    }
+    if (!imageUrl) throw new Error("Tempo limite excedido. Tente novamente.");
 
-    // --- SALVAR NO HISTÓRICO ---
+    // 5. SALVAR NO HISTÓRICO
     try {
         await supabase.from('user_history').insert({
             user_id: user.id,
             type: 'image',
             module: 'studio',
-            prompt: prompt,
+            prompt: promptUsuario, // Salva o prompt original em PT
             result: { url: imageUrl }
         });
-    } catch (dbError) {
-        console.error("Erro ao salvar imagem no histórico (ignorado):", dbError);
+    } catch (dbErr) {
+        console.error("Erro ao salvar histórico:", dbErr);
     }
 
     return imageUrl;
 
   } catch (error: any) {
-    console.error("Erro CRÍTICO na Server Action de Imagem:", error);
-    // Lança o erro para que o componente Client-Side possa exibir o alerta
-    throw new Error(error.message || "Erro interno ao gerar imagem.");
+    console.error("Erro Final:", error);
+    throw new Error(error.message || "Erro desconhecido ao gerar imagem.");
   }
 }

@@ -5,7 +5,6 @@ import { createClient } from "@/utils/supabase/server";
 import { checkRateLimit } from "@/utils/rate-limit";
 
 // Módulos que EXIGEM pagamento (Server-Side Enforced)
-// Adicionados novos módulos premium: email_marketing, blog_post, persona
 const PREMIUM_MODULES = [
     'video_script', 
     'studio', 
@@ -18,8 +17,6 @@ const PREMIUM_MODULES = [
 export async function generateCopy(prompt: string, moduleId?: string) {
   // --- CAMADA 1: CONEXÃO SEGURA ---
   const supabase = await createClient();
-  
-  // Usamos getUser() e não getSession() para garantir que o token não foi forjado
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError || !user) {
@@ -36,10 +33,8 @@ export async function generateCopy(prompt: string, moduleId?: string) {
   // --- CAMADA 3: VERIFICAÇÃO DE PLANO (Database Truth) ---
   const userPlan = user.user_metadata?.plan || 'free'; 
 
-  // Se o módulo for premium e o plano não for PRO, bloqueia.
   if (moduleId && PREMIUM_MODULES.includes(moduleId)) {
     if (userPlan !== 'pro') {
-      console.warn(`[SECURITY] User ${user.id} (Plan: ${userPlan}) attempted to breach premium module: ${moduleId}`);
       throw new Error("🔒 BLOQUEADO: Este recurso exige o Plano PRO. O servidor recusou sua solicitação.");
     }
   }
@@ -53,9 +48,42 @@ export async function generateCopy(prompt: string, moduleId?: string) {
   const ai = new GoogleGenAI({ apiKey });
 
   try {
+    let finalPrompt = prompt;
+
+    // Se for o gerador de anúncios, injetamos o prompt MESTRE para todas as plataformas
+    if (moduleId === 'generator') {
+        const antiMarkdown = "IMPORTANTE: Retorne APENAS texto puro dentro dos valores JSON. NÃO use formatação markdown.";
+        
+        // Extrai dados básicos do prompt original (que vem formatado como string)
+        // Isso é uma simplificação, idealmente o prompt já viria estruturado, mas aqui garantimos a injeção.
+        finalPrompt = `
+          ${prompt}
+          
+          ${antiMarkdown}
+          TAREFA: Gere variações de anúncio ALTAMENTE PERSUASIVAS para AS 12 PLATAFORMAS ABAIXO.
+          Adapte a linguagem (gírias, formalidade, emojis, tamanho) para cada rede.
+
+          Retorne um JSON ÚNICO com esta estrutura exata:
+          {
+            "facebook": { "headline": "...", "body": "...", "cta": "..." },
+            "instagram": { "headline": "...", "body": "...", "cta": "..." },
+            "tiktok": { "description": "...", "cta": "..." },
+            "google": { "headline": "...", "description": "..." },
+            "shopee": { "title": "...", "description": "..." },
+            "mercadolivre": { "title": "...", "headline": "..." },
+            "olx": { "title": "...", "body": "..." },
+            "amazon": { "headline": "...", "title": "..." },
+            "pinterest": { "title": "...", "description": "..." },
+            "linkedin": { "headline": "...", "body": "..." },
+            "twitter": { "text": "..." },
+            "youtube": { "title": "...", "description": "..." }
+          }
+        `;
+    }
+
     const response = await ai.models.generateContent({
       model: 'gemini-flash-lite-latest', 
-      contents: prompt,
+      contents: finalPrompt,
       config: {
         responseMimeType: 'application/json'
       }
@@ -66,7 +94,6 @@ export async function generateCopy(prompt: string, moduleId?: string) {
     // --- CAMADA 5: SALVAR NO HISTÓRICO ---
     try {
         let resultToSave = response.text;
-        // Tenta parsear para salvar como JSON puro se possível, senão salva como string no JSON
         try {
             const parsed = JSON.parse(response.text);
             resultToSave = parsed;
@@ -76,11 +103,11 @@ export async function generateCopy(prompt: string, moduleId?: string) {
             user_id: user.id,
             type: 'text',
             module: moduleId || 'generator',
-            prompt: prompt.substring(0, 200) + '...', // Salva um resumo do prompt
+            prompt: prompt.substring(0, 200) + '...',
             result: typeof resultToSave === 'object' ? resultToSave : { text: resultToSave }
         });
     } catch (dbError) {
-        console.error("Erro ao salvar histórico (não bloqueante):", dbError);
+        console.error("Erro db:", dbError);
     }
 
     return response.text;
