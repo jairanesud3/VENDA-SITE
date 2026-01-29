@@ -10,7 +10,8 @@ import {
   Palette, Box, Moon, Sun, Grid3X3, Aperture, Leaf, Gem, Monitor,
   History, Trash2, Calendar, FileText, CheckCircle,
   Mail, UserPlus, FileEdit, Shield, Type,
-  ChevronDown, Upload, Eraser, DollarSign, Tag, Text
+  ChevronDown, Upload, Eraser, DollarSign, Tag, Text,
+  Clock
 } from 'lucide-react';
 import { generateCopy } from '@/app/actions/generate-copy';
 import { getUserHistory, deleteHistoryItem } from '@/app/actions/history';
@@ -324,6 +325,50 @@ const SidebarItem = ({ id, conf, active, onClick, userPlan }: any) => (
 const CategoryLabel = ({ label }: { label: string }) => (
     <div className="px-3 mt-4 mb-2 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{label}</div>
 );
+
+// --- COMPONENTE DE RENDERIZAÇÃO DO HISTÓRICO (PRETTY JSON) ---
+const HistoryContentRenderer = ({ content }: { content: any }) => {
+    // Se for string simples
+    if (typeof content !== 'object' || content === null) {
+        return <p className="text-slate-300 text-sm whitespace-pre-wrap">{String(content)}</p>;
+    }
+
+    // Se for Objeto JSON
+    return (
+        <div className="space-y-4">
+            {Object.entries(content).map(([key, value], idx) => {
+                // Remove chaves técnicas se houver (opcional)
+                if (key === 'tags' || key === 'technical_info') return null;
+
+                const label = key.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').trim();
+
+                return (
+                    <div key={idx} className="bg-black/30 rounded-lg p-3 border border-white/5">
+                        <h4 className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-1">
+                            {label}
+                        </h4>
+                        
+                        {Array.isArray(value) ? (
+                            <ul className="list-disc list-inside space-y-1">
+                                {value.map((v: any, i: number) => (
+                                    <li key={i} className="text-slate-300 text-sm">
+                                        {typeof v === 'object' ? JSON.stringify(v) : String(v)}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : typeof value === 'object' ? (
+                            <pre className="text-xs text-slate-400 overflow-x-auto">{JSON.stringify(value, null, 2)}</pre>
+                        ) : (
+                            <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap">
+                                {String(value)}
+                            </p>
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
 
 export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => {
   const [activeModule, setActiveModule] = useState<ModuleId>('home');
@@ -707,9 +752,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
               </div>
 
           ) : activeModule === 'history' ? (
-             // === HISTÓRICO (Lógica mantida, visual ajustado) ===
+             // === HISTÓRICO REFORMULADO ===
              <div className="flex-1 flex flex-col h-screen overflow-hidden bg-[#0B0518]">
-                <div className="h-20 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-950/50 backdrop-blur-md shrink-0">
+                <div className="h-20 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-950/50 backdrop-blur-md shrink-0 z-20">
                     <h2 className="text-xl font-bold text-white flex items-center gap-3">
                         <div className="p-2 bg-slate-900 rounded-lg border border-slate-800"><History className="w-5 h-5 text-purple-400"/></div>
                         Minha Biblioteca
@@ -719,25 +764,93 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                         <button onClick={() => setHistoryType('image')} className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${historyType === 'image' ? 'bg-orange-600 text-white' : 'text-slate-500 hover:text-white'}`}>Imagens</button>
                     </div>
                 </div>
-                <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-                    {/* (Mesma lógica de renderização do histórico do código anterior, omitida para brevidade mas deve ser mantida) */}
+                
+                <div className="flex-1 overflow-y-auto p-6 custom-scrollbar bg-grid-white/[0.02]">
                     {isLoadingHistory ? (
-                         <div className="flex justify-center p-10"><Loader2 className="animate-spin text-purple-500" /></div>
+                         <div className="flex justify-center p-10"><Loader2 className="animate-spin text-purple-500 w-8 h-8" /></div>
                     ) : historyItems.length === 0 ? (
-                        <div className="text-center text-slate-500 mt-20">Nenhum item salvo.</div>
+                        <div className="flex flex-col items-center justify-center mt-20 opacity-50">
+                            <History className="w-16 h-16 text-slate-600 mb-4" />
+                            <p className="text-slate-400">Nenhum item salvo no histórico ainda.</p>
+                        </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {historyItems.map(item => (
-                                <div key={item.id} className="bg-slate-900/50 border border-slate-800 p-4 rounded-xl relative group">
-                                    <button onClick={() => { if(confirm('Excluir?')) deleteHistoryItem(item.id).then(fetchHistory); }} className="absolute top-2 right-2 p-1.5 hover:bg-red-500/20 text-slate-500 hover:text-red-400 rounded transition-colors"><Trash2 className="w-4 h-4" /></button>
-                                    <div className="mb-2 text-xs font-bold text-purple-400 uppercase">{item.module}</div>
-                                    {historyType === 'image' ? (
-                                        <img src={item.result?.url} className="w-full rounded-lg aspect-square object-cover" />
-                                    ) : (
-                                        <p className="text-xs text-slate-300 line-clamp-6 whitespace-pre-wrap font-mono">{typeof item.result === 'string' ? item.result : JSON.stringify(item.result)}</p>
-                                    )}
-                                </div>
-                            ))}
+                        <div className={`grid gap-6 ${historyType === 'image' ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
+                            {historyItems.map(item => {
+                                const ModuleIcon = MODULES[item.module]?.icon || Zap;
+                                return (
+                                    <div key={item.id} className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden hover:border-purple-500/30 transition-all group flex flex-col h-full shadow-lg">
+                                        
+                                        {/* HEADER DO CARD */}
+                                        <div className="px-4 py-3 border-b border-slate-800 bg-slate-950/50 flex items-center justify-between shrink-0">
+                                            <div className="flex items-center gap-2">
+                                                <div className="p-1.5 rounded bg-slate-900 border border-slate-800">
+                                                    <ModuleIcon className="w-3.5 h-3.5 text-purple-400" />
+                                                </div>
+                                                <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider truncate max-w-[120px]">
+                                                    {MODULES[item.module]?.label || item.module}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <div className="flex items-center gap-1 text-[10px] text-slate-500">
+                                                    <Calendar className="w-3 h-3" />
+                                                    {new Date(item.created_at).toLocaleDateString('pt-BR')}
+                                                </div>
+                                                <button 
+                                                    onClick={() => { if(confirm('Excluir este item?')) deleteHistoryItem(item.id).then(fetchHistory); }} 
+                                                    className="p-1 hover:bg-red-500/10 text-slate-600 hover:text-red-400 rounded transition-colors"
+                                                    title="Excluir"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* CORPO DO CARD */}
+                                        <div className="p-4 flex-1 flex flex-col min-h-0">
+                                            {/* Prompt (Pergunta) */}
+                                            <div className="mb-3">
+                                                <div className="flex items-center gap-1.5 mb-1.5">
+                                                    <Search className="w-3 h-3 text-slate-500" />
+                                                    <span className="text-[9px] font-bold text-slate-500 uppercase">Entrada</span>
+                                                </div>
+                                                <p className="text-xs text-slate-400 italic line-clamp-2 bg-slate-950/50 p-2 rounded border border-slate-800/50">
+                                                    "{item.prompt}"
+                                                </p>
+                                            </div>
+
+                                            {/* Resultado (Conteúdo) */}
+                                            <div className="flex-1 overflow-y-auto custom-scrollbar max-h-[300px] min-h-[150px]">
+                                                {historyType === 'image' ? (
+                                                    <div className="relative group/img cursor-pointer aspect-square rounded-lg overflow-hidden border border-slate-800">
+                                                        <img src={item.result?.url} className="w-full h-full object-cover transition-transform group-hover/img:scale-105" />
+                                                        <a href={item.result?.url} target="_blank" className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
+                                                            <Download className="w-6 h-6 text-white" />
+                                                        </a>
+                                                    </div>
+                                                ) : (
+                                                    <HistoryContentRenderer content={item.result} />
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* FOOTER DO CARD (AÇÕES) */}
+                                        {historyType === 'text' && (
+                                            <div className="p-3 border-t border-slate-800 bg-slate-950/30">
+                                                <button 
+                                                    onClick={() => {
+                                                        const textToCopy = typeof item.result === 'object' ? JSON.stringify(item.result, null, 2) : item.result;
+                                                        navigator.clipboard.writeText(textToCopy);
+                                                        alert('Copiado!');
+                                                    }}
+                                                    className="w-full py-2 flex items-center justify-center gap-2 bg-slate-800 hover:bg-purple-600 hover:text-white text-slate-300 text-xs font-bold rounded-lg transition-all border border-slate-700 hover:border-purple-500"
+                                                >
+                                                    <Copy className="w-3.5 h-3.5" /> Copiar Conteúdo
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
