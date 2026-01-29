@@ -944,7 +944,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                   <div className="w-full lg:w-[380px] bg-slate-950 border-r border-slate-800 flex flex-col h-auto lg:h-full z-20 shadow-2xl overflow-y-auto custom-scrollbar">
                         <div className="p-6 sticky top-0 bg-slate-950 z-10 border-b border-slate-800/50 flex flex-col gap-4">
                             <div className="flex items-center justify-between"><button onClick={() => setActiveModule('home')} className="lg:hidden flex items-center gap-1 text-xs text-slate-500"><ChevronRight className="rotate-180 w-3 h-3"/> Voltar</button></div>
-                            <div className="flex items-center gap-3 relative"><div className={`p-2 rounded-lg bg-slate-900 border border-slate-800`}>{React.createElement(MODULES[activeModule].icon, { className: `w-5 h-5 ${MODULES[activeModule].color}` })}</div><div><h2 className="font-bold text-white text-lg leading-tight flex items-center gap-2">{MODULES[activeModule].label}<button onClick={() => setShowHelp(!showHelp)} className="text-slate-600 hover:text-purple-400 transition-colors"><HelpCircle className="w-4 h-4" /></button></h2><p className="text-[10px] text-slate-500 line-clamp-1">{MODULES[activeModule].desc}</p></div></div>
+                            <div className="flex items-center gap-3 relative"><div className={`p-2 rounded-lg bg-slate-900 border border-slate-800`}>{React.createElement(MODULES[activeModule].icon, { className: `w-5 h-5 ${MODULES[activeModule].color}` })}</div><div><h2 className="font-bold text-white text-lg leading-tight flex items-center gap-2">{MODULES[activeModule].label}<button onClick={() => setShowHelp(!showHelp)} className="text-slate-600 hover:text-purple-400 transition-colors"><HelpCircle className="w-4 h-4" /></button></h2><p className="text-[10px] text-slate-500 line-clamp-1">{MODULES[activeModule].desc}</p></div>
+                            {/* --- CAIXA DE AJUDA FUNCIONAL --- */}
+                            {showHelp && (
+                                <div className="absolute top-full left-0 mt-3 p-4 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 w-[280px] animate-in fade-in slide-in-from-top-2">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <span className="text-[10px] font-bold text-purple-400 uppercase">Como funciona:</span>
+                                        <button onClick={() => setShowHelp(false)}><X className="w-3 h-3 text-slate-500 hover:text-white" /></button>
+                                    </div>
+                                    <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                                        {MODULES[activeModule].explanation || MODULES[activeModule].desc || "Preencha os campos para gerar o resultado."}
+                                    </p>
+                                </div>
+                            )}
+                            </div>
                         </div>
                         <div className="p-6 space-y-6 flex-1 relative">
                             {isModuleLocked && (
