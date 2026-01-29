@@ -622,7 +622,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const handleInputChange = (field: string, value: string) => { setFormDataByModule(prev => ({ ...prev, [activeModule]: { ...prev[activeModule], [field]: value } })); };
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => { const file = e.target.files?.[0]; if (file) { const reader = new FileReader(); reader.onloadend = () => setAdImage(reader.result as string); reader.readAsDataURL(file); } };
   const handleClearFormConfirm = () => { setResult(null); setError(null); setFormDataByModule(prev => ({ ...prev, [activeModule]: {} })); setAdImage(null); setShowClearModal(false); };
-  const handleDeleteItemConfirm = async () => { if (!itemToDelete) return; try { await deleteHistoryItem(itemToDelete); fetchHistory(); } catch(e) { console.error(e); } finally { setShowDeleteModal(false); setItemToDelete(null); } };
+  
+  const handleDeleteItemConfirm = async () => { 
+      if (!itemToDelete) return; 
+      try { 
+          await deleteHistoryItem(itemToDelete); 
+          fetchHistory(); 
+      } catch(e) { 
+          console.error(e); 
+      } finally { 
+          setShowDeleteModal(false); 
+          setItemToDelete(null); 
+      } 
+  };
 
   // --- LÓGICA DE SELEÇÃO DE PLATAFORMA ---
   const togglePlatform = (id: string) => {
@@ -886,7 +898,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                       <div key={item.id} className="bg-[#130b24] border border-white/5 rounded-xl p-4 hover:border-purple-500/30 transition-all group relative">
                           <div className="flex justify-between items-start mb-3">
                               <span className="text-[10px] font-bold text-purple-400 bg-purple-900/20 px-2 py-1 rounded uppercase">{item.module || 'Geral'}</span>
-                              <button onClick={() => setItemToDelete(item.id)} className="text-slate-600 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4"/></button>
+                              <button onClick={() => { setItemToDelete(item.id); setShowDeleteModal(true); }} className="text-slate-600 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4"/></button>
                           </div>
                           
                           {item.type === 'image' ? (
