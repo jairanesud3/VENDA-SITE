@@ -14,7 +14,8 @@ import {
   Clock, HelpCircle, Briefcase, GraduationCap, Globe, Heart,
   Save, Smile, AlertTriangle, Music2, Share2, MessageCircle, MapPin, Star,
   Linkedin, Youtube, Facebook, Instagram, ShoppingBag, ShoppingCart, Twitter, Smartphone, Laptop,
-  Battery, Wifi, Signal, ThumbsUp, Percent, Truck, Building, RefreshCw, MessageSquare
+  Battery, Wifi, Signal, ThumbsUp, Percent, Truck, Building, RefreshCw, MessageSquare,
+  Sunset, Flame, Waves, Trophy, Cpu, Triangle, Snowflake, Hexagon, Flower2, Disc, CloudRain
 } from 'lucide-react';
 import { generateCopy } from '@/app/actions/generate-copy';
 import { getUserHistory, deleteHistoryItem } from '@/app/actions/history';
@@ -68,12 +69,30 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel }: { isOpen:
 };
 
 export const BACKGROUNDS = [
+  // Clássicos
   { id: 'studio', name: 'Estúdio Dark', icon: Moon, class: 'bg-[#050505] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-800/20 via-[#050505] to-[#000000]' },
   { id: 'purple_haze', name: 'Roxo Profundo', icon: Zap, class: 'bg-[#0f0518] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/40 via-[#0f0518] to-black' },
   { id: 'midnight_blue', name: 'Azul Meia-Noite', icon: Monitor, class: 'bg-[#020617] bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-blue-900/30 via-[#020617] to-black' },
   { id: 'concrete', name: 'Urbano Cinza', icon: Box, class: 'bg-[#18181b] bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-slate-700/30 via-[#18181b] to-black' },
   { id: 'matrix', name: 'Matrix Code', icon: Grid3X3, class: 'bg-black bg-[linear-gradient(rgba(0,255,0,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,0,0.05)_1px,transparent_1px)] bg-[size:20px_20px]' },
   { id: 'clean_dark', name: 'Preto Puro', icon: Palette, class: 'bg-black' },
+
+  // NOVOS TEMAS (Vibrantes & Premium)
+  { id: 'sunset_drive', name: 'Sunset Drive', icon: Sunset, class: 'bg-[#1a0b2e] bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/20 via-purple-900/40 to-black' },
+  { id: 'emerald_city', name: 'Emerald City', icon: Gem, class: 'bg-[#022c22] bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-emerald-500/30 via-[#064e3b] to-[#020617]' },
+  { id: 'crimson_tide', name: 'Crimson Tide', icon: Flame, class: 'bg-[#450a0a] bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-red-600/30 via-[#220505] to-black' },
+  { id: 'ocean_depths', name: 'Ocean Depths', icon: Waves, class: 'bg-[#082f49] bg-[linear-gradient(to_bottom_right,_#0c4a6e,_#020617)]' },
+  { id: 'golden_hour', name: 'Luxury Gold', icon: Trophy, class: 'bg-[#271a00] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-yellow-600/20 via-[#1a1200] to-black' },
+  { id: 'cyber_neon', name: 'Cyber Neon', icon: Cpu, class: 'bg-[#09090b] bg-[linear-gradient(90deg,rgba(0,255,255,0.05)_1px,transparent_1px),linear-gradient(0deg,rgba(255,0,255,0.05)_1px,transparent_1px)] bg-[size:30px_30px]' },
+  { id: 'deep_space', name: 'Deep Space', icon: Globe, class: 'bg-[#020617] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/40 via-[#0f172a] to-black' },
+  { id: 'toxic_green', name: 'Biohazard', icon: Triangle, class: 'bg-[#051a05] bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-lime-500/20 via-[#020617] to-black' },
+  { id: 'frozen_ice', name: 'Frozen Ice', icon: Snowflake, class: 'bg-[#0f172a] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-300/10 via-[#1e293b] to-[#020617]' },
+  { id: 'royal_amethyst', name: 'Royal Amethyst', icon: Hexagon, class: 'bg-[#1e1b4b] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-violet-500/20 via-[#312e81] to-black' },
+  { id: 'cherry_blossom', name: 'Midnight Rose', icon: Flower2, class: 'bg-[#280510] bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-pink-600/20 via-[#280510] to-black' },
+  { id: 'minimal_slate', name: 'Minimal Slate', icon: LayoutTemplate, class: 'bg-[#1e293b] text-slate-200' },
+  { id: 'retro_wave', name: 'Retro Wave', icon: Disc, class: 'bg-[#180a20] bg-[linear-gradient(to_top,#db2777_0%,transparent_30%),linear-gradient(to_bottom,#000000_50%,#2e1065_100%)]' },
+  { id: 'stormy_night', name: 'Stormy Night', icon: CloudRain, class: 'bg-[#111827] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-500/20 via-[#030712] to-black' },
+  { id: 'carbon_fiber', name: 'Carbon Fiber', icon: Shield, class: 'bg-[#171717] bg-[radial-gradient(black_15%,transparent_16%)_0_0,radial-gradient(black_15%,transparent_16%)_8px_8px,radial-gradient(rgba(255,255,255,.1)_15%,transparent_20%)_0_1px,radial-gradient(rgba(255,255,255,.1)_15%,transparent_20%)_8px_9px] bg-[size:16px_16px]' }
 ];
 
 const MobileStatusBar = () => (
@@ -481,7 +500,11 @@ const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setA
       {isOpen && (
         <div className="absolute top-12 right-0 w-[280px] bg-[#0f0f11] border border-slate-700 rounded-xl shadow-2xl p-4 animate-in fade-in zoom-in-95 duration-200">
            <div className="flex justify-between items-center mb-3 px-1"><div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Ambiente</div><button onClick={() => setIsOpen(false)} className="text-slate-500 hover:text-white"><X className="w-3 h-3" /></button></div>
-          <div className="grid grid-cols-4 gap-2">{BACKGROUNDS.map((bg) => (<button key={bg.id} onClick={() => setActiveTheme(bg)} className={`relative group aspect-square rounded-lg flex flex-col items-center justify-center transition-all ${activeTheme.id === bg.id ? 'bg-purple-600 text-white ring-2 ring-purple-400' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`} title={bg.name}><bg.icon className="w-5 h-5 mb-1" /></button>))}</div>
+          <div className="grid grid-cols-4 gap-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
+            {BACKGROUNDS.map((bg) => (
+                <button key={bg.id} onClick={() => setActiveTheme(bg)} className={`relative group aspect-square rounded-lg flex flex-col items-center justify-center transition-all ${activeTheme.id === bg.id ? 'bg-purple-600 text-white ring-2 ring-purple-400' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`} title={bg.name}><bg.icon className="w-5 h-5 mb-1" /></button>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -870,7 +893,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
             <div className="flex-1 overflow-y-auto px-3 py-2 custom-scrollbar"><SidebarItem id="home" conf={MODULES.home} active={activeModule === 'home'} onClick={() => { setActiveModule('home'); setMobileMenuOpen(false); }} userPlan={userPlan} />{sidebarOpen && <CategoryLabel label="Criação" />}{['generator', 'video_script', 'studio'].map(k => (<SidebarItem key={k} id={k} conf={MODULES[k as ModuleId]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />))}{sidebarOpen && <CategoryLabel label="Marketing" />}{['email_marketing', 'influencer_dm', 'blog_post'].map(k => (<SidebarItem key={k} id={k} conf={MODULES[k as ModuleId]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />))}{sidebarOpen && <CategoryLabel label="Estratégia" />}{['product_desc', 'persona', 'roas_analyzer', 'headline_optimizer'].map(k => (<SidebarItem key={k} id={k} conf={MODULES[k as ModuleId]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />))}{sidebarOpen && <CategoryLabel label="Sistema" />}{['policy_gen', 'history', 'settings'].map(k => (<SidebarItem key={k} id={k} conf={MODULES[k as ModuleId]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />))}</div>
             <div className="p-3 border-t border-slate-800 bg-[#0B0518]"><button onClick={() => setSidebarOpen(!sidebarOpen)} className="hidden lg:flex w-full items-center justify-center p-2 hover:bg-white/5 rounded-lg text-slate-500 mb-2 transition-colors"><Menu className="w-5 h-5" /></button><button onClick={onLogout} className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-red-400 hover:bg-red-950/30 hover:text-red-300 rounded-lg transition-colors ${!sidebarOpen && 'justify-center'}`}><LogOut className="w-4 h-4" />{(sidebarOpen) && "Sair da Conta"}</button></div>
         </aside>
-      </>
+      </main>
       <main className="flex-1 flex flex-col h-screen overflow-hidden relative z-10 pt-16 lg:pt-0">
           {activeModule === 'home' ? (
               <div key="home" className={`flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 animate-in fade-in slide-in-from-bottom-8 duration-500 ease-out ${activeTheme.class}`}><div className="absolute top-4 right-4 z-20"><ThemeSelector activeTheme={activeTheme} setActiveTheme={handleThemeChange} /></div><div className="max-w-7xl mx-auto pb-20 relative z-10"><div className="mb-10"><h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Olá, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{displayName}</span></h1><p className="text-slate-400">Tudo pronto para vender hoje?</p></div><div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">{Object.entries(MODULES).filter(([k, v]) => k !== 'home' && k !== 'settings' && k !== 'history').map(([key, mod]) => (<button key={key} onClick={() => setActiveModule(key as ModuleId)} className="group relative bg-slate-900/40 hover:bg-slate-800/60 border border-slate-800 hover:border-purple-500/30 p-5 rounded-2xl text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-xl overflow-hidden backdrop-blur-sm active:scale-95"><div className="flex justify-between items-start mb-4"><div className="p-3 rounded-xl bg-slate-950 border border-slate-800 group-hover:scale-110 transition-transform duration-300"><mod.icon className={`w-6 h-6 ${mod.color}`} /></div>{mod.isPremium && userPlan === 'free' && <Lock className="w-4 h-4 text-slate-600" />}</div><h3 className="font-bold text-white mb-1 group-hover:text-purple-300 transition-colors">{mod.label}</h3><p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{mod.desc}</p></button>))}</div></div></div>
