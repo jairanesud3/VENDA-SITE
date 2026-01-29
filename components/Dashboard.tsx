@@ -657,6 +657,27 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
             case 'policy_gen':
                 prompt = `Gere as seguintes páginas legais para a loja "${data.companyName}": ${selectedPolicies.join(', ')}. Use linguagem jurídica padrão e-commerce Brasil. ${antiMarkdown}`;
                 break;
+            case 'video_script':
+                prompt = `Crie um roteiro de vídeo para ${data.platform || 'TikTok'} de ${data.duration || '30s'} com tom ${data.tone || 'Viral'} sobre o produto: ${data.productName}. Estrutura: Gancho (0-3s), Desenvolvimento, CTA. ${antiMarkdown}`;
+                break;
+            case 'email_marketing':
+                prompt = `Crie uma sequência de e-mail marketing do tipo "${data.campaignType}" para o produto "${data.productName}" com a oferta "${data.offerDetails}". ${antiMarkdown}`;
+                break;
+            case 'influencer_dm':
+                prompt = `Escreva uma mensagem de abordagem para influenciador do nicho "${data.niche}" propondo uma parceria do tipo "${data.proposal}" para o produto "${data.productName}". ${antiMarkdown}`;
+                break;
+            case 'blog_post':
+                prompt = `Escreva um artigo de blog otimizado para SEO sobre "${data.topic}". Palavras-chave: ${data.keywords}. Tom: ${data.tone}. ${antiMarkdown}`;
+                break;
+            case 'product_desc':
+                prompt = `Crie uma descrição de produto altamente persuasiva usando o framework ${data.framework || 'AIDA'}. Produto: ${data.productName}. Características: ${data.features}. ${antiMarkdown}`;
+                break;
+            case 'persona':
+                prompt = `Crie uma persona (Avatar) detalhada para o nicho "${data.niche}" interessada no produto "${data.product}". Inclua dados demográficos, dores, desejos e objeções. ${antiMarkdown}`;
+                break;
+            case 'headline_optimizer':
+                prompt = `Otimize a headline "${data.originalHeadline}" para o objetivo "${data.goal}". Gere 5 variações virais. ${antiMarkdown}`;
+                break;
             default: prompt = `Ajude com: ${JSON.stringify(data)}`;
         }
         
@@ -714,6 +735,49 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                 ))}
              </div>
              </> );
+
+        case 'video_script': return ( <>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Smartwatch Ultra" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div>
+            <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Plataforma</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.platform || 'TikTok'} onChange={e => handleInputChange('platform', e.target.value)}><option value="TikTok">TikTok</option><option value="Reels">Instagram Reels</option><option value="Shorts">YouTube Shorts</option></select></div>
+                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Duração</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.duration || '30s'} onChange={e => handleInputChange('duration', e.target.value)}><option value="15s">15 Segundos</option><option value="30s">30 Segundos</option><option value="60s">60 Segundos</option></select></div>
+            </div>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Estilo / Tom</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.tone || 'Viral'} onChange={e => handleInputChange('tone', e.target.value)}><option value="Viral">Viral & Humor</option><option value="Storytelling">Storytelling (Emocional)</option><option value="Educational">Educativo / Tutorial</option><option value="Hard Sell">Venda Direta (Oferta)</option></select></div>
+            </> );
+
+        case 'email_marketing': return ( <>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Tipo de Campanha</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.campaignType || 'Abandoned Cart'} onChange={e => handleInputChange('campaignType', e.target.value)}><option value="Abandoned Cart">Recuperação de Carrinho</option><option value="Welcome Series">Boas Vindas</option><option value="Black Friday">Promoção Relâmpago</option><option value="Post Purchase">Pós-Venda (Upsell)</option></select></div>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Fone Bluetooth" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Oferta / Desconto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: 10% OFF + Frete Grátis" value={dynamicFormData.offerDetails || ''} onChange={e => handleInputChange('offerDetails', e.target.value)} /></div>
+            </> );
+
+        case 'influencer_dm': return ( <>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Nicho do Influencer</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Fitness, Moda, Tech" value={dynamicFormData.niche || ''} onChange={e => handleInputChange('niche', e.target.value)} /></div>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Legging Modeladora" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Tipo de Proposta</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.proposal || 'Barter'} onChange={e => handleInputChange('proposal', e.target.value)}><option value="Barter">Permuta (Envio de Produto)</option><option value="Paid Post">Publi Paga (Cachê)</option><option value="Commission">Afiliado (Comissão)</option></select></div>
+            </> );
+
+        case 'blog_post': return ( <>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Tópico Principal</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Como emagrecer rápido" value={dynamicFormData.topic || ''} onChange={e => handleInputChange('topic', e.target.value)} /></div>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Palavras-Chave (SEO)</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: dieta, exercícios, saúde" value={dynamicFormData.keywords || ''} onChange={e => handleInputChange('keywords', e.target.value)} /></div>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Tom de Voz</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.tone || 'Informative'} onChange={e => handleInputChange('tone', e.target.value)}><option value="Informative">Informativo & Sério</option><option value="Listicle">Lista (Top 10...)</option><option value="How-to">Tutorial (Passo a passo)</option><option value="Controversial">Polêmico / Opinião</option></select></div>
+            </> );
+
+        case 'product_desc': return ( <>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Nome do Produto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Tênis Ortopédico" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Características Chave</label><textarea className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none h-24 resize-none" placeholder="Ex: Solado macio, tecido respirável, anti-derrapante..." value={dynamicFormData.features || ''} onChange={e => handleInputChange('features', e.target.value)} /></div>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Framework de Copy</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.framework || 'AIDA'} onChange={e => handleInputChange('framework', e.target.value)}><option value="AIDA">AIDA (Atenção, Interesse, Desejo, Ação)</option><option value="PAS">PAS (Problema, Agitação, Solução)</option><option value="Storytelling">Storytelling (Narrativa)</option></select></div>
+            </> );
+
+        case 'persona': return ( <>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Nicho de Mercado</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Jardinagem Urbana" value={dynamicFormData.niche || ''} onChange={e => handleInputChange('niche', e.target.value)} /></div>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto Principal</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Kit de Ferramentas" value={dynamicFormData.product || ''} onChange={e => handleInputChange('product', e.target.value)} /></div>
+            </> );
+
+        case 'headline_optimizer': return ( <>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Headline Original</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Compre este tênis agora" value={dynamicFormData.originalHeadline || ''} onChange={e => handleInputChange('originalHeadline', e.target.value)} /></div>
+            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Objetivo</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.goal || 'High CTR'} onChange={e => handleInputChange('goal', e.target.value)}><option value="High CTR">CTR Alto (Mais Cliques)</option><option value="SEO">SEO (Rankeamento)</option><option value="Curiosity">Curiosidade (Clickbait Ético)</option><option value="Urgency">Urgência & Escassez</option></select></div>
+            </> );
 
         default: return <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Entrada</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div>;
     }
