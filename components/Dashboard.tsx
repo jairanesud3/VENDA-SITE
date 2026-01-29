@@ -12,7 +12,7 @@ import {
   Mail, UserPlus, FileEdit, Shield, Type,
   ChevronDown, Upload, Eraser, DollarSign, Tag, Text,
   Clock, HelpCircle, Briefcase, GraduationCap, Globe, Heart,
-  Save, Smile, AlertTriangle
+  Save, Smile, AlertTriangle, Music2, Share2, MessageCircle, MapPin, Star
 } from 'lucide-react';
 import { generateCopy } from '@/app/actions/generate-copy';
 import { getUserHistory, deleteHistoryItem } from '@/app/actions/history';
@@ -29,8 +29,8 @@ interface DashboardProps {
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel }: { isOpen: boolean, title: string, message: string, onConfirm: () => void, onCancel: () => void }) => {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-      <div className="bg-[#1a1025] border border-white/10 p-6 rounded-2xl max-w-sm w-full shadow-2xl shadow-purple-900/20 transform scale-100 animate-in zoom-in-95">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="bg-[#1a1025] border border-white/10 p-6 rounded-2xl max-w-sm w-full shadow-2xl shadow-purple-900/20 transform scale-100 animate-in zoom-in-95 duration-300">
         <div className="flex flex-col items-center text-center gap-4">
           <div className="p-3 bg-red-500/10 rounded-full text-red-500 mb-2">
             <Trash2 className="w-8 h-8" />
@@ -70,190 +70,10 @@ export const BACKGROUNDS = [
   { id: 'slate', name: 'Ardósia', icon: LayoutTemplate, class: 'bg-slate-900' }
 ];
 
-// --- SELETOR DE TEMA ---
-const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setActiveTheme: (t: any) => void }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  return (
-    <div className="relative z-50" ref={menuRef}>
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-all shadow-lg border ${
-          isOpen 
-            ? 'bg-purple-600 border-purple-400 text-white' 
-            : 'bg-black/40 border-white/10 text-slate-300 hover:text-white hover:bg-white/10'
-        }`}
-        title="Mudar Fundo da Tela"
-      >
-        <Palette className="w-4 h-4 md:w-5 md:h-5" />
-      </button>
-
-      {isOpen && (
-        <div className="absolute top-12 right-0 w-[280px] bg-[#0f0f11] border border-slate-700 rounded-xl shadow-2xl p-4 animate-in fade-in zoom-in-95 duration-200">
-          <div className="flex justify-between items-center mb-3 px-1">
-            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-              Escolha o Visual
-            </div>
-            <button onClick={() => setIsOpen(false)} className="text-slate-500 hover:text-white"><X className="w-3 h-3" /></button>
-          </div>
-          
-          <div className="grid grid-cols-4 gap-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
-            {BACKGROUNDS.map((bg) => (
-              <button
-                key={bg.id}
-                onClick={() => setActiveTheme(bg)} 
-                className={`
-                  relative group aspect-square rounded-lg flex flex-col items-center justify-center transition-all border
-                  ${activeTheme.id === bg.id 
-                    ? 'bg-purple-600 text-white border-purple-400' 
-                    : 'bg-slate-800 text-slate-400 border-transparent hover:bg-slate-700 hover:text-white'}
-                `}
-                title={bg.name}
-              >
-                <bg.icon className="w-4 h-4" />
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-
-type ModuleId = 
-  | 'home' | 'settings' | 'history'
-  | 'generator' | 'video_script' | 'studio'
-  | 'email_marketing' | 'influencer_dm' | 'blog_post' 
-  | 'product_desc' | 'persona' | 'roas_analyzer' 
-  | 'policy_gen' | 'headline_optimizer';
-
-interface ModuleConfig {
-  label: string;
-  icon: LucideIcon;
-  color: string;
-  desc: string;
-  category: 'core' | 'marketing' | 'strategy' | 'legal' | 'system';
-  explanation: string;
-  isPremium?: boolean;
-}
-
-const MODULES: Record<string, ModuleConfig> = {
-  home: { label: 'Início', icon: Home, color: 'text-purple-400', desc: 'Resumo da conta', category: 'system', explanation: 'Sua tela principal.' },
-  
-  // CRIAÇÃO (CORE)
-  generator: { 
-      label: 'Criador de Anúncios', 
-      icon: Megaphone, 
-      color: 'text-blue-400', 
-      desc: 'Posts para Insta/Face/TikTok', 
-      category: 'core',
-      explanation: 'Cria o texto (legenda) e simula como seu anúncio vai ficar no Instagram ou Facebook. Ajuda a vender o produto.'
-  },
-  video_script: { 
-      label: 'Roteiros de Vídeo', 
-      icon: Video, 
-      color: 'text-pink-400', 
-      desc: 'Para TikTok, Reels e Shorts', 
-      category: 'core', isPremium: true,
-      explanation: 'Escreve o que você deve falar ou mostrar em vídeos curtos para viralizar no TikTok ou Instagram Reels.'
-  },
-  studio: { 
-      label: 'Estúdio de Fotos IA', 
-      icon: Camera, 
-      color: 'text-orange-400', 
-      desc: 'Fotos profissionais de produto', 
-      category: 'core', isPremium: true,
-      explanation: 'Transforma uma foto caseira do seu produto em uma foto profissional de estúdio usando Inteligência Artificial.'
-  },
-  
-  // MARKETING 
-  email_marketing: { 
-      label: 'E-mails que Vendem', 
-      icon: Mail, 
-      color: 'text-yellow-400', 
-      desc: 'Recuperação e Promoções', 
-      category: 'marketing', isPremium: true,
-      explanation: 'Escreve e-mails para enviar aos seus clientes, seja para recuperar uma venda perdida ou anunciar promoções.'
-  },
-  influencer_dm: { 
-      label: 'Parceria com Influencers', 
-      icon: UserPlus, 
-      color: 'text-rose-400', 
-      desc: 'Mensagens de abordagem', 
-      category: 'marketing',
-      explanation: 'Cria a mensagem perfeita para você mandar no direct de influenciadores e fechar parcerias de divulgação.'
-  },
-  blog_post: { 
-      label: 'Artigos para Blog (SEO)', 
-      icon: FileEdit, 
-      color: 'text-green-400', 
-      desc: 'Conteúdo para Google', 
-      category: 'marketing', isPremium: true,
-      explanation: 'Escreve textos completos para blogs que ajudam sua loja a aparecer nas pesquisas do Google (SEO).'
-  },
-
-  // ESTRATÉGIA
-  product_desc: { 
-      label: 'Descrição de Produto', 
-      icon: Search, 
-      color: 'text-cyan-400', 
-      desc: 'Páginas que convencem', 
-      category: 'strategy',
-      explanation: 'Cria aquele texto bonito que fica na página do produto, explicando os benefícios e convencendo o cliente a comprar.'
-  },
-  persona: { 
-      label: 'Descobrir Cliente Ideal', 
-      icon: Users, 
-      color: 'text-indigo-400', 
-      desc: 'Quem é seu comprador?', 
-      category: 'strategy', isPremium: true,
-      explanation: 'Analisa seu produto e te diz exatamente quem é a pessoa que compraria ele (idade, interesses, comportamentos).'
-  },
-  roas_analyzer: { 
-      label: 'Calculadora de Lucro', 
-      icon: Calculator, 
-      color: 'text-emerald-400', 
-      desc: 'Vale a pena vender?', 
-      category: 'strategy',
-      explanation: 'Faz as contas para você: diz quanto você pode gastar em anúncios e qual deve ser o preço para ter lucro.'
-  },
-  headline_optimizer: { 
-      label: 'Gerador de Títulos', 
-      icon: Type, 
-      color: 'text-red-400', 
-      desc: 'Chamadas que clicam', 
-      category: 'strategy',
-      explanation: 'Cria 10 opções de títulos chamativos (headlines) para usar em anúncios ou na página do produto.'
-  },
-
-  // LEGAL & SISTEMA
-  policy_gen: { 
-      label: 'Termos e Políticas', 
-      icon: Shield, 
-      color: 'text-slate-400', 
-      desc: 'Textos jurídicos da loja', 
-      category: 'legal',
-      explanation: 'Gera automaticamente os textos de "Política de Privacidade" e "Termos de Uso" obrigatórios para sua loja.'
-  },
-  history: { label: 'Minha Biblioteca', icon: History, color: 'text-slate-300', desc: 'Tudo que você criou', category: 'system', explanation: 'Seu histórico salvo.' },
-  settings: { label: 'Configurações', icon: Settings, color: 'text-slate-300', desc: 'Ajustes da conta', category: 'system', explanation: 'Ajustes da sua conta.' },
-};
-
 // --- PREVIEWS ---
+
 const FacebookPreview = ({ data, userImage }: { data: any, userImage: string | null }) => (
-    <div className="bg-[#242526] text-white rounded-xl border border-slate-700 overflow-hidden max-w-sm mx-auto font-sans shadow-2xl animate-in fade-in zoom-in-95">
+    <div className="bg-[#242526] text-white rounded-xl border border-slate-700 overflow-hidden max-w-sm mx-auto font-sans shadow-2xl animate-in fade-in zoom-in-95 duration-500">
         <div className="p-3 flex items-center gap-2">
             <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs">SL</div>
             <div className="flex-1">
@@ -279,7 +99,7 @@ const FacebookPreview = ({ data, userImage }: { data: any, userImage: string | n
         <div className="bg-[#3A3B3C] p-3 flex items-center justify-between">
             <div>
                 <div className="text-[10px] text-slate-400">LOJAOFICIAL.COM.BR</div>
-                <div className="font-bold text-sm leading-tight">{data.headline || data.title}</div>
+                <div className="font-bold text-sm leading-tight line-clamp-1">{data.headline || data.title}</div>
             </div>
             <button className="bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded text-sm font-bold transition-colors">{data.cta || "Saiba mais"}</button>
         </div>
@@ -291,7 +111,7 @@ const FacebookPreview = ({ data, userImage }: { data: any, userImage: string | n
 );
 
 const InstagramPreview = ({ data, userImage }: { data: any, userImage: string | null }) => (
-    <div className="bg-black text-white rounded-xl border border-slate-800 overflow-hidden max-w-sm mx-auto font-sans shadow-2xl animate-in fade-in zoom-in-95">
+    <div className="bg-black text-white rounded-xl border border-slate-800 overflow-hidden max-w-sm mx-auto font-sans shadow-2xl animate-in fade-in zoom-in-95 duration-500">
         <div className="flex items-center justify-between p-3">
             <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600 p-[2px]">
@@ -323,17 +143,235 @@ const InstagramPreview = ({ data, userImage }: { data: any, userImage: string | 
     </div>
 );
 
+const TikTokPreview = ({ data, userImage }: { data: any, userImage: string | null }) => (
+    <div className="bg-black text-white rounded-3xl border border-slate-800 overflow-hidden max-w-[320px] mx-auto font-sans shadow-2xl animate-in fade-in zoom-in-95 duration-500 relative aspect-[9/16]">
+        <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">
+             {userImage ? (
+                <img src={userImage} alt="Produto" className="w-full h-full object-cover opacity-80" />
+             ) : (
+                <div className="text-slate-600 flex flex-col items-center">
+                    <Video className="w-16 h-16 mb-2 opacity-30" />
+                    <span className="text-xs">Vídeo de Fundo</span>
+                </div>
+             )}
+        </div>
+        
+        {/* TikTok Overlay UI */}
+        <div className="absolute inset-0 flex flex-col justify-end p-4 bg-gradient-to-t from-black/90 via-transparent to-transparent">
+            
+            {/* Right Sidebar Icons */}
+            <div className="absolute right-2 bottom-20 flex flex-col items-center gap-4">
+                <div className="flex flex-col items-center gap-1">
+                    <div className="w-10 h-10 rounded-full bg-slate-800 border border-white/20"></div>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                    <Heart className="w-8 h-8 text-white fill-white shadow-sm" />
+                    <span className="text-[10px] font-bold">12.5K</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                    <MessageCircle className="w-8 h-8 text-white shadow-sm" />
+                    <span className="text-[10px] font-bold">843</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                    <Share2 className="w-8 h-8 text-white shadow-sm" />
+                    <span className="text-[10px] font-bold">203</span>
+                </div>
+                <div className="w-10 h-10 rounded-full bg-slate-900 border-4 border-slate-800 flex items-center justify-center animate-spin-slow">
+                    <Music2 className="w-5 h-5 text-white" />
+                </div>
+            </div>
+
+            <div className="mb-4 pr-12">
+                <div className="font-bold text-sm mb-1 shadow-black drop-shadow-md">@sualojaoficial</div>
+                <p className="text-xs text-white/90 leading-snug mb-2 shadow-black drop-shadow-md">
+                    {data.body || data.description || "Descrição do vídeo aqui..."} #viral #fyp #promo
+                </p>
+                <div className="flex items-center gap-2 text-[10px] text-white/80">
+                    <Music2 className="w-3 h-3" /> <span>Som Original - Trending Audio</span>
+                </div>
+            </div>
+
+            {/* CTA Button */}
+            <div className="w-full bg-[#EA2D49] hover:bg-[#D1233E] text-white py-2 rounded-sm font-bold text-sm flex items-center justify-between px-4 transition-colors">
+                <span>{data.cta || "Comprar Agora"}</span>
+                <ChevronRight className="w-4 h-4 bg-white/20 rounded" />
+            </div>
+        </div>
+    </div>
+);
+
+const ShopeePreview = ({ data, userImage }: { data: any, userImage: string | null }) => (
+    <div className="bg-[#f5f5f5] text-slate-900 rounded-xl border border-slate-300 overflow-hidden max-w-sm mx-auto font-sans shadow-2xl animate-in fade-in zoom-in-95 duration-500">
+        <div className="bg-[#ee4d2d] text-white p-3 flex items-center justify-between">
+            <span className="font-bold text-sm">Shopee</span>
+            <span className="text-xs bg-white/20 px-2 py-0.5 rounded">Patrocinado</span>
+        </div>
+        <div className="bg-white p-2">
+            <div className="flex gap-3">
+                <div className="w-24 h-24 bg-slate-100 shrink-0 relative border border-slate-100 rounded">
+                    {userImage ? (
+                        <img src={userImage} className="w-full h-full object-cover" />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center text-slate-300"><ImageIcon className="w-8 h-8"/></div>
+                    )}
+                    <div className="absolute top-0 left-0 bg-[#ee4d2d] text-white text-[8px] font-bold px-1">Mall</div>
+                </div>
+                <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                        <h4 className="text-sm font-medium line-clamp-2 leading-tight mb-1">{data.title || data.headline}</h4>
+                        <div className="flex items-center gap-1">
+                            <span className="bg-[#ee4d2d]/10 text-[#ee4d2d] text-[10px] px-1 border border-[#ee4d2d]">Frete Grátis</span>
+                            <span className="text-[10px] text-slate-500 border border-[#ee4d2d] text-[#ee4d2d] px-1">10.10</span>
+                        </div>
+                    </div>
+                    <div className="flex justify-between items-end">
+                        <div>
+                            <span className="text-[#ee4d2d] text-sm font-bold">R$ {data.price || "00,00"}</span>
+                            <div className="text-[10px] text-slate-500">2,4mil vendidos</div>
+                        </div>
+                        <div className="flex gap-0.5">
+                            {[1,2,3,4,5].map(i => <Star key={i} className="w-2.5 h-2.5 text-[#ee4d2d] fill-[#ee4d2d]" />)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="mt-2 text-xs text-slate-600 line-clamp-2 bg-slate-50 p-2 rounded">
+                {data.body || data.description}
+            </div>
+        </div>
+    </div>
+);
+
+const MercadoLivrePreview = ({ data, userImage }: { data: any, userImage: string | null }) => (
+    <div className="bg-white text-slate-900 rounded-lg border border-slate-200 overflow-hidden max-w-sm mx-auto font-sans shadow-lg animate-in fade-in zoom-in-95 duration-500">
+        <div className="p-4 border-b border-slate-100 flex gap-4">
+            <div className="w-32 h-32 bg-slate-100 shrink-0 relative flex items-center justify-center rounded-md overflow-hidden">
+                 {userImage ? (
+                        <img src={userImage} className="w-full h-full object-cover" />
+                    ) : (
+                        <ImageIcon className="w-8 h-8 text-slate-300"/>
+                    )}
+            </div>
+            <div className="flex-1">
+                <h3 className="text-sm text-slate-800 font-normal leading-snug mb-1">{data.title || data.headline}</h3>
+                <div className="flex items-center gap-1 mb-2">
+                    <span className="text-[10px] bg-black text-white font-bold px-1.5 py-0.5 rounded-sm uppercase">MAIS VENDIDO</span>
+                    <span className="text-[10px] text-slate-400">1º em categoria</span>
+                </div>
+                <div className="text-2xl font-light text-slate-800 mb-1">R$ {data.price}</div>
+                <div className="text-xs text-[#00a650] font-semibold mb-1">em 12x R$ {(parseFloat((data.price || "100").replace(',','.'))/12).toFixed(2).replace('.',',')} sem juros</div>
+                <div className="text-xs text-[#00a650] font-bold flex items-center gap-1">
+                    Chegará grátis amanhã
+                    <Zap className="w-3 h-3 fill-[#00a650] text-[#00a650]" />
+                    <span className="italic font-black">FULL</span>
+                </div>
+                <div className="mt-2 text-xs text-slate-500">Vendido por <span className="text-slate-700 font-medium">Loja Oficial</span></div>
+            </div>
+        </div>
+        <div className="bg-slate-50 p-3 text-xs text-slate-500 text-center">
+            Promocionado
+        </div>
+    </div>
+);
+
+const OLXPreview = ({ data, userImage }: { data: any, userImage: string | null }) => (
+    <div className="bg-white text-slate-900 rounded-lg border border-slate-200 overflow-hidden max-w-sm mx-auto font-sans shadow-lg animate-in fade-in zoom-in-95 duration-500">
+        <div className="relative aspect-[4/3] bg-slate-100 flex items-center justify-center overflow-hidden">
+             {userImage ? (
+                <img src={userImage} className="w-full h-full object-cover" />
+            ) : (
+                <ImageIcon className="w-12 h-12 text-slate-300"/>
+            )}
+            <div className="absolute bottom-2 left-2 bg-[#6e0ad6] text-white text-xs font-bold px-2 py-1 rounded">DESTAQUE</div>
+        </div>
+        <div className="p-4">
+            <h3 className="text-base text-slate-800 font-normal mb-1 truncate">{data.title || data.headline}</h3>
+            <div className="text-xl font-bold text-slate-900 mb-2">R$ {data.price}</div>
+            <p className="text-xs text-slate-500 mb-3 line-clamp-2">{data.body || data.description}</p>
+            
+            <div className="flex items-center justify-between text-xs text-slate-400 mb-4">
+                <span className="flex items-center gap-1"><MapPin className="w-3 h-3"/> São Paulo, SP</span>
+                <span>Hoje, 10:30</span>
+            </div>
+
+            <div className="flex gap-2">
+                <button className="flex-1 bg-[#f28000] hover:bg-[#d97300] text-white py-2 rounded-full font-bold text-sm transition-colors">Chat</button>
+            </div>
+        </div>
+    </div>
+);
+
+const GoogleAdsPreview = ({ data }: { data: any }) => (
+    <div className="bg-white text-slate-900 rounded-xl border border-slate-200 overflow-hidden max-w-sm mx-auto font-sans shadow-lg animate-in fade-in zoom-in-95 duration-500 p-4">
+        <div className="flex items-center gap-1 mb-1">
+            <span className="font-bold text-black text-xs">Patrocinado</span>
+            <span className="text-slate-500 text-xs">•</span>
+            <span className="text-slate-500 text-xs">lojaoficial.com.br</span>
+        </div>
+        <div className="text-[#1a0dab] text-xl font-medium hover:underline cursor-pointer mb-1 leading-tight">
+            {data.headline || data.title}
+        </div>
+        <div className="text-sm text-[#4d5156] leading-relaxed">
+            {data.body || data.description}
+            <br/>
+            <span className="text-slate-800 font-medium">Compre agora: R$ {data.price}</span>. Frete Grátis. Garantia Estendida.
+        </div>
+        <div className="mt-2 flex gap-2">
+            <div className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-medium border border-slate-200">Oferta do Dia</div>
+            <div className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-medium border border-slate-200">Entrega Rápida</div>
+        </div>
+    </div>
+);
+
+const AmazonPreview = ({ data, userImage }: { data: any, userImage: string | null }) => (
+    <div className="bg-white text-black rounded-lg border border-slate-200 overflow-hidden max-w-sm mx-auto font-sans shadow-lg animate-in fade-in zoom-in-95 duration-500 p-4">
+        <div className="flex gap-4">
+             <div className="w-24 h-32 bg-slate-100 shrink-0 flex items-center justify-center rounded overflow-hidden">
+                 {userImage ? (
+                    <img src={userImage} className="w-full h-full object-cover" />
+                ) : (
+                    <ImageIcon className="w-8 h-8 text-slate-300"/>
+                )}
+             </div>
+             <div className="flex-1">
+                 <h3 className="text-sm font-medium leading-snug mb-1 text-[#007185] hover:text-[#C7511F] cursor-pointer line-clamp-3">
+                     {data.headline || data.title}
+                 </h3>
+                 <div className="flex items-center gap-1 mb-1">
+                     <div className="flex text-[#F4A41C]">
+                         {[1,2,3,4].map(i => <Star key={i} className="w-3 h-3 fill-current" />)}
+                         <Star className="w-3 h-3 fill-current text-[#F4A41C]/50" />
+                     </div>
+                     <span className="text-xs text-[#007185]">1.204</span>
+                 </div>
+                 <div className="flex items-baseline gap-1 mb-1">
+                     <span className="text-xs align-top mt-1">R$</span>
+                     <span className="text-xl font-medium">{data.price ? data.price.split(',')[0] : "99"}</span>
+                     <span className="text-xs align-top mt-1">{data.price ? data.price.split(',')[1] : "90"}</span>
+                 </div>
+                 <div className="text-xs text-slate-500 mb-2">
+                     Receba até <span className="font-bold text-slate-800">Sexta-feira</span>
+                 </div>
+                 <button className="bg-[#FFD814] hover:bg-[#F7CA00] border border-[#FCD200] rounded-full w-full py-1.5 text-xs text-black shadow-sm transition-colors">
+                     Adicionar ao Carrinho
+                 </button>
+             </div>
+        </div>
+    </div>
+);
+
+
 const SidebarItem = ({ id, conf, active, onClick, userPlan }: any) => (
   <button 
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all rounded-lg group mb-1
+      className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all duration-200 rounded-lg group mb-1 active:scale-95
           ${active 
-          ? 'bg-purple-600/10 text-white border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]' 
-          : 'text-slate-400 hover:bg-white/5 hover:text-white border border-transparent'
+          ? 'bg-purple-600/10 text-white border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)] translate-x-1' 
+          : 'text-slate-400 hover:bg-white/5 hover:text-white border border-transparent hover:translate-x-1'
       }`}
   >
       <div className="relative">
-        <conf.icon className={`w-4 h-4 ${active ? conf.color : 'text-slate-500 group-hover:text-white'} transition-colors`} />
+        <conf.icon className={`w-4 h-4 ${active ? conf.color : 'text-slate-500 group-hover:text-white'} transition-colors duration-200`} />
         {conf.isPremium && userPlan === 'free' && (
              <div className="absolute -top-1 -right-1 bg-slate-950 rounded-full p-[1px] border border-slate-800"><Lock className="w-2 h-2 text-yellow-500" /></div>
         )}
@@ -380,6 +418,173 @@ const HistoryContentRenderer = ({ content }: { content: any }) => {
             })}
         </div>
     );
+};
+
+type ModuleId = 'home' | 'generator' | 'video_script' | 'studio' | 'email_marketing' | 'influencer_dm' | 'blog_post' | 'product_desc' | 'persona' | 'roas_analyzer' | 'policy_gen' | 'headline_optimizer' | 'history' | 'settings';
+
+const MODULES: Record<ModuleId, { 
+    label: string; 
+    icon: any; 
+    color?: string; 
+    desc?: string; 
+    isPremium?: boolean; 
+    explanation?: string;
+}> = {
+  home: { label: 'Início', icon: Home },
+  generator: { 
+      label: 'Gerador de Anúncios', 
+      icon: Megaphone, 
+      color: 'text-purple-400', 
+      desc: 'Crie anúncios de alta conversão para Facebook, TikTok e Google.',
+      explanation: 'Esta ferramenta usa IA treinada em milhares de anúncios vencedores para criar copy persuasiva (AIDA) específica para cada plataforma.'
+  },
+  video_script: { 
+      label: 'Roteiros de Vídeo', 
+      icon: Video, 
+      color: 'text-pink-400', 
+      desc: 'Roteiros virais para TikTok e Reels com ganchos visuais.',
+      isPremium: true,
+      explanation: 'Gera roteiros segundo a segundo, sugerindo o que mostrar (visual) e o que falar (áudio) para maximizar a retenção.'
+  },
+  studio: { 
+      label: 'Studio Product AI', 
+      icon: Camera, 
+      color: 'text-orange-400', 
+      desc: 'Transforme fotos amadoras em imagens de estúdio 4K.',
+      isPremium: true,
+      explanation: 'IA Generativa de Imagem que coloca seu produto em qualquer cenário imaginável.'
+  },
+  email_marketing: { 
+      label: 'E-mail Marketing', 
+      icon: Mail, 
+      color: 'text-blue-400', 
+      desc: 'Sequências de e-mail para recuperação e vendas.',
+      isPremium: true,
+      explanation: 'Cria sequências de e-mail (Fluxos) para recuperar carrinhos abandonados ou dar boas vindas a novos clientes.'
+  },
+  influencer_dm: { 
+      label: 'Parcerias & Influencers', 
+      icon: MessageCircle, 
+      color: 'text-green-400', 
+      desc: 'Scripts de negociação para fechar com influencers.',
+      explanation: 'Gera abordagens profissionais para fechar parcerias com influenciadores, focando em permuta ou comissão.'
+  },
+  blog_post: { 
+      label: 'Artigos de Blog (SEO)', 
+      icon: FileText, 
+      color: 'text-cyan-400', 
+      desc: 'Artigos otimizados para ranquear no Google.',
+      isPremium: true,
+      explanation: 'Escreve artigos completos com estrutura de SEO (H1, H2, Meta Description) para atrair tráfego orgânico.'
+  },
+  product_desc: { 
+      label: 'Descrição de Produto', 
+      icon: Text, 
+      color: 'text-yellow-400', 
+      desc: 'Descrições hipnóticas para páginas de vendas.',
+      explanation: 'Transforma características técnicas em benefícios emocionais que fazem o cliente querer comprar agora.'
+  },
+  persona: { 
+      label: 'Gerador de Persona', 
+      icon: UserPlus, 
+      color: 'text-indigo-400', 
+      desc: 'Descubra quem é seu cliente ideal e suas dores.',
+      isPremium: true,
+      explanation: 'Analisa o produto e cria um perfil detalhado do comprador ideal (Avatar), incluindo dores, desejos e objeções.'
+  },
+  roas_analyzer: { 
+      label: 'Calculadora de ROAS', 
+      icon: Calculator, 
+      color: 'text-emerald-400', 
+      desc: 'Analise a viabilidade e precificação do produto.',
+      explanation: 'Simula cenários financeiros para dizer se seu produto é viável e qual deve ser o preço de venda ideal.'
+  },
+  policy_gen: { 
+      label: 'Gerador de Políticas', 
+      icon: Shield, 
+      color: 'text-slate-400', 
+      desc: 'Termos de uso e privacidade para sua loja.',
+      explanation: 'Gera os textos jurídicos obrigatórios para rodar anúncios e aprovar sua loja em gateways de pagamento.'
+  },
+  headline_optimizer: { 
+      label: 'Otimizador de Headline', 
+      icon: FileEdit, 
+      color: 'text-red-400', 
+      desc: 'Torne seus títulos impossíveis de ignorar.',
+      isPremium: true,
+      explanation: 'Reescreve seu título ou promessa principal usando gatilhos mentais de curiosidade, urgência e benefício.'
+  },
+  history: { label: 'Minha Biblioteca', icon: History, color: 'text-purple-400' },
+  settings: { label: 'Configurações', icon: Settings, color: 'text-slate-400' }
+};
+
+const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setActiveTheme: (t: any) => void }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative z-50" ref={menuRef}>
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-lg border ${
+          isOpen 
+            ? 'bg-purple-600 border-purple-400 text-white' 
+            : 'bg-black/40 border-white/10 text-slate-300 hover:text-white hover:bg-white/10'
+        }`}
+        title="Alterar Cenário/Tema"
+      >
+        <Palette className="w-5 h-5" />
+      </button>
+
+      {isOpen && (
+        <div className="absolute top-12 right-0 w-[280px] bg-[#0f0f11] border border-slate-700 rounded-xl shadow-2xl p-4 animate-in fade-in zoom-in-95 duration-200">
+           <div className="flex justify-between items-center mb-3 px-1">
+            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              Selecionar Ambiente
+            </div>
+            <button 
+                onClick={() => setIsOpen(false)}
+                className="text-slate-500 hover:text-white p-1 rounded-md hover:bg-white/10 transition-colors"
+            >
+                <X className="w-3 h-3" />
+            </button>
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {BACKGROUNDS.map((bg) => (
+              <button
+                key={bg.id}
+                onClick={() => setActiveTheme(bg)}
+                className={`
+                  relative group aspect-square rounded-lg flex flex-col items-center justify-center transition-all
+                  ${activeTheme.id === bg.id 
+                    ? 'bg-purple-600 text-white ring-2 ring-purple-400 ring-offset-2 ring-offset-black' 
+                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'}
+                `}
+                title={bg.name}
+              >
+                <bg.icon className="w-5 h-5 mb-1" />
+              </button>
+            ))}
+          </div>
+          <div className="mt-3 pt-2 border-t border-slate-800 text-center">
+            <span className="text-[10px] text-slate-400">
+              Tema Atual: <span className="text-white font-bold">{activeTheme.name}</span>
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => {
@@ -540,7 +745,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
 
         switch (activeModule) {
             case 'generator':
-                prompt = `Atue como um Copywriter Sênior Agressivo e Especialista em ${data.platform || 'Facebook'}. ${antiMarkdown}
+                // REGRAS ESPECÍFICAS DE PLATAFORMA
+                const platform = data.platform || 'Facebook';
+                let platformRules = "";
+                
+                if (platform === 'OLX' || platform === 'Google Ads') {
+                    platformRules = "REGRA CRÍTICA: NÃO use emojis no título. Seja direto e informativo.";
+                } else if (platform === 'TikTok Ads') {
+                    platformRules = "Estilo: Viral, dinâmico, gírias da internet aceitas, uso intensivo de emojis.";
+                } else if (platform === 'LinkedIn Ads') {
+                    platformRules = "Estilo: Profissional, B2B, focado em solução de problemas corporativos.";
+                }
+
+                prompt = `Atue como um Copywriter Sênior Agressivo e Especialista em ${platform}. ${antiMarkdown}
+                ${platformRules}
                 Crie 1 anúncio de alta conversão para:
                 Produto: ${data.productName}
                 Preço: ${data.price || 'Não informado'}
@@ -684,6 +902,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                  <option value="Shopee">Shopee</option>
                                  <option value="Amazon">Amazon</option>
                                  <option value="Mercado Livre">Mercado Livre</option>
+                                 <option value="OLX">OLX</option>
+                                 <option value="Google Ads">Google Ads (Search)</option>
+                                 <option value="Pinterest">Pinterest Ads</option>
+                                 <option value="YouTube">YouTube Shorts</option>
+                                 <option value="LinkedIn">LinkedIn Ads</option>
+                                 <option value="Twitter">X (Twitter) Ads</option>
                              </select>
                         </div>
                     </div>
@@ -909,6 +1133,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     </div>
   );
 
+  const renderAdPreview = (data: any, platform: string, userImage: string | null) => {
+      switch (platform) {
+          case 'Instagram Ads': return <InstagramPreview data={data} userImage={userImage} />;
+          case 'TikTok Ads': return <TikTokPreview data={data} userImage={userImage} />;
+          case 'Shopee': return <ShopeePreview data={data} userImage={userImage} />;
+          case 'Amazon': return <AmazonPreview data={data} userImage={userImage} />;
+          case 'Mercado Livre': return <MercadoLivrePreview data={data} userImage={userImage} />;
+          case 'OLX': return <OLXPreview data={data} userImage={userImage} />;
+          case 'Google Ads': return <GoogleAdsPreview data={data} />;
+          default: return <FacebookPreview data={data} userImage={userImage} />;
+      }
+  };
+
   return (
     <div className="flex h-screen bg-[#0B0518] text-white font-sans overflow-hidden relative selection:bg-purple-500/30">
       
@@ -998,22 +1235,22 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
 
                 {sidebarOpen && <CategoryLabel label="Criação" />}
                 {['generator', 'video_script', 'studio'].map(k => (
-                    <SidebarItem key={k} id={k} conf={MODULES[k]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />
+                    <SidebarItem key={k} id={k} conf={MODULES[k as ModuleId]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />
                 ))}
 
                 {sidebarOpen && <CategoryLabel label="Marketing" />}
                 {['email_marketing', 'influencer_dm', 'blog_post'].map(k => (
-                    <SidebarItem key={k} id={k} conf={MODULES[k]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />
+                    <SidebarItem key={k} id={k} conf={MODULES[k as ModuleId]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />
                 ))}
 
                 {sidebarOpen && <CategoryLabel label="Estratégia" />}
                 {['product_desc', 'persona', 'roas_analyzer', 'headline_optimizer'].map(k => (
-                    <SidebarItem key={k} id={k} conf={MODULES[k]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />
+                    <SidebarItem key={k} id={k} conf={MODULES[k as ModuleId]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />
                 ))}
 
                  {sidebarOpen && <CategoryLabel label="Sistema" />}
                  {['policy_gen', 'history', 'settings'].map(k => (
-                    <SidebarItem key={k} id={k} conf={MODULES[k]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />
+                    <SidebarItem key={k} id={k} conf={MODULES[k as ModuleId]} active={activeModule === k} onClick={() => { setActiveModule(k as any); setMobileMenuOpen(false); }} userPlan={userPlan} />
                 ))}
 
             </div>
@@ -1036,7 +1273,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
           
           {activeModule === 'home' ? (
               // === DASHBOARD HOME ===
-              <div className={`flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 animate-in fade-in slide-in-from-bottom-4 duration-500 ${activeTheme.class}`}>
+              <div key="home" className={`flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 animate-in fade-in slide-in-from-bottom-8 duration-500 ease-out ${activeTheme.class}`}>
                    <div className="absolute top-4 right-4 z-20">
                       <ThemeSelector activeTheme={activeTheme} setActiveTheme={handleThemeChange} />
                    </div>
@@ -1055,10 +1292,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                 <button 
                                     key={key}
                                     onClick={() => setActiveModule(key as ModuleId)}
-                                    className="group relative bg-slate-900/40 hover:bg-slate-800/60 border border-slate-800 hover:border-purple-500/30 p-5 rounded-2xl text-left transition-all hover:-translate-y-1 hover:shadow-xl overflow-hidden backdrop-blur-sm"
+                                    className="group relative bg-slate-900/40 hover:bg-slate-800/60 border border-slate-800 hover:border-purple-500/30 p-5 rounded-2xl text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-xl overflow-hidden backdrop-blur-sm active:scale-95"
                                 >
                                     <div className="flex justify-between items-start mb-4">
-                                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 group-hover:scale-110 transition-transform">
+                                        <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 group-hover:scale-110 transition-transform duration-300">
                                             <mod.icon className={`w-6 h-6 ${mod.color}`} />
                                         </div>
                                         {mod.isPremium && userPlan === 'free' && <Lock className="w-4 h-4 text-slate-600" />}
@@ -1073,7 +1310,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
 
           ) : activeModule === 'history' ? (
              // === HISTÓRICO ===
-             <div className="flex-1 flex flex-col h-screen overflow-hidden bg-[#0B0518]">
+             <div key="history" className="flex-1 flex flex-col h-screen overflow-hidden bg-[#0B0518] animate-in fade-in slide-in-from-bottom-8 duration-500 ease-out">
                 <div className="h-20 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-950/50 backdrop-blur-md shrink-0 z-20">
                     <h2 className="text-xl font-bold text-white flex items-center gap-3">
                         <div className="p-2 bg-slate-900 rounded-lg border border-slate-800"><History className="w-5 h-5 text-purple-400"/></div>
@@ -1096,7 +1333,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                     ) : (
                         <div className={`grid gap-6 ${historyType === 'image' ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
                             {historyItems.map(item => {
-                                const ModuleIcon = MODULES[item.module]?.icon || Zap;
+                                const ModuleIcon = MODULES[item.module as ModuleId]?.icon || Zap;
                                 return (
                                     <div key={item.id} className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden hover:border-purple-500/30 transition-all group flex flex-col h-full shadow-lg">
                                         <div className="px-4 py-3 border-b border-slate-800 bg-slate-950/50 flex items-center justify-between shrink-0">
@@ -1105,7 +1342,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                                     <ModuleIcon className="w-3.5 h-3.5 text-purple-400" />
                                                 </div>
                                                 <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider truncate max-w-[120px]">
-                                                    {MODULES[item.module]?.label || item.module}
+                                                    {MODULES[item.module as ModuleId]?.label || item.module}
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-2">
@@ -1155,7 +1392,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
 
           ) : activeModule === 'settings' ? (
               // === CONFIGURAÇÕES ===
-              <div className="flex-1 flex flex-col h-screen overflow-hidden bg-[#0B0518]">
+              <div key="settings" className="flex-1 flex flex-col h-screen overflow-hidden bg-[#0B0518] animate-in fade-in slide-in-from-bottom-8 duration-500 ease-out">
                   <div className="h-20 border-b border-slate-800 flex items-center px-6 bg-slate-950/50 backdrop-blur-md">
                       <h2 className="text-xl font-bold text-white flex items-center gap-3">
                         <div className="p-2 bg-slate-900 rounded-lg border border-slate-800"><Settings className="w-5 h-5 text-purple-400"/></div>
@@ -1197,11 +1434,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
 
           ) : activeModule === 'studio' ? (
               // === STUDIO (IMAGENS) ===
-              <ImageTool userPlan={userPlan} onUpgrade={handleUpgradeClick} activeTheme={activeTheme} setActiveTheme={handleThemeChange} />
+              <div key="studio" className="w-full h-full animate-in fade-in slide-in-from-bottom-8 duration-500 ease-out">
+                  <ImageTool userPlan={userPlan} onUpgrade={handleUpgradeClick} activeTheme={activeTheme} setActiveTheme={handleThemeChange} />
+              </div>
           
           ) : (
               // === GERADORES DE TEXTO (TODOS) ===
-              <div className="flex flex-col lg:flex-row h-full overflow-hidden relative">
+              <div key={activeModule} className="flex flex-col lg:flex-row h-full overflow-hidden relative animate-in fade-in slide-in-from-bottom-8 duration-500 ease-out">
                   
                   {/* --- PAINEL DE ENTRADA (ESQUERDA) --- */}
                   <div className="w-full lg:w-[380px] bg-slate-950 border-r border-slate-800 flex flex-col h-auto lg:h-full z-20 shadow-2xl overflow-y-auto custom-scrollbar">
@@ -1256,7 +1495,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                 {isGenerating ? <Loader2 className="animate-spin w-5 h-5"/> : <Wand2 className="w-5 h-5"/>}
                                 {isGenerating ? 'Trabalhando...' : 'Gerar Resultado'}
                             </button>
-                            <button onClick={() => setShowClearModal(true)} className="w-full py-2.5 text-xs font-bold text-slate-500 hover:text-slate-300 hover:bg-slate-800 rounded-lg flex items-center justify-center gap-2 transition-all">
+                            <button onClick={() => setShowClearModal(true)} className="w-full py-2.5 text-xs font-bold text-slate-500 hover:text-slate-300 hover:bg-slate-800 rounded-lg flex items-center justify-center gap-2 transition-all active:scale-95">
                                 <Eraser className="w-3 h-3" /> Limpar Tudo
                             </button>
                         </div>
@@ -1295,11 +1534,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                      </div>
                                      
                                      {activeModule === 'generator' ? (
-                                         dynamicFormData.platform === 'Instagram' ? (
-                                            <InstagramPreview data={result} userImage={adImage} />
-                                         ) : (
-                                            <FacebookPreview data={result} userImage={adImage} />
-                                         )
+                                         renderAdPreview(result, dynamicFormData.platform, adImage)
                                      ) : (
                                          renderGenericResult(result)
                                      )}
