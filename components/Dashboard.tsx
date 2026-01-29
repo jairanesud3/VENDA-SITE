@@ -31,7 +31,7 @@ interface DashboardProps {
 // --- CONFIGURAÇÃO GLOBAL ---
 const MAX_PLATFORMS = 3; 
 
-// Lista simplificada conforme solicitado (Apenas os principais)
+// LISTA LIMPA - APENAS OS PRINCIPAIS
 const PLATFORM_TABS = [
     { id: 'instagram', label: 'Instagram', icon: Instagram, color: 'text-pink-500', bg: 'bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500', neon: 'shadow-[0_0_30px_rgba(236,72,153,0.3)] border-pink-500/30' },
     { id: 'facebook', label: 'Facebook', icon: Facebook, color: 'text-blue-500', bg: 'bg-blue-600', neon: 'shadow-[0_0_30px_rgba(59,130,246,0.3)] border-blue-500/30' },
@@ -45,10 +45,11 @@ function PinIcon(props: any) {
     return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>; 
 }
 
+// MODAL DE CONFIRMAÇÃO (Z-INDEX ALTO)
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel }: { isOpen: boolean, title: string, message: string, onConfirm: () => void, onCancel: () => void }) => {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
       <div className="bg-[#1a1025] border border-white/10 p-6 rounded-2xl max-w-sm w-full shadow-2xl shadow-purple-900/40 transform scale-100 animate-in zoom-in-95 duration-200">
         <div className="flex flex-col items-center text-center gap-4">
           <div className="p-4 bg-red-500/10 rounded-full text-red-500 mb-1 border border-red-500/20"><Trash2 className="w-8 h-8" /></div>
@@ -102,9 +103,8 @@ const MobileStatusBar = () => (
     </div>
 );
 
-// --- TODOS OS PREVIEWS (COMPLETOS) ---
+// --- PREVIEWS ---
 
-// 1. OLX
 const OLXPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => {
     if (device === 'mobile') {
         return (
@@ -139,7 +139,6 @@ const OLXPreview = ({ data, userImage, device }: { data: any, userImage: string 
             </div>
         );
     }
-    // Desktop Version
     return (
         <div className="bg-white text-[#4A4A4A] rounded-lg border border-slate-200 overflow-hidden font-sans shadow-xl mx-auto max-w-[700px] flex">
              <div className="w-[55%] bg-slate-100 relative">
@@ -166,7 +165,6 @@ const OLXPreview = ({ data, userImage, device }: { data: any, userImage: string 
     );
 };
 
-// 2. Mercado Livre
 const MercadoLivrePreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => {
     if (device === 'mobile') {
         return (
@@ -197,7 +195,6 @@ const MercadoLivrePreview = ({ data, userImage, device }: { data: any, userImage
             </div>
         );
     }
-    // Desktop
     return (
         <div className="bg-white text-slate-900 rounded-lg border border-slate-200 overflow-hidden font-sans shadow-lg mx-auto max-w-[800px] flex p-6">
              <div className="w-[50%] flex gap-4">
@@ -228,7 +225,6 @@ const MercadoLivrePreview = ({ data, userImage, device }: { data: any, userImage
     );
 };
 
-// 3. Shopee
 const ShopeePreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
     <div className={`bg-[#F5F5F5] text-black rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px] aspect-[9/18]' : 'max-w-[360px] aspect-[9/18]'}`}>
         <div className="bg-[#EE4D2D] text-white pt-2 pb-1 px-4"><MobileStatusBar /></div>
@@ -254,7 +250,6 @@ const ShopeePreview = ({ data, userImage, device }: { data: any, userImage: stri
     </div>
 );
 
-// 4. Facebook
 const FacebookPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
     <div className={`bg-[#242526] text-white rounded-xl border border-slate-700 overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[500px]'}`}>
         <div className="p-3 flex items-center gap-2">
@@ -281,7 +276,6 @@ const FacebookPreview = ({ data, userImage, device }: { data: any, userImage: st
     </div>
 );
 
-// 5. Instagram
 const InstagramPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
     <div className={`bg-black text-white rounded-xl border border-slate-800 overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[400px]'}`}>
         {device === 'mobile' && <div className="bg-black text-white pt-1 px-4"><MobileStatusBar /></div>}
@@ -312,32 +306,6 @@ const InstagramPreview = ({ data, userImage, device }: { data: any, userImage: s
     </div>
 );
 
-// 6. TikTok
-const TikTokPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-black text-white rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl relative mx-auto ${device === 'mobile' ? 'max-w-[320px] aspect-[9/18]' : 'max-w-[360px] aspect-[9/18]'}`}>
-        <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">
-             {userImage ? <img src={userImage} className="w-full h-full object-cover opacity-80" /> : <div className="flex flex-col items-center opacity-30"><Video className="w-16 h-16 mb-2"/><span className="text-xs">Vídeo</span></div>}
-        </div>
-        <div className="absolute top-2 w-full px-4"><MobileStatusBar /></div>
-        <div className="absolute inset-0 flex flex-col justify-end p-4 bg-gradient-to-t from-black/90 via-transparent to-transparent">
-            <div className="absolute right-2 bottom-20 flex flex-col items-center gap-4">
-                <div className="flex flex-col items-center gap-1"><div className="w-10 h-10 rounded-full bg-slate-800 border border-white/20"></div></div>
-                <div className="flex flex-col items-center gap-1"><Heart className="w-8 h-8 text-white fill-white shadow-sm" /><span className="text-[10px] font-bold">12.5K</span></div>
-                <div className="flex flex-col items-center gap-1"><MessageCircle className="w-8 h-8 text-white shadow-sm" /><span className="text-[10px] font-bold">843</span></div>
-                <div className="w-10 h-10 rounded-full bg-slate-900 border-4 border-slate-800 flex items-center justify-center animate-spin-slow"><Music2 className="w-5 h-5 text-white" /></div>
-            </div>
-            <div className="mb-4 pr-12">
-                <div className="font-bold text-sm mb-1 shadow-black drop-shadow-md">@sualojaoficial</div>
-                <p className="text-xs text-white/90 leading-snug mb-2 shadow-black drop-shadow-md">{data.body || data.description || "Descrição..."} #viral #fyp</p>
-            </div>
-            <div className="w-full bg-[#EA2D49] hover:bg-[#D1233E] text-white py-2 rounded-sm font-bold text-sm flex items-center justify-between px-4 transition-colors">
-                <span>{data.cta || "Comprar Agora"}</span><ChevronRight className="w-4 h-4 bg-white/20 rounded" />
-            </div>
-        </div>
-    </div>
-);
-
-// 7. Amazon
 const AmazonPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
    <div className={`bg-white text-black rounded-xl border border-slate-200 overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[600px] flex'}`}>
         {device === 'mobile' && <div className="bg-[#232F3E] text-white pt-2 pb-1 px-4"><MobileStatusBar /></div>}
@@ -355,7 +323,7 @@ const AmazonPreview = ({ data, userImage, device }: { data: any, userImage: stri
    </div>
 );
 
-// --- NOVO: SELETOR DE PLATAFORMAS (LOGOS REAIS/ESTILIZADOS) ---
+// --- COMPONENTES AUXILIARES ---
 const PlatformSelector = ({ selected, onToggle }: { selected: string[], onToggle: (id: string) => void }) => (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 mb-6">
         <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center justify-between">
@@ -391,7 +359,6 @@ const PlatformSelector = ({ selected, onToggle }: { selected: string[], onToggle
     </div>
 );
 
-// --- COMPONENTES AUXILIARES ---
 const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setActiveTheme: (t: any) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -510,7 +477,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     init();
   }, []);
 
-  // CORREÇÃO NOME DO USUÁRIO
   useEffect(() => {
     if(userEmail) {
         const name = userEmail.split('@')[0];
@@ -521,7 +487,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   useEffect(() => { const savedThemeId = themePrefs[activeModule] || themePrefs['global']; if (savedThemeId) { const found = BACKGROUNDS.find(b => b.id === savedThemeId); if (found) setActiveTheme(found); } }, [activeModule]);
   const handleThemeChange = (newTheme: typeof BACKGROUNDS[0]) => { setActiveTheme(newTheme); const newPrefs = { ...themePrefs, [activeModule]: newTheme.id, 'global': newTheme.id }; setThemePrefs(newPrefs); localStorage.setItem('drophacker_themes', JSON.stringify(newPrefs)); };
   
-  // CORREÇÃO BIBLIOTECA
   useEffect(() => { if (activeModule === 'history') fetchHistory(); }, [activeModule, historyType]);
   const fetchHistory = async () => { setIsLoadingHistory(true); try { const items = await getUserHistory(historyType); setHistoryItems(items || []); } catch (e) { console.error(e); } finally { setIsLoadingHistory(false); } };
   
@@ -544,7 +509,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
       } 
   };
 
-  // --- LÓGICA DE SELEÇÃO DE PLATAFORMA ---
   const togglePlatform = (id: string) => {
     setSelectedPlatforms(prev => {
         if (prev.includes(id)) {
@@ -557,7 +521,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     });
   };
 
-  // --- LÓGICA DE SELEÇÃO DE POLÍTICAS ---
   const togglePolicy = (id: string) => {
       setSelectedPolicies(prev => prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]);
   };
@@ -650,14 +613,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
         
         case 'roas_analyzer': return ( <>
              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Quanto você pagou? (Custo)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="30,00" value={dynamicFormData.cost || ''} onChange={e => handleInputChange('cost', e.target.value)} /></div>
-                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Por quanto vai vender?</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="99,90" value={dynamicFormData.salePrice || ''} onChange={e => handleInputChange('salePrice', e.target.value)} /></div>
+                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Quanto você pagou? (Custo)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="30,00" value={dynamicFormData.cost || ''} onChange={e => { if(Number(e.target.value) >= 0) handleInputChange('cost', e.target.value)}} /></div>
+                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Por quanto vai vender?</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="99,90" value={dynamicFormData.salePrice || ''} onChange={e => { if(Number(e.target.value) >= 0) handleInputChange('salePrice', e.target.value)}} /></div>
              </div>
              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Imposto (%)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="6" value={dynamicFormData.tax || ''} onChange={e => handleInputChange('tax', e.target.value)} /></div>
-                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Frete Médio (R$)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="20,00" value={dynamicFormData.shipping || ''} onChange={e => handleInputChange('shipping', e.target.value)} /></div>
+                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Imposto (%)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="6" value={dynamicFormData.tax || ''} onChange={e => { if(Number(e.target.value) >= 0) handleInputChange('tax', e.target.value)}} /></div>
+                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Frete Médio (R$)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="20,00" value={dynamicFormData.shipping || ''} onChange={e => { if(Number(e.target.value) >= 0) handleInputChange('shipping', e.target.value)}} /></div>
              </div>
-             <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Custo de Marketing (CPA)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-emerald-500 outline-none" placeholder="25,00" value={dynamicFormData.cpa || ''} onChange={e => handleInputChange('cpa', e.target.value)} /></div>
+             <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Custo Marketing (CPA)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-emerald-500 outline-none" placeholder="25,00" value={dynamicFormData.cpa || ''} onChange={e => { if(Number(e.target.value) >= 0) handleInputChange('cpa', e.target.value)}} /></div>
              </> );
 
         case 'policy_gen': return ( <>
@@ -761,7 +724,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     </div>
   );
 
-  // --- RENDERIZADOR DE PREVIEW ---
   const renderAdPreview = (data: any, platform: string, userImage: string | null, device: 'mobile' | 'desktop') => {
       let platformData = data;
       if (activeModule === 'generator' && data && typeof data === 'object') {
@@ -778,7 +740,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
       }
   };
 
-  // --- RENDERIZADOR DE HISTÓRICO ---
   const renderHistory = () => (
       <div className="w-full max-w-5xl mx-auto pb-20">
           <div className="flex items-center justify-between mb-6">
