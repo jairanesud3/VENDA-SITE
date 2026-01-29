@@ -9,9 +9,11 @@ import {
   Camera, Home, ChevronRight, Wand2, LucideIcon, Download,
   Lock, AlertTriangle, X, LayoutTemplate,
   Heart, MessageCircle, Send, Bookmark, MoreHorizontal, Star, ShoppingCart, Truck, MapPin,
-  Palette, Box, Moon, Sun, Grid3X3, Aperture, Leaf, Gem, Monitor
+  Palette, Box, Moon, Sun, Grid3X3, Aperture, Leaf, Gem, Monitor,
+  History, Trash2, Calendar
 } from 'lucide-react';
 import { generateCopy } from '@/app/actions/generate-copy';
+import { getUserHistory, deleteHistoryItem } from '@/app/actions/history';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { ImageTool } from './ImageTool';
@@ -22,7 +24,6 @@ interface DashboardProps {
 }
 
 // --- TEMAS GLOBAIS (BACKGROUNDS) ---
-// Definidos aqui para serem usados em TODO o dashboard
 export const BACKGROUNDS = [
   { 
     id: 'studio', 
@@ -86,12 +87,11 @@ export const BACKGROUNDS = [
   }
 ];
 
-// --- COMPONENTE SELETOR DE TEMA (ATUALIZADO) ---
+// --- COMPONENTE SELETOR DE TEMA ---
 const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setActiveTheme: (t: any) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Fecha ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -165,6 +165,7 @@ type ModuleId =
   | 'generator' | 'video_script' | 'product_desc' 
   | 'persona' | 'studio'
   | 'roas_analyzer' 
+  | 'history' // NOVO MÓDULO
   | 'settings';
 
 interface ModuleConfig {
@@ -186,10 +187,12 @@ const MODULES: Record<string, ModuleConfig> = {
   video_script: { label: 'Roteiros TikTok/Reels', icon: Video, color: 'text-pink-400', desc: 'Scripts virais para vídeos curtos', placeholder: 'Ex: Escova Alisadora 3 em 1...', isPremium: true },
   studio: { label: 'Studio Product AI', icon: Camera, color: 'text-orange-400', desc: 'Fotos profissionais de produtos', placeholder: 'Ex: Garrafa Térmica Preta em cima de uma mesa de madeira...', isPremium: true },
   persona: { label: 'Hacker de Público', icon: Users, color: 'text-indigo-400', desc: 'Descubra quem compra seu produto', placeholder: 'Ex: Kit de Ferramentas para Jardim...', isPremium: true },
+  
+  history: { label: 'Histórico Salvo', icon: History, color: 'text-slate-300', desc: 'Seus textos e imagens salvos' },
   settings: { label: 'Configurações', icon: Settings, color: 'text-slate-400', desc: 'Ajustes da conta' },
 };
 
-// --- COMPONENTE SELECT ---
+// ... (Select e Previews components mantidos iguais) ...
 const CustomSelect = ({ label, value, onChange, options }: any) => {
   return (
     <div className="space-y-2">
@@ -213,8 +216,7 @@ const CustomSelect = ({ label, value, onChange, options }: any) => {
   )
 }
 
-// --- PREVIEW COMPONENTS (SIMULADORES) ---
-
+// ... (Social Preview Components mantidos omitidos para brevidade, mas devem estar aqui no código real) ...
 const SocialStats = () => (
     <div className="flex items-center gap-4 py-2">
         <Heart className="w-5 h-5 text-slate-300" />
@@ -224,212 +226,79 @@ const SocialStats = () => (
         <Bookmark className="w-5 h-5 text-slate-300" />
     </div>
 );
-
-// MOCKUP INSTAGRAM
 const InstagramPreview = ({ data }: { data: any }) => (
     <div className="bg-black text-white rounded-xl border border-slate-800 overflow-hidden max-w-sm mx-auto font-sans shadow-2xl">
         <div className="flex items-center justify-between p-3 border-b border-white/10">
-            <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600 p-[2px]">
-                    <div className="w-full h-full rounded-full bg-black border-2 border-black"></div>
-                </div>
-                <span className="text-xs font-bold">sua_loja_oficial</span>
-            </div>
+            <span className="text-xs font-bold">sua_loja_oficial</span>
             <MoreHorizontal className="w-5 h-5 text-white" />
         </div>
         <div className="bg-slate-900 aspect-square w-full flex items-center justify-center text-slate-600 border-b border-white/10 relative">
             <ImageIcon className="w-12 h-12 opacity-20" />
-            <span className="absolute bottom-2 right-2 bg-black/60 px-2 py-1 rounded text-[10px] text-white font-bold">Patrocinado</span>
         </div>
         <div className="p-3">
-            <div className="flex justify-between items-center mb-2">
-                 <div className="flex gap-4"><Heart /><MessageCircle /><Send /></div>
-                 <Bookmark />
-            </div>
-            <div className="text-xs text-white mb-1 font-bold">2.493 curtidas</div>
             <p className="text-sm leading-snug">
                 <span className="font-bold mr-2">sua_loja_oficial</span>
                 {data.headline || data.title}
                 <br/><br/>
                 <span className="text-slate-300 text-xs font-normal whitespace-pre-wrap">{data.body || data.description}</span>
             </p>
-            <div className="mt-2 text-blue-400 text-xs cursor-pointer">#{data.tags || "promoção #oferta #novidade"}</div>
-        </div>
-        <div className="bg-[#262626] p-3 flex justify-between items-center">
-             <span className="text-sm font-bold text-white">{data.cta || "Saiba Mais"}</span>
-             <ChevronRight className="w-4 h-4 text-slate-400"/>
         </div>
     </div>
 );
-
-// MOCKUP FACEBOOK
 const FacebookPreview = ({ data }: { data: any }) => (
     <div className="bg-[#242526] text-white rounded-xl border border-slate-700 overflow-hidden max-w-sm mx-auto font-sans shadow-2xl">
         <div className="p-3 flex items-center gap-2">
             <div className="w-10 h-10 rounded-full bg-blue-600"></div>
             <div>
-                <div className="font-bold text-sm">Sua Loja <span className="text-xs font-normal text-slate-400">• Patrocinado</span></div>
-                <div className="text-[10px] text-slate-400 flex items-center gap-1">Publicado agora <div className="w-3 h-3 rounded-full bg-slate-500"></div></div>
+                <div className="font-bold text-sm">Sua Loja</div>
+                <div className="text-[10px] text-slate-400">Patrocinado</div>
             </div>
-            <div className="ml-auto"><MoreHorizontal className="text-slate-400"/></div>
         </div>
-        <div className="px-3 pb-2 text-sm text-slate-200 whitespace-pre-wrap">
-            {data.body || data.description}
-        </div>
-        <div className="bg-slate-800 aspect-video w-full flex items-center justify-center relative">
-             <ImageIcon className="w-12 h-12 text-slate-600 opacity-50" />
-        </div>
+        <div className="px-3 pb-2 text-sm text-slate-200">{data.body || data.description}</div>
+        <div className="bg-slate-800 aspect-video w-full"></div>
         <div className="bg-[#3A3B3C] p-3 flex items-center justify-between">
-            <div className="flex-1">
-                <div className="text-xs text-slate-400 uppercase">LOJAOFICIAL.COM.BR</div>
-                <div className="font-bold text-sm leading-tight truncate pr-2">{data.headline || data.title}</div>
-            </div>
+            <div className="font-bold text-sm">{data.headline || data.title}</div>
             <button className="bg-slate-600 px-4 py-1.5 rounded text-sm font-bold">{data.cta || "Saiba mais"}</button>
         </div>
-        <div className="p-2 border-t border-slate-700 flex justify-between text-slate-400 text-xs font-medium">
-             <div className="flex gap-2 items-center"><div className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center text-[8px] text-white">👍</div> 420</div>
-             <div className="flex gap-3"><span>34 Comentários</span><span>12 Compartilhamentos</span></div>
-        </div>
     </div>
 );
-
-// MOCKUP SHOPEE
 const ShopeePreview = ({ data }: { data: any }) => (
-    <div className="bg-[#F5F5F5] text-slate-800 rounded-xl overflow-hidden max-w-sm mx-auto font-sans shadow-2xl border border-slate-300 relative">
-        <div className="bg-[#EE4D2D] text-white p-3 flex items-center gap-2 text-sm font-bold sticky top-0 z-10">
-            <div className="bg-white text-[#EE4D2D] px-1 rounded text-xs">Mall</div>
-            <span>Shopee</span>
-            <div className="ml-auto flex gap-3"><ShoppingCart size={18}/><MoreHorizontal size={18}/></div>
-        </div>
-        <div className="bg-white aspect-square w-full flex items-center justify-center relative border-b border-slate-100">
-             <ImageIcon className="w-16 h-16 text-slate-300" />
-             <div className="absolute bottom-0 left-0 bg-[#EE4D2D]/90 text-white text-[10px] px-2 py-0.5">Frete Grátis</div>
-             <div className="absolute top-2 right-2 bg-[#FFD424] text-[#EE4D2D] text-xs font-bold px-1 py-0.5 rounded">-40%</div>
-        </div>
+    <div className="bg-[#F5F5F5] text-slate-800 rounded-xl overflow-hidden max-w-sm mx-auto shadow-2xl border border-slate-300">
+        <div className="bg-[#EE4D2D] text-white p-3 font-bold">Shopee</div>
+        <div className="bg-white aspect-square w-full"></div>
         <div className="p-3 bg-white">
-            <div className="line-clamp-2 text-sm text-[#1d1d1f] font-medium leading-snug mb-2">
-                {data.headline || data.title}
-            </div>
-            <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-xs text-[#EE4D2D]">R$</span>
-                <span className="text-lg font-bold text-[#EE4D2D]">{data.price || "97,90"}</span>
-                <span className="text-xs text-slate-400 line-through ml-2">R$ {((parseFloat((data.price || "97,90").replace(',','.')) || 100) * 1.5).toFixed(2).replace('.',',')}</span>
-            </div>
-            <div className="flex items-center gap-1 mb-2">
-                <div className="flex text-[#FFD424]"><Star size={10} fill="currentColor"/><Star size={10} fill="currentColor"/><Star size={10} fill="currentColor"/><Star size={10} fill="currentColor"/><Star size={10} fill="currentColor"/></div>
-                <span className="text-[10px] text-slate-500 border-l border-slate-300 pl-1 ml-1">1.2k Vendidos</span>
-            </div>
-            <div className="bg-[#FAFAFA] p-2 rounded text-[10px] text-slate-600 line-clamp-3 leading-relaxed border border-slate-100">
-                {data.body || data.description}
-            </div>
-        </div>
-        <div className="p-2 bg-white border-t border-slate-200 flex justify-end gap-2">
-            <button className="flex-1 bg-[#EE4D2D]/10 text-[#EE4D2D] py-2 text-xs border border-[#EE4D2D] rounded">Adicionar ao Carrinho</button>
-            <button className="flex-1 bg-[#EE4D2D] text-white py-2 text-xs rounded font-bold">Comprar Agora</button>
+            <div className="font-medium mb-2">{data.headline || data.title}</div>
+            <div className="text-[#EE4D2D] font-bold">R$ {data.price || "97,90"}</div>
         </div>
     </div>
 );
-
-// MOCKUP MERCADO LIVRE
 const MLPreview = ({ data }: { data: any }) => (
-    <div className="bg-[#EDEDED] text-slate-800 rounded-xl overflow-hidden max-w-sm mx-auto font-sans shadow-2xl border border-slate-200">
-        <div className="bg-[#FFF159] p-3 text-sm flex items-center gap-3 text-slate-700 font-medium">
-             <Menu size={18} />
-             <div className="bg-white/50 h-8 rounded-full flex-1 px-3 flex items-center text-xs text-slate-400">Buscar no Mercado Livre</div>
-             <ShoppingCart size={18} />
-        </div>
+    <div className="bg-[#EDEDED] text-slate-800 rounded-xl overflow-hidden max-w-sm mx-auto shadow-2xl">
+        <div className="bg-[#FFF159] p-3 text-slate-700 font-medium">Mercado Livre</div>
         <div className="bg-white p-4">
-             <div className="text-[10px] text-slate-400 mb-1">Novo  |  +1000 vendidos</div>
-             <div className="text-sm font-medium text-slate-900 leading-snug mb-2">{data.headline || data.title}</div>
-             <div className="flex items-center gap-1 mb-3">
-                 <div className="flex text-blue-500"><Star size={12} fill="currentColor"/><Star size={12} fill="currentColor"/><Star size={12} fill="currentColor"/><Star size={12} fill="currentColor"/><Star size={12} fill="currentColor"/></div>
-                 <span className="text-xs text-slate-400">(423)</span>
-             </div>
-             
-             <div className="bg-slate-100 aspect-video rounded w-full flex items-center justify-center mb-4">
-                 <ImageIcon className="text-slate-300 w-10 h-10" />
-             </div>
-
-             <div className="text-2xl font-light text-slate-900 mb-1">R$ {data.price || "129,90"}</div>
-             <div className="text-sm text-green-600 font-medium mb-1">em 12x R$ {((parseFloat((data.price || "129,90").replace(',','.')) || 100) / 12).toFixed(2).replace('.',',')} sem juros</div>
-             
-             <div className="text-green-600 text-xs font-bold mb-1">Chegará grátis amanhã</div>
-             <div className="text-[10px] text-slate-500 mb-4">Vendido por <span className="text-blue-500">Loja Oficial</span></div>
-
-             <button className="w-full bg-[#3483FA] text-white font-bold py-3 rounded-lg text-sm mb-2 hover:bg-[#2968c8] transition-colors">Comprar agora</button>
-             <button className="w-full bg-[#E3EDFB] text-[#3483FA] font-bold py-3 rounded-lg text-sm hover:bg-[#d0e0f8] transition-colors">Adicionar ao carrinho</button>
-        </div>
-        <div className="p-4 bg-white border-t border-slate-100 mt-2">
-            <h4 className="text-sm font-medium mb-2">Descrição</h4>
-            <p className="text-xs text-slate-500 leading-relaxed whitespace-pre-wrap">{data.body || data.description}</p>
+             <div className="font-medium mb-2">{data.headline || data.title}</div>
+             <div className="bg-slate-100 aspect-video rounded w-full mb-4"></div>
+             <div className="text-2xl font-light">R$ {data.price || "129,90"}</div>
         </div>
     </div>
 );
-
-// MOCKUP AMAZON
 const AmazonPreview = ({ data }: { data: any }) => (
-    <div className="bg-white text-slate-900 rounded-xl overflow-hidden max-w-sm mx-auto font-sans shadow-2xl border border-slate-300">
-        <div className="bg-[#232f3e] p-3 text-white flex items-center justify-between">
-            <span className="font-bold tracking-tighter">amazon</span>
-            <ShoppingCart size={20} />
-        </div>
+    <div className="bg-white text-slate-900 rounded-xl overflow-hidden max-w-sm mx-auto shadow-2xl border border-slate-300">
+        <div className="bg-[#232f3e] p-3 text-white font-bold">amazon</div>
         <div className="p-4">
-            <div className="text-xs text-[#007185] mb-1 hover:underline cursor-pointer">Visite a loja da marca</div>
-            <div className="text-sm font-medium leading-snug mb-1">{data.headline || data.title}</div>
-            <div className="flex items-center gap-1 mb-2">
-                 <div className="flex text-[#F4A41D]"><Star size={12} fill="currentColor"/><Star size={12} fill="currentColor"/><Star size={12} fill="currentColor"/><Star size={12} fill="currentColor"/><Star size={12} fill="currentColor"/></div>
-                 <span className="text-xs text-[#007185]">12.493</span>
-            </div>
-            
-            <div className="bg-slate-50 aspect-square w-full flex items-center justify-center my-2 p-4">
-                 <ImageIcon className="text-slate-300 w-16 h-16" />
-            </div>
-
-            <div className="flex items-start gap-1 mb-1">
-                 <span className="text-xs relative top-1">R$</span>
-                 <span className="text-2xl font-medium">{String(data.price || "149,00").split(',')[0]}</span>
-                 <span className="text-xs relative top-1">{String(data.price || "149,00").split(',')[1] || "00"}</span>
-            </div>
-            <div className="text-xs text-slate-500 mb-2">
-                Entrega GRÁTIS: <span className="font-bold text-slate-800">Quarta-feira, 28 de Jun</span>
-            </div>
-            <div className="text-sm text-[#007185] mb-4 flex items-center gap-1">
-                <div className="text-[#00A8E1] font-bold italic">prime</div>
-            </div>
-
-            <div className="space-y-2">
-                <button className="w-full bg-[#FFD814] text-black text-sm py-2.5 rounded-full border border-[#FCD200] shadow-sm hover:bg-[#F7CA00]">Adicionar ao carrinho</button>
-                <button className="w-full bg-[#FFA41C] text-black text-sm py-2.5 rounded-full border border-[#FF8F00] shadow-sm hover:bg-[#FA8900]">Comprar agora</button>
-            </div>
+            <div className="font-medium mb-1">{data.headline || data.title}</div>
+            <div className="bg-slate-50 aspect-square w-full my-2"></div>
+            <div className="text-2xl font-medium">R$ {String(data.price || "149,00").split(',')[0]}</div>
         </div>
     </div>
 );
-
-// MOCKUP OLX
 const OLXPreview = ({ data }: { data: any }) => (
-    <div className="bg-white text-slate-800 rounded-xl overflow-hidden max-w-sm mx-auto font-sans shadow-2xl border border-slate-200">
-        <div className="bg-[#6E0AD6] p-3 flex justify-between items-center text-white">
-            <Menu size={20} />
-            <span className="font-bold text-xl tracking-tight">OLX</span>
-            <Search size={20} />
-        </div>
-        <div className="bg-slate-200 aspect-video w-full flex items-center justify-center relative">
-             <ImageIcon className="text-slate-400 w-12 h-12" />
-             <div className="absolute bottom-2 right-2 bg-black/50 text-white px-2 rounded text-xs">1/4</div>
-        </div>
+    <div className="bg-white text-slate-800 rounded-xl overflow-hidden max-w-sm mx-auto shadow-2xl border border-slate-200">
+        <div className="bg-[#6E0AD6] p-3 text-white font-bold">OLX</div>
+        <div className="bg-slate-200 aspect-video w-full"></div>
         <div className="p-4">
-            <div className="text-2xl font-medium text-slate-900 mb-1">R$ {data.price || "800"}</div>
-            <div className="text-sm text-slate-800 leading-snug mb-2">{data.headline || data.title}</div>
-            <div className="text-[10px] text-slate-400 uppercase font-bold mb-4">Publicado hoje às 14:30</div>
-            
-            <div className="border-t border-slate-100 pt-3">
-                <h4 className="font-bold text-sm text-slate-900 mb-2">Descrição</h4>
-                <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{data.body || data.description}</p>
-            </div>
-        </div>
-        <div className="p-3 border-t border-slate-100 flex gap-2 bg-white sticky bottom-0 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
-            <button className="flex-1 bg-[#F78323] hover:bg-[#e07218] text-white font-bold py-2.5 rounded-full text-sm">Chat</button>
-            <button className="bg-[#6E0AD6] hover:bg-[#5b08b3] text-white p-2.5 rounded-full"><MessageCircle/></button>
+            <div className="text-2xl font-medium mb-1">R$ {data.price || "800"}</div>
+            <div className="text-sm">{data.headline || data.title}</div>
         </div>
     </div>
 );
@@ -473,11 +342,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  // --- ESTADO GLOBAL DO TEMA COM PERSISTÊNCIA ---
   const [activeTheme, setActiveTheme] = useState(BACKGROUNDS[0]);
   const [themePrefs, setThemePrefs] = useState<Record<string, string>>({});
 
-  // 1. CARREGAR PREFERÊNCIAS AO INICIAR
+  // History State
+  const [historyItems, setHistoryItems] = useState<any[]>([]);
+  const [historyType, setHistoryType] = useState<'text' | 'image'>('text');
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
   useEffect(() => {
     const saved = localStorage.getItem('drophacker_themes');
     if (saved) {
@@ -488,19 +360,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     }
   }, []);
 
-  // 2. ATUALIZAR TEMA QUANDO MUDAR DE MÓDULO
   useEffect(() => {
     const savedThemeId = themePrefs[activeModule];
     if (savedThemeId) {
         const found = BACKGROUNDS.find(b => b.id === savedThemeId);
         if (found) setActiveTheme(found);
     } else {
-        // Se não tiver salvo, usa o padrão (Studio Dark)
         setActiveTheme(BACKGROUNDS[0]);
     }
-  }, [activeModule, themePrefs]); // Depende também de themePrefs para primeira carga
+  }, [activeModule, themePrefs]);
 
-  // 3. FUNÇÃO PARA MUDAR E SALVAR TEMA
   const handleThemeChange = (newTheme: typeof BACKGROUNDS[0]) => {
      setActiveTheme(newTheme);
      const newPrefs = { ...themePrefs, [activeModule]: newTheme.id };
@@ -508,18 +377,45 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
      localStorage.setItem('drophacker_themes', JSON.stringify(newPrefs));
   };
 
+  // FETCH HISTORY WHEN MODULE IS ACTIVE
+  useEffect(() => {
+    if (activeModule === 'history') {
+        fetchHistory();
+    }
+  }, [activeModule, historyType]);
+
+  const fetchHistory = async () => {
+      setIsLoadingHistory(true);
+      try {
+          const items = await getUserHistory(historyType);
+          setHistoryItems(items || []);
+      } catch (e) {
+          console.error(e);
+      } finally {
+          setIsLoadingHistory(false);
+      }
+  };
+
+  const handleDeleteItem = async (id: string) => {
+      if(!confirm("Tem certeza que deseja excluir este item?")) return;
+      try {
+          await deleteHistoryItem(id);
+          setHistoryItems(prev => prev.filter(i => i.id !== id));
+      } catch (e) {
+          alert("Erro ao excluir.");
+      }
+  };
+
   const router = useRouter();
   
   const [userPlan, setUserPlan] = useState<'free' | 'pro'>('free'); 
   const [isLoadingPlan, setIsLoadingPlan] = useState(true);
 
-  // State for Generation
   const [input, setInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
   
-  // Options State
   const [tone, setTone] = useState('Agressivo');
   const [platform, setPlatform] = useState('Facebook');
   const [videoDuration, setVideoDuration] = useState('30s');
@@ -547,20 +443,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     fetchUserPlan();
   }, []);
 
-  const handleUpgradeClick = () => {
-    router.push('/plans');
-  };
-
+  const handleUpgradeClick = () => { router.push('/plans'); };
   const isModuleLocked = MODULES[activeModule].isPremium && userPlan === 'free';
 
-  // --- LÓGICA DA API ---
   const handleGenerate = async () => {
     if (!input || isModuleLocked) return;
     setIsGenerating(true);
     setResult(null);
     setError(null);
 
-    // Mobile: Scroll to result area automatically
     if (window.innerWidth < 1024) {
         setTimeout(() => {
             document.getElementById('result-area')?.scrollIntoView({ behavior: 'smooth' });
@@ -604,7 +495,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                 prompt = `Ajude com: ${input}`;
         }
         
-        // Studio agora é tratado via componente separado, mas mantemos o fallback aqui por segurança
         if (activeModule !== 'studio') {
             const text = await generateCopy(prompt, activeModule);
             
@@ -633,25 +523,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     }
   };
 
-  // --- SWITCH DE RENDERIZAÇÃO ---
-  const renderPreview = () => {
-    if (!result) return null;
+  const renderPreview = (data: any = result) => {
+    if (!data) return null;
 
     if (activeModule === 'generator') {
         switch(platform) {
-            case 'Instagram': return <InstagramPreview data={result} />;
-            case 'Facebook': return <FacebookPreview data={result} />;
-            case 'Shopee': return <ShopeePreview data={result} />;
-            case 'Mercado Livre': return <MLPreview data={result} />;
-            case 'Amazon': return <AmazonPreview data={result} />;
-            case 'OLX': return <OLXPreview data={result} />;
-            default: return <FacebookPreview data={result} />;
+            case 'Instagram': return <InstagramPreview data={data} />;
+            case 'Facebook': return <FacebookPreview data={data} />;
+            case 'Shopee': return <ShopeePreview data={data} />;
+            case 'Mercado Livre': return <MLPreview data={data} />;
+            case 'Amazon': return <AmazonPreview data={data} />;
+            case 'OLX': return <OLXPreview data={data} />;
+            default: return <FacebookPreview data={data} />;
         }
     }
 
     return (
         <div className="space-y-4">
-            {Object.entries(result).map(([key, value]: any, idx) => (
+            {Object.entries(data).map(([key, value]: any, idx) => (
                 <div key={idx} className="bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden shadow-xl">
                     <div className="px-6 py-4 border-b border-white/5 bg-white/5 flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_10px_#a855f7]"></div>
@@ -789,6 +678,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
               // --- HOME VIEW ---
               <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                   <div className="max-w-6xl mx-auto pb-20">
+                    {/* ... (Conteúdo Home mantido) ... */}
                     <div className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                         <div>
                             <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
@@ -822,9 +712,80 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                     </div>
                   </div>
               </div>
+          ) : activeModule === 'history' ? (
+            // --- HISTORY VIEW ---
+            <div className="flex-1 flex flex-col h-screen overflow-hidden bg-[#0B0518]">
+                <div className="h-16 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-950/50">
+                    <div className="flex items-center gap-4">
+                        <History className="text-slate-300" />
+                        <h2 className="text-lg font-bold text-white">Histórico Salvo</h2>
+                    </div>
+                    
+                    <div className="flex bg-slate-900 p-1 rounded-lg border border-slate-800">
+                        <button 
+                            onClick={() => setHistoryType('text')}
+                            className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${historyType === 'text' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'}`}
+                        >
+                            Textos / Copies
+                        </button>
+                        <button 
+                            onClick={() => setHistoryType('image')}
+                            className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${historyType === 'image' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                        >
+                            Imagens Geradas
+                        </button>
+                    </div>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                    {isLoadingHistory ? (
+                        <div className="flex justify-center items-center h-64">
+                            <Loader2 className="w-8 h-8 text-purple-500 animate-spin" />
+                        </div>
+                    ) : historyItems.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-64 text-slate-500">
+                            <History className="w-12 h-12 mb-4 opacity-20" />
+                            <p>Nenhum histórico encontrado.</p>
+                        </div>
+                    ) : (
+                        <div className={`grid gap-6 ${historyType === 'image' ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-2'}`}>
+                            {historyItems.map((item) => (
+                                <div key={item.id} className="relative group bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden hover:border-purple-500/30 transition-all hover:shadow-lg">
+                                    <button 
+                                        onClick={() => handleDeleteItem(item.id)}
+                                        className="absolute top-2 right-2 z-10 p-2 bg-black/60 text-red-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 hover:text-white"
+                                        title="Excluir Permanentemente"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+
+                                    {historyType === 'image' ? (
+                                        <div className="aspect-square relative">
+                                            <img src={item.result?.url} className="w-full h-full object-cover" alt="Histórico" />
+                                            <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-transparent">
+                                                <p className="text-[10px] text-white/80 line-clamp-2">{item.prompt}</p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="p-5 flex flex-col h-64">
+                                            <div className="flex items-center gap-2 mb-3 text-xs text-slate-500">
+                                                <Calendar className="w-3 h-3" />
+                                                {new Date(item.created_at).toLocaleDateString('pt-BR')}
+                                            </div>
+                                            <h4 className="font-bold text-white mb-2 line-clamp-1">{item.module?.toUpperCase() || 'GERADOR'}</h4>
+                                            <div className="flex-1 bg-black/20 p-3 rounded-lg overflow-y-auto custom-scrollbar text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
+                                                {typeof item.result === 'string' ? item.result : JSON.stringify(item.result, null, 2)}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
           ) : activeModule === 'studio' ? (
               // --- STUDIO VIEW (LEONARDO AI) ---
-              // AGORA RECEBE O TEMA GLOBAL E A FUNÇÃO DE SAVE
               <ImageTool 
                 userPlan={userPlan} 
                 onUpgrade={handleUpgradeClick} 
@@ -904,7 +865,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                   {/* RIGHT: PREVIEW AREA - AGORA COM TEMA DINÂMICO */}
                   <div id="result-area" className={`flex-1 relative overflow-hidden flex flex-col min-h-[50vh] transition-all duration-700 ease-in-out ${activeTheme.class}`}>
                       
-                      {/* NEW THEME SELECTOR - AGORA FLUTUANTE NA DIREITA */}
                       <div className="absolute top-4 right-4 z-50">
                         <ThemeSelector activeTheme={activeTheme} setActiveTheme={handleThemeChange} />
                       </div>

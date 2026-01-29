@@ -4,6 +4,10 @@ import { createClient } from "@/utils/supabase/server";
 import { checkRateLimit } from "@/utils/rate-limit";
 import { Buffer } from "buffer";
 
+// CONFIGURAÇÃO CRÍTICA PARA VERCEL
+// Aumenta o tempo limite de execução da Server Action para 60 segundos (limite do plano Hobby)
+export const maxDuration = 60;
+
 const LEONARDO_API_URL = "https://cloud.leonardo.ai/api/rest/v1";
 const MODEL_ID = "aa77f04e-3eec-4034-9c07-d0f619684628"; // Leonardo Kino XL
 
@@ -40,7 +44,6 @@ async function uploadToLeonardo(apiKey: string, imageFile: File) {
       body: buffer,
       headers: {
         'Content-Type': imageFile.type || 'image/jpeg',
-        // 'Content-Length' é gerenciado automaticamente pelo fetch/node
       }
     });
 
@@ -56,36 +59,32 @@ async function uploadToLeonardo(apiKey: string, imageFile: File) {
 }
 
 export async function generateProductImage(formData: FormData) {
-  // 1. EXTRAÇÃO DE DADOS
-  const prompt = formData.get('prompt') as string;
-  const imageFile = formData.get('image') as File | null;
-
-  if (!prompt) throw new Error("Prompt é obrigatório.");
-
-  // 2. SEGURANÇA E AUTENTICAÇÃO
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    throw new Error("Usuário não autenticado.");
-  }
-
-  // Verificar Plano
-  const userPlan = user.user_metadata?.plan || 'free';
-  // Lógica de restrição de plano pode ser reativada aqui se necessário
-
-  // Rate Limit
-  const isAllowed = checkRateLimit(user.id);
-  if (!isAllowed) {
-    throw new Error("⏳ Muitas requisições. Aguarde um momento.");
-  }
-
-  const apiKey = process.env.LEONARDO_API_KEY;
-  if (!apiKey) {
-    throw new Error("Erro de configuração: LEONARDO_API_KEY ausente.");
-  }
-
   try {
+    // 1. EXTRAÇÃO DE DADOS
+    const prompt = formData.get('prompt') as string;
+    const imageFile = formData.get('image') as File | null;
+
+    if (!prompt) throw new Error("Prompt é obrigatório.");
+
+    // 2. SEGURANÇA E AUTENTICAÇÃO
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error("Usuário não autenticado.");
+    }
+
+    const userPlan = user.user_metadata?.plan || 'free';
+    const isAllowed = checkRateLimit(user.id);
+    if (!isAllowed) {
+      throw new Error("⏳ Muitas requisições. Aguarde um momento.");
+    }
+
+    const apiKey = process.env.LEONARDO_API_KEY;
+    if (!apiKey) {
+      throw new Error("Erro de configuração: LEONARDO_API_KEY ausente.");
+    }
+
     let initImageId = null;
 
     // 3. SE HOUVER ARQUIVO, FAZER UPLOAD
@@ -104,14 +103,9 @@ export async function generateProductImage(formData: FormData) {
       public: false,
     };
 
-    // Configuração Image-to-Image
     if (initImageId) {
       payload.init_image_id = initImageId;
-      // init_strength controla quanto a IA deve respeitar a imagem original vs o prompt.
-      // 0.35 dá liberdade criativa para mudar o fundo mantendo a essência do produto.
       payload.init_strength = 0.35; 
-      
-      // Reforça o prompt para garantir que o cenário mude
       payload.prompt = `(product shot) ${prompt}, maintaining the product shape perfectly, cinematic lighting, 8k resolution`;
     }
 
@@ -138,10 +132,11 @@ export async function generateProductImage(formData: FormData) {
       throw new Error("Falha ao obter ID da geração.");
     }
 
-    // 6. POLLING LOOP (ESPERAR IMAGEM FICAR PRONTA)
+    // 6. POLLING LOOP (Espera a imagem ficar pronta)
+    // Ajustado para não estourar o tempo da Vercel (Max 50s de espera ativa)
     let imageUrl = null;
     let attempts = 0;
-    const maxAttempts = 30; // 60 segundos máx
+    const maxAttempts = 25; // 25 * 2s = 50s
 
     while (attempts < maxAttempts) {
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -169,13 +164,27 @@ export async function generateProductImage(formData: FormData) {
     }
 
     if (!imageUrl) {
-      throw new Error("Tempo limite excedido. Tente novamente.");
+      throw new Error("A geração demorou muito. Tente novamente em instantes.");
+    }
+
+    // --- SALVAR NO HISTÓRICO ---
+    try {
+        await supabase.from('user_history').insert({
+            user_id: user.id,
+            type: 'image',
+            module: 'studio',
+            prompt: prompt,
+            result: { url: imageUrl }
+        });
+    } catch (dbError) {
+        console.error("Erro ao salvar imagem no histórico (ignorado):", dbError);
     }
 
     return imageUrl;
 
   } catch (error: any) {
-    console.error("Erro na Server Action de Imagem:", error);
+    console.error("Erro CRÍTICO na Server Action de Imagem:", error);
+    // Lança o erro para que o componente Client-Side possa exibir o alerta
     throw new Error(error.message || "Erro interno ao gerar imagem.");
   }
 }

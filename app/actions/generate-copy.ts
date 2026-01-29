@@ -26,9 +26,7 @@ export async function generateCopy(prompt: string, moduleId?: string) {
   }
 
   // --- CAMADA 3: VERIFICAÇÃO DE PLANO (Database Truth) ---
-  // O plano vem do metadata do usuário (protegido pelo Supabase/Stripe)
-  // O usuário NÃO consegue alterar isso via inspecionar elemento.
-  const userPlan = user.user_metadata?.plan || 'free'; // Default seguro é 'free'
+  const userPlan = user.user_metadata?.plan || 'free'; 
 
   // Se o módulo for premium e o plano não for PRO, bloqueia.
   if (moduleId && PREMIUM_MODULES.includes(moduleId)) {
@@ -44,12 +42,9 @@ export async function generateCopy(prompt: string, moduleId?: string) {
     throw new Error("Erro de Configuração do Servidor (API Key ausente).");
   }
 
-  // Se passou por todas as barreiras, executa a IA
   const ai = new GoogleGenAI({ apiKey });
 
   try {
-    // ATUALIZAÇÃO CRÍTICA: Uso do modelo oficial 'gemini-flash-lite-latest'.
-    // Este modelo é mais rápido, econômico e substitui as versões 1.5.
     const response = await ai.models.generateContent({
       model: 'gemini-flash-lite-latest', 
       contents: prompt,
@@ -60,12 +55,30 @@ export async function generateCopy(prompt: string, moduleId?: string) {
 
     if (!response.text) throw new Error("A IA não retornou texto.");
     
+    // --- CAMADA 5: SALVAR NO HISTÓRICO ---
+    try {
+        let resultToSave = response.text;
+        // Tenta parsear para salvar como JSON puro se possível, senão salva como string no JSON
+        try {
+            const parsed = JSON.parse(response.text);
+            resultToSave = parsed;
+        } catch(e) {}
+
+        await supabase.from('user_history').insert({
+            user_id: user.id,
+            type: 'text',
+            module: moduleId || 'generator',
+            prompt: prompt.substring(0, 200) + '...', // Salva um resumo do prompt
+            result: typeof resultToSave === 'object' ? resultToSave : { text: resultToSave }
+        });
+    } catch (dbError) {
+        console.error("Erro ao salvar histórico (não bloqueante):", dbError);
+    }
+
     return response.text;
 
   } catch (error: any) {
     console.error("Erro na Geração IA:", error);
-    // Retry simples: Em caso de falha momentânea, o frontend pode solicitar novamente.
-    // Não tentamos fallback para modelos antigos para evitar erros de depreciação.
     throw new Error(`Erro no processamento da IA: ${error.message}`);
   }
 }
