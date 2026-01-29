@@ -721,7 +721,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                   </div>
 
                   {/* RIGHT: PREVIEW AREA */}
-                  <div id="result-area" className="flex-1 bg-slate-950 relative overflow-hidden flex flex-col min-h-[50vh]">
+                  <div id="result-area" className="flex-1 bg-gradient-to-br from-slate-950 to-[#0B0518] relative overflow-hidden flex flex-col min-h-[50vh]">
                       <div className="h-12 md:h-16 border-b border-white/5 flex items-center justify-between px-4 md:px-8 bg-black/20 backdrop-blur-sm sticky top-0 z-10">
                           <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
                             <Sparkles size={14} className="text-purple-500" /> Resultado Final
@@ -736,7 +736,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                           )}
                       </div>
 
-                      <div className="flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar flex items-start justify-center pb-24 md:pb-8 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] bg-opacity-5">
+                      <div className="flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar flex items-start justify-center pb-24 md:pb-8">
                           {!result && !isGenerating && (
                               <div className="text-center opacity-40 mt-10 md:mt-20">
                                   <LayoutTemplate className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-6 text-slate-500"/>
