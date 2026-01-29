@@ -15,14 +15,18 @@ export async function generateProductImage(prompt: string) {
     throw new Error("Usuário não autenticado.");
   }
 
-  // Verificar Plano (Apenas PRO pode usar Studio de alta qualidade)
-  // Nota: Mantendo a lógica de segurança solicitada, sem alterar DB.
+  // Verificar Plano
   const userPlan = user.user_metadata?.plan || 'free';
+  
+  // --- MODO TESTE (DEV): TRAVA DE PLANO DESATIVADA TEMPORARIAMENTE ---
+  // Reative estas linhas antes de lançar publicamente para cobrar pelo recurso.
+  /*
   if (userPlan !== 'pro') {
     throw new Error("🔒 Recurso exclusivo PRO. Faça upgrade para gerar imagens de estúdio.");
   }
+  */
 
-  // Rate Limit
+  // Rate Limit (Mantido para evitar abuso excessivo da sua API Key)
   const isAllowed = checkRateLimit(user.id);
   if (!isAllowed) {
     throw new Error("⏳ Muitas requisições. Aguarde um momento.");

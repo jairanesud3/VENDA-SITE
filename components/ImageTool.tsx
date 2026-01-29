@@ -19,11 +19,11 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
     
-    // Verificação Client-Side rápida
-    if (userPlan !== 'pro') {
-      setError("Recurso exclusivo PRO.");
-      return;
-    }
+    // --- MODO TESTE: Validação de plano removida ---
+    // if (userPlan !== 'pro') {
+    //   setError("Recurso exclusivo PRO.");
+    //   return;
+    // }
 
     setIsLoading(true);
     setError(null);
@@ -58,7 +58,11 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
           </p>
         </div>
 
-        {userPlan === 'free' && (
+        {/* 
+            BANNER DE BLOQUEIO OCULTADO PARA TESTES
+            (Descomentar quando for para produção)
+        */}
+        {/* {userPlan === 'free' && (
            <div className="mb-6 p-4 bg-slate-900/80 border border-yellow-500/30 rounded-xl relative overflow-hidden group">
               <div className="absolute inset-0 bg-yellow-500/5 animate-pulse"></div>
               <div className="relative z-10 flex flex-col gap-2">
@@ -71,7 +75,7 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
                  </button>
               </div>
            </div>
-        )}
+        )} */}
 
         <div className="space-y-4 flex-1">
           <div>
@@ -81,7 +85,7 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              disabled={isLoading || userPlan === 'free'}
+              disabled={isLoading} 
               placeholder="Ex: Uma garrafa térmica preta moderna em cima de uma mesa de madeira rústica, iluminação suave de manhã, alta resolução..."
               className="w-full h-40 bg-slate-900 border border-slate-700 rounded-xl p-4 text-white text-sm placeholder:text-slate-600 focus:outline-none focus:border-orange-500 transition-colors resize-none"
             />
@@ -96,7 +100,7 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
 
           <Button
             onClick={handleGenerate}
-            disabled={isLoading || !prompt || userPlan === 'free'}
+            disabled={isLoading || !prompt}
             className="w-full py-6 text-sm font-bold bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 shadow-orange-900/20"
           >
             {isLoading ? (
