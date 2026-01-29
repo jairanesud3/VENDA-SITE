@@ -5,6 +5,9 @@ import { Dashboard } from '@/components/Dashboard';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
+// Configuração de Rota para Vercel (Timeout aumentado para 60s)
+export const maxDuration = 60;
+
 export default function DashboardPage() {
   const router = useRouter();
   const supabase = createClient();

@@ -33,7 +33,7 @@ export async function deleteHistoryItem(id: string) {
     .from('user_history')
     .delete()
     .eq('id', id)
-    .eq('user_id', user.id); // Garante que só deleta o próprio item
+    .eq('user_id', user.id); // Segurança: só deleta se for dono
 
   if (error) throw new Error("Erro ao deletar item");
   

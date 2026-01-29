@@ -10,7 +10,7 @@ import {
   Lock, AlertTriangle, X, LayoutTemplate,
   Heart, MessageCircle, Send, Bookmark, MoreHorizontal, Star, ShoppingCart, Truck, MapPin,
   Palette, Box, Moon, Sun, Grid3X3, Aperture, Leaf, Gem, Monitor,
-  History, Trash2, Calendar
+  History, Trash2, Calendar, FileText, CheckCircle
 } from 'lucide-react';
 import { generateCopy } from '@/app/actions/generate-copy';
 import { getUserHistory, deleteHistoryItem } from '@/app/actions/history';
@@ -188,44 +188,11 @@ const MODULES: Record<string, ModuleConfig> = {
   studio: { label: 'Studio Product AI', icon: Camera, color: 'text-orange-400', desc: 'Fotos profissionais de produtos', placeholder: 'Ex: Garrafa Térmica Preta em cima de uma mesa de madeira...', isPremium: true },
   persona: { label: 'Hacker de Público', icon: Users, color: 'text-indigo-400', desc: 'Descubra quem compra seu produto', placeholder: 'Ex: Kit de Ferramentas para Jardim...', isPremium: true },
   
-  history: { label: 'Histórico Salvo', icon: History, color: 'text-slate-300', desc: 'Seus textos e imagens salvos' },
+  history: { label: 'Histórico & Galeria', icon: History, color: 'text-slate-300', desc: 'Seus textos e imagens salvos para sempre' },
   settings: { label: 'Configurações', icon: Settings, color: 'text-slate-400', desc: 'Ajustes da conta' },
 };
 
-// ... (Select e Previews components mantidos iguais) ...
-const CustomSelect = ({ label, value, onChange, options }: any) => {
-  return (
-    <div className="space-y-2">
-      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{label}</label>
-      <div className="flex flex-wrap gap-2">
-        {options.map((opt: string) => (
-          <button
-            key={opt}
-            onClick={() => onChange(opt)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
-              value === opt 
-              ? 'bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-900/20' 
-              : 'bg-slate-900/50 border-slate-700 text-slate-400 hover:border-slate-500 hover:text-white'
-            }`}
-          >
-            {opt}
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// ... (Social Preview Components mantidos omitidos para brevidade, mas devem estar aqui no código real) ...
-const SocialStats = () => (
-    <div className="flex items-center gap-4 py-2">
-        <Heart className="w-5 h-5 text-slate-300" />
-        <MessageCircle className="w-5 h-5 text-slate-300" />
-        <Send className="w-5 h-5 text-slate-300" />
-        <div className="flex-1"></div>
-        <Bookmark className="w-5 h-5 text-slate-300" />
-    </div>
-);
+// ... (Social Preview Components omitted for brevity - Assume they are here) ...
 const InstagramPreview = ({ data }: { data: any }) => (
     <div className="bg-black text-white rounded-xl border border-slate-800 overflow-hidden max-w-sm mx-auto font-sans shadow-2xl">
         <div className="flex items-center justify-between p-3 border-b border-white/10">
@@ -303,6 +270,29 @@ const OLXPreview = ({ data }: { data: any }) => (
     </div>
 );
 
+const CustomSelect = ({ label, value, onChange, options }: any) => {
+    return (
+      <div className="space-y-2">
+        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{label}</label>
+        <div className="flex flex-wrap gap-2">
+          {options.map((opt: string) => (
+            <button
+              key={opt}
+              onClick={() => onChange(opt)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                value === opt 
+                ? 'bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-900/20' 
+                : 'bg-slate-900/50 border-slate-700 text-slate-400 hover:border-slate-500 hover:text-white'
+              }`}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
 interface SidebarItemProps {
   id: string;
   conf: ModuleConfig;
@@ -349,6 +339,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const [historyItems, setHistoryItems] = useState<any[]>([]);
   const [historyType, setHistoryType] = useState<'text' | 'image'>('text');
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [copySuccessId, setCopySuccessId] = useState<string | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('drophacker_themes');
@@ -397,13 +388,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   };
 
   const handleDeleteItem = async (id: string) => {
-      if(!confirm("Tem certeza que deseja excluir este item?")) return;
+      if(!confirm("Tem certeza que deseja excluir permanentemente este item?")) return;
       try {
           await deleteHistoryItem(id);
           setHistoryItems(prev => prev.filter(i => i.id !== id));
       } catch (e) {
-          alert("Erro ao excluir.");
+          alert("Erro ao excluir. Tente novamente.");
       }
+  };
+  
+  const handleCopyItem = (id: string, content: string | object) => {
+      const textToCopy = typeof content === 'string' ? content : JSON.stringify(content, null, 2);
+      navigator.clipboard.writeText(textToCopy);
+      setCopySuccessId(id);
+      setTimeout(() => setCopySuccessId(null), 2000);
   };
 
   const router = useRouter();
@@ -713,68 +711,136 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                   </div>
               </div>
           ) : activeModule === 'history' ? (
-            // --- HISTORY VIEW ---
+            // --- HISTORY VIEW (REVAMPED) ---
             <div className="flex-1 flex flex-col h-screen overflow-hidden bg-[#0B0518]">
-                <div className="h-16 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-950/50">
+                {/* Header da Aba Histórico */}
+                <div className="h-20 border-b border-slate-800 flex items-center justify-between px-8 bg-slate-950/50 backdrop-blur-md shrink-0">
                     <div className="flex items-center gap-4">
-                        <History className="text-slate-300" />
-                        <h2 className="text-lg font-bold text-white">Histórico Salvo</h2>
+                        <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center border border-slate-800 shadow-xl">
+                            <History className="text-purple-400 w-5 h-5" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-white">Minha Biblioteca</h2>
+                            <p className="text-xs text-slate-500">Tudo que você gerou fica salvo aqui.</p>
+                        </div>
                     </div>
                     
-                    <div className="flex bg-slate-900 p-1 rounded-lg border border-slate-800">
+                    {/* Toggle Switch */}
+                    <div className="flex bg-slate-900 p-1.5 rounded-xl border border-slate-800 shadow-inner">
                         <button 
                             onClick={() => setHistoryType('text')}
-                            className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${historyType === 'text' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'}`}
+                            className={`flex items-center gap-2 px-5 py-2 text-xs font-bold rounded-lg transition-all duration-300 ${historyType === 'text' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-500 hover:text-white hover:bg-slate-800'}`}
                         >
+                            <FileText className="w-3 h-3" />
                             Textos / Copies
                         </button>
                         <button 
                             onClick={() => setHistoryType('image')}
-                            className={`px-4 py-1.5 text-xs font-bold rounded-md transition-all ${historyType === 'image' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                            className={`flex items-center gap-2 px-5 py-2 text-xs font-bold rounded-lg transition-all duration-300 ${historyType === 'image' ? 'bg-orange-600 text-white shadow-lg' : 'text-slate-500 hover:text-white hover:bg-slate-800'}`}
                         >
-                            Imagens Geradas
+                            <ImageIcon className="w-3 h-3" />
+                            Galeria de Imagens
                         </button>
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                {/* Grid de Conteúdo */}
+                <div className="flex-1 overflow-y-auto p-8 custom-scrollbar bg-grid-white bg-[size:30px_30px]">
                     {isLoadingHistory ? (
-                        <div className="flex justify-center items-center h-64">
-                            <Loader2 className="w-8 h-8 text-purple-500 animate-spin" />
+                        <div className="flex flex-col justify-center items-center h-[50vh] gap-4">
+                            <Loader2 className="w-10 h-10 text-purple-500 animate-spin" />
+                            <p className="text-slate-500 text-sm animate-pulse">Carregando seu histórico...</p>
                         </div>
                     ) : historyItems.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-64 text-slate-500">
-                            <History className="w-12 h-12 mb-4 opacity-20" />
-                            <p>Nenhum histórico encontrado.</p>
+                        <div className="flex flex-col items-center justify-center h-[60vh] text-slate-500 border-2 border-dashed border-slate-800 rounded-3xl bg-slate-900/20">
+                            <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mb-6 shadow-xl">
+                                <History className="w-10 h-10 opacity-20" />
+                            </div>
+                            <h3 className="text-lg font-bold text-slate-400 mb-2">Nada por aqui ainda</h3>
+                            <p className="text-sm max-w-xs text-center">Gere seus primeiros textos ou imagens para vê-los salvos automaticamente nesta área.</p>
                         </div>
                     ) : (
-                        <div className={`grid gap-6 ${historyType === 'image' ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-2'}`}>
+                        <div className={`grid gap-6 ${historyType === 'image' ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
                             {historyItems.map((item) => (
-                                <div key={item.id} className="relative group bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden hover:border-purple-500/30 transition-all hover:shadow-lg">
+                                <div key={item.id} className="relative group bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-2xl overflow-hidden hover:border-purple-500/40 transition-all hover:shadow-2xl hover:shadow-purple-900/10 hover:-translate-y-1 flex flex-col h-full">
+                                    
+                                    {/* Botão de Excluir Flutuante */}
                                     <button 
                                         onClick={() => handleDeleteItem(item.id)}
-                                        className="absolute top-2 right-2 z-10 p-2 bg-black/60 text-red-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 hover:text-white"
+                                        className="absolute top-3 right-3 z-20 p-2 bg-black/60 text-slate-400 rounded-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white backdrop-blur-sm shadow-lg"
                                         title="Excluir Permanentemente"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </button>
 
                                     {historyType === 'image' ? (
-                                        <div className="aspect-square relative">
-                                            <img src={item.result?.url} className="w-full h-full object-cover" alt="Histórico" />
-                                            <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-transparent">
-                                                <p className="text-[10px] text-white/80 line-clamp-2">{item.prompt}</p>
+                                        // CARD TIPO IMAGEM
+                                        <>
+                                            <div className="aspect-square relative overflow-hidden bg-slate-950">
+                                                <img 
+                                                    src={item.result?.url} 
+                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                                                    alt="Histórico" 
+                                                    loading="lazy"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                                
+                                                {/* Botão Download */}
+                                                <a 
+                                                    href={item.result?.url} 
+                                                    target="_blank" 
+                                                    download 
+                                                    className="absolute bottom-3 left-3 right-12 py-2 bg-white text-black text-[10px] font-bold rounded-lg flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all hover:bg-slate-200 shadow-xl translate-y-2 group-hover:translate-y-0"
+                                                >
+                                                    <Download className="w-3 h-3" /> Baixar HD
+                                                </a>
                                             </div>
-                                        </div>
+                                            <div className="p-3 border-t border-white/5 bg-slate-950/30">
+                                                <p className="text-[10px] text-slate-400 line-clamp-1 group-hover:text-white transition-colors" title={item.prompt}>
+                                                    {item.prompt}
+                                                </p>
+                                                <div className="flex items-center gap-1 mt-1 text-[9px] text-slate-600">
+                                                    <Calendar className="w-3 h-3" />
+                                                    {new Date(item.created_at).toLocaleDateString('pt-BR')}
+                                                </div>
+                                            </div>
+                                        </>
                                     ) : (
-                                        <div className="p-5 flex flex-col h-64">
-                                            <div className="flex items-center gap-2 mb-3 text-xs text-slate-500">
-                                                <Calendar className="w-3 h-3" />
-                                                {new Date(item.created_at).toLocaleDateString('pt-BR')}
+                                        // CARD TIPO TEXTO
+                                        <div className="flex flex-col h-[320px]">
+                                            <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`w-2 h-2 rounded-full ${item.module === 'video_script' ? 'bg-pink-500' : 'bg-blue-500'}`}></div>
+                                                    <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+                                                        {item.module === 'video_script' ? 'Roteiro Viral' : 'Copy de Vendas'}
+                                                    </span>
+                                                </div>
+                                                <div className="text-[10px] text-slate-500 font-mono">
+                                                    {new Date(item.created_at).toLocaleDateString()}
+                                                </div>
                                             </div>
-                                            <h4 className="font-bold text-white mb-2 line-clamp-1">{item.module?.toUpperCase() || 'GERADOR'}</h4>
-                                            <div className="flex-1 bg-black/20 p-3 rounded-lg overflow-y-auto custom-scrollbar text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
-                                                {typeof item.result === 'string' ? item.result : JSON.stringify(item.result, null, 2)}
+                                            
+                                            <div className="flex-1 p-4 overflow-y-auto custom-scrollbar bg-black/20">
+                                                <p className="text-xs text-slate-300 whitespace-pre-wrap leading-relaxed font-mono">
+                                                    {typeof item.result === 'string' 
+                                                        ? item.result 
+                                                        : JSON.stringify(item.result, null, 2)
+                                                    }
+                                                </p>
+                                            </div>
+
+                                            <div className="p-3 border-t border-white/5 bg-slate-950/30 flex items-center gap-2">
+                                                <button 
+                                                    onClick={() => handleCopyItem(item.id, item.result)}
+                                                    className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                                                        copySuccessId === item.id 
+                                                        ? 'bg-green-500/20 text-green-400' 
+                                                        : 'bg-white/5 hover:bg-white/10 text-slate-300'
+                                                    }`}
+                                                >
+                                                    {copySuccessId === item.id ? <CheckCircle className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                                                    {copySuccessId === item.id ? 'Copiado!' : 'Copiar Texto'}
+                                                </button>
                                             </div>
                                         </div>
                                     )}

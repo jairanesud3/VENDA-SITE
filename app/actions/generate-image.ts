@@ -4,10 +4,6 @@ import { createClient } from "@/utils/supabase/server";
 import { checkRateLimit } from "@/utils/rate-limit";
 import { Buffer } from "buffer";
 
-// CONFIGURAÇÃO CRÍTICA PARA VERCEL
-// Aumenta o tempo limite de execução da Server Action para 60 segundos (limite do plano Hobby)
-export const maxDuration = 60;
-
 const LEONARDO_API_URL = "https://cloud.leonardo.ai/api/rest/v1";
 const MODEL_ID = "aa77f04e-3eec-4034-9c07-d0f619684628"; // Leonardo Kino XL
 
