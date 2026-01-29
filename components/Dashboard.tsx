@@ -721,7 +721,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                   </div>
 
                   {/* RIGHT: PREVIEW AREA */}
-                  <div id="result-area" className="flex-1 bg-gradient-to-br from-slate-950 to-[#0B0518] relative overflow-hidden flex flex-col min-h-[50vh]">
+                  <div id="result-area" className="flex-1 bg-[#09090b] relative overflow-hidden flex flex-col min-h-[50vh]">
+                      {/* Modern Background Pattern */}
+                      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+                      <div className="absolute top-0 left-0 right-0 h-[500px] w-full bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent pointer-events-none"></div>
+
                       <div className="h-12 md:h-16 border-b border-white/5 flex items-center justify-between px-4 md:px-8 bg-black/20 backdrop-blur-sm sticky top-0 z-10">
                           <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
                             <Sparkles size={14} className="text-purple-500" /> Resultado Final
@@ -736,10 +740,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                           )}
                       </div>
 
-                      <div className="flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar flex items-start justify-center pb-24 md:pb-8">
+                      <div className="flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar flex items-start justify-center pb-24 md:pb-8 relative z-10">
                           {!result && !isGenerating && (
-                              <div className="text-center opacity-40 mt-10 md:mt-20">
-                                  <LayoutTemplate className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-6 text-slate-500"/>
+                              <div className="text-center opacity-40 mt-10 md:mt-20 flex flex-col items-center">
+                                  <div className="w-20 h-20 bg-slate-900/50 rounded-full flex items-center justify-center mb-6 border border-white/5 shadow-2xl relative">
+                                     <div className="absolute inset-0 bg-purple-500/20 blur-xl rounded-full"></div>
+                                     <LayoutTemplate className="w-8 h-8 text-slate-400 relative z-10"/>
+                                  </div>
                                   <p className="text-slate-300 font-medium text-base md:text-lg">Selecione a plataforma e gere seu anúncio.</p>
                               </div>
                           )}

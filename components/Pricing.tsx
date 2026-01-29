@@ -41,7 +41,6 @@ export const Pricing: React.FC = () => {
 
   return (
     <section id="pricing" className="py-20 md:py-24 bg-slate-950 border-t border-slate-900 relative">
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none"></div>
       
       <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
         <h2 className="reveal text-3xl md:text-5xl font-bold text-center mb-6 text-white">Planos para todos os níveis</h2>
