@@ -66,15 +66,12 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel }: { isOpen:
 };
 
 export const BACKGROUNDS = [
-  // Clássicos
   { id: 'studio', name: 'Estúdio Dark', icon: Moon, class: 'bg-[#050505] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-800/20 via-[#050505] to-[#000000]' },
   { id: 'purple_haze', name: 'Roxo Profundo', icon: Zap, class: 'bg-[#0f0518] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/40 via-[#0f0518] to-black' },
   { id: 'midnight_blue', name: 'Azul Meia-Noite', icon: Monitor, class: 'bg-[#020617] bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-blue-900/30 via-[#020617] to-black' },
   { id: 'concrete', name: 'Urbano Cinza', icon: Box, class: 'bg-[#18181b] bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-slate-700/30 via-[#18181b] to-black' },
   { id: 'matrix', name: 'Matrix Code', icon: Grid3X3, class: 'bg-black bg-[linear-gradient(rgba(0,255,0,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,0,0.05)_1px,transparent_1px)] bg-[size:20px_20px]' },
   { id: 'clean_dark', name: 'Preto Puro', icon: Palette, class: 'bg-black' },
-
-  // NOVOS TEMAS (Vibrantes & Premium)
   { id: 'sunset_drive', name: 'Sunset Drive', icon: Sunset, class: 'bg-[#1a0b2e] bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/20 via-purple-900/40 to-black' },
   { id: 'emerald_city', name: 'Emerald City', icon: Gem, class: 'bg-[#022c22] bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-emerald-500/30 via-[#064e3b] to-[#020617]' },
   { id: 'crimson_tide', name: 'Crimson Tide', icon: Flame, class: 'bg-[#450a0a] bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-red-600/30 via-[#220505] to-black' },
@@ -103,225 +100,94 @@ const MobileStatusBar = () => (
     </div>
 );
 
-// --- PREVIEWS ---
+// --- PREVIEWS (Simplificados para evitar erros de sintaxe) ---
 
-const OLXPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => {
-    if (device === 'mobile') {
-        return (
-            <div className="bg-[#F4F5F7] text-[#4A4A4A] rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl mx-auto max-w-[320px] aspect-[9/18] relative flex flex-col">
+// ... (Previews mantidos mas encapsulados corretamente)
+const OLXPreview = ({ data, userImage, device }: any) => (
+    <div className={device === 'mobile' ? "bg-[#F4F5F7] text-[#4A4A4A] rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl mx-auto max-w-[320px] aspect-[9/18] relative flex flex-col" : "bg-white text-[#4A4A4A] rounded-lg border border-slate-200 overflow-hidden font-sans shadow-xl mx-auto max-w-[700px] flex"}>
+        {device === 'mobile' ? (
+            <>
                 <div className="bg-white text-slate-800 pt-2 pb-1"><MobileStatusBar /></div>
-                <div className="bg-[#6E0AD6] text-white p-3 flex justify-between items-center shadow-md z-10">
-                    <div className="flex gap-4"><Menu className="w-5 h-5"/> <span className="font-bold text-lg">OLX</span></div>
-                    <Search className="w-5 h-5"/>
-                </div>
-                <div className="flex-1 overflow-y-auto bg-white">
-                    <div className="relative aspect-[4/3] bg-slate-200">
-                         {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <div className="flex items-center justify-center h-full"><ImageIcon className="text-slate-300 w-10 h-10"/></div>}
-                         <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded">1/4</div>
-                    </div>
-                    <div className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                             <h3 className="text-base text-slate-800 font-normal leading-snug w-3/4">{data.title || "Título do Produto"}</h3>
-                             <Heart className="w-6 h-6 text-[#6E0AD6]"/>
-                        </div>
-                        <div className="text-2xl font-bold text-slate-900 mb-2">R$ {data.price || "00,00"}</div>
-                        <p className="text-xs text-slate-500 mb-4">Publicado em 12/10 às 14:30</p>
-                        <div className="border-t border-slate-100 py-4">
-                             <h4 className="font-bold text-sm mb-2 text-slate-900">Descrição</h4>
-                             <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{data.body || data.description}</p>
-                        </div>
-                    </div>
-                </div>
-                <div className="p-3 bg-white border-t border-slate-200 flex gap-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-                    <button className="flex-1 bg-[#F28000] active:bg-[#d97300] text-white font-bold py-3 rounded-full text-sm">Chat</button>
-                    <button className="w-12 h-12 rounded-full border border-[#F28000] flex items-center justify-center text-[#F28000]"><Share2 className="w-5 h-5"/></button>
-                </div>
-            </div>
-        );
-    }
-    return (
-        <div className="bg-white text-[#4A4A4A] rounded-lg border border-slate-200 overflow-hidden font-sans shadow-xl mx-auto max-w-[700px] flex">
-             <div className="w-[55%] bg-slate-100 relative">
-                 {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <div className="h-full flex items-center justify-center"><ImageIcon className="w-16 h-16 text-slate-300"/></div>}
-                 <div className="absolute top-4 left-4 bg-[#6E0AD6] text-white text-xs font-bold px-2 py-1 rounded">Destaque</div>
-             </div>
-             <div className="w-[45%] p-6 flex flex-col">
-                 <div className="flex justify-between items-start mb-4">
-                      <h2 className="text-xl text-slate-800 font-light leading-snug">{data.title}</h2>
-                      <Heart className="w-6 h-6 text-slate-300 hover:text-[#6E0AD6] cursor-pointer"/>
-                 </div>
-                 <div className="text-3xl font-bold text-slate-900 mb-1">R$ {data.price}</div>
-                 <div className="text-xs text-slate-400 mb-6">Em 12x de R$ {(parseFloat((data.price || "0").replace('.','').replace(',','.'))/12).toFixed(2)} sem juros</div>
-                 <button className="w-full bg-[#F28000] hover:bg-[#d97300] text-white font-bold py-3 rounded-full mb-3 shadow-lg shadow-orange-200 transition-all">Chat</button>
-                 <div className="flex gap-2 mb-6">
-                    <button className="flex-1 border border-[#6E0AD6] text-[#6E0AD6] font-bold py-2 rounded-full text-sm hover:bg-purple-50">Ver telefone</button>
-                 </div>
-                 <div className="mt-auto">
-                    <h4 className="font-bold text-sm text-slate-900 mb-1">Localização</h4>
-                    <div className="text-xs text-slate-500 flex items-center gap-1"><MapPin className="w-3 h-3"/> São Paulo, Centro</div>
-                 </div>
-             </div>
-        </div>
-    );
-};
+                <div className="bg-[#6E0AD6] text-white p-3 flex justify-between items-center shadow-md z-10"><div className="flex gap-4"><Menu className="w-5 h-5"/> <span className="font-bold text-lg">OLX</span></div><Search className="w-5 h-5"/></div>
+                <div className="flex-1 overflow-y-auto bg-white"><div className="relative aspect-[4/3] bg-slate-200">{userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <div className="flex items-center justify-center h-full"><ImageIcon className="text-slate-300 w-10 h-10"/></div>}<div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded">1/4</div></div><div className="p-4"><div className="flex justify-between items-start mb-2"><h3 className="text-base text-slate-800 font-normal leading-snug w-3/4">{data.title || "Título do Produto"}</h3><Heart className="w-6 h-6 text-[#6E0AD6]"/></div><div className="text-2xl font-bold text-slate-900 mb-2">R$ {data.price || "00,00"}</div><p className="text-xs text-slate-500 mb-4">Publicado hoje</p><div className="border-t border-slate-100 py-4"><h4 className="font-bold text-sm mb-2 text-slate-900">Descrição</h4><p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{data.body || data.description}</p></div></div></div>
+            </>
+        ) : (
+            <>
+             <div className="w-[55%] bg-slate-100 relative">{userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <div className="h-full flex items-center justify-center"><ImageIcon className="w-16 h-16 text-slate-300"/></div>}</div>
+             <div className="w-[45%] p-6 flex flex-col"><div className="flex justify-between items-start mb-4"><h2 className="text-xl text-slate-800 font-light leading-snug">{data.title}</h2><Heart className="w-6 h-6 text-slate-300 hover:text-[#6E0AD6] cursor-pointer"/></div><div className="text-3xl font-bold text-slate-900 mb-1">R$ {data.price}</div><button className="w-full bg-[#F28000] text-white font-bold py-3 rounded-full mb-3">Chat</button></div>
+            </>
+        )}
+    </div>
+);
 
-const MercadoLivrePreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => {
-    if (device === 'mobile') {
-        return (
-            <div className="bg-[#ebebeb] text-slate-900 rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl mx-auto max-w-[320px] aspect-[9/18] relative flex flex-col">
-                <div className="bg-[#FFE600] text-slate-800 pt-2 pb-1"><MobileStatusBar /></div>
-                <div className="bg-[#FFE600] p-2 flex items-center gap-2 shadow-sm z-10">
-                    <ArrowLeftIcon className="w-5 h-5 text-slate-700"/>
-                    <div className="flex-1 bg-white h-8 rounded-full flex items-center px-3 text-xs text-slate-400 gap-2"><Search className="w-3 h-3"/> Buscar no Mercado Livre</div>
-                    <ShoppingCart className="w-5 h-5 text-slate-700"/>
-                </div>
-                <div className="flex-1 overflow-y-auto bg-white">
-                    <div className="p-3">
-                        <span className="text-[10px] text-slate-400">Novo  |  +1000 vendidos</span>
-                        <h3 className="text-sm font-normal text-slate-900 leading-snug mt-1 mb-2">{data.title || data.headline}</h3>
-                        <div className="aspect-square bg-white flex items-center justify-center mb-4">
-                            {userImage ? <img src={userImage} className="max-w-full max-h-full object-contain" /> : <ImageIcon className="w-16 h-16 text-slate-200"/>}
-                        </div>
-                        <div className="text-2xl font-normal text-slate-900">R$ {data.price}</div>
-                        <div className="text-xs text-slate-500 mb-2">em 10x R$ {(parseFloat((data.price || "0").replace('.','').replace(',','.'))/10).toFixed(2)} sem juros</div>
-                        <div className="text-xs font-bold text-[#00A650] mb-1">Frete Grátis</div>
-                        <div className="text-xs text-slate-500">Saiba os prazos de entrega e as formas de envio.</div>
-                        <div className="mt-4 flex flex-col gap-2">
-                            <button className="w-full bg-[#3483FA] text-white font-bold py-3 rounded-lg text-sm">Comprar agora</button>
-                            <button className="w-full bg-[#E3EDFB] text-[#3483FA] font-bold py-3 rounded-lg text-sm">Adicionar ao carrinho</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-    return (
-        <div className="bg-white text-slate-900 rounded-lg border border-slate-200 overflow-hidden font-sans shadow-lg mx-auto max-w-[800px] flex p-6">
-             <div className="w-[50%] flex gap-4">
-                 <div className="w-12 flex flex-col gap-2">
-                     {[1,2,3].map(i => <div key={i} className="w-12 h-12 border border-slate-300 rounded hover:border-[#3483FA] cursor-pointer"></div>)}
-                 </div>
-                 <div className="flex-1 bg-white flex items-center justify-center border border-slate-100 rounded hover:scale-105 transition-transform">
-                     {userImage ? <img src={userImage} className="max-w-full max-h-full object-contain" /> : <ImageIcon className="w-20 h-20 text-slate-200"/>}
-                 </div>
-             </div>
-             <div className="w-[50%] pl-8 flex flex-col">
-                 <span className="text-xs text-slate-400 mb-1">Novo | 452 vendidos</span>
-                 <h1 className="text-xl font-bold text-slate-900 leading-snug mb-3">{data.title || data.headline}</h1>
-                 <div className="flex gap-1 mb-4">
-                    {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 text-[#3483FA] fill-[#3483FA]"/>)}
-                    <span className="text-xs text-slate-400 ml-1">(120 opiniões)</span>
-                 </div>
-                 <div className="text-4xl font-light text-slate-900 mb-2">R$ {data.price}</div>
-                 <div className="text-sm text-slate-500 mb-4">em <span className="text-[#00A650]">12x sem juros</span></div>
-                 <div className="flex items-center gap-2 mb-6">
-                    <Truck className="w-5 h-5 text-[#00A650]"/>
-                    <div className="text-sm text-[#00A650] font-normal">Chegará grátis amanhã<br/><span className="text-xs text-slate-400">Comprando dentro das próximas 2h</span></div>
-                 </div>
-                 <button className="w-full bg-[#3483FA] hover:bg-[#2968c8] text-white font-bold py-3.5 rounded-md text-base transition-colors mb-2">Comprar agora</button>
-                 <button className="w-full bg-[#E3EDFB] hover:bg-[#d0e4fc] text-[#3483FA] font-bold py-3.5 rounded-md text-base transition-colors">Adicionar ao carrinho</button>
-             </div>
-        </div>
-    );
-};
+const MercadoLivrePreview = ({ data, userImage, device }: any) => (
+    <div className={device === 'mobile' ? "bg-[#ebebeb] text-slate-900 rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl mx-auto max-w-[320px] aspect-[9/18] relative flex flex-col" : "bg-white text-slate-900 rounded-lg border border-slate-200 overflow-hidden font-sans shadow-lg mx-auto max-w-[800px] flex p-6"}>
+        {device === 'mobile' ? (
+            <>
+             <div className="bg-[#FFE600] text-slate-800 pt-2 pb-1"><MobileStatusBar /></div>
+             <div className="bg-[#FFE600] p-2 flex items-center gap-2 shadow-sm z-10"><div className="flex-1 bg-white h-8 rounded-full flex items-center px-3 text-xs text-slate-400 gap-2"><Search className="w-3 h-3"/> Buscar</div><ShoppingCart className="w-5 h-5 text-slate-700"/></div>
+             <div className="flex-1 overflow-y-auto bg-white"><div className="p-3"><h3 className="text-sm font-normal text-slate-900 leading-snug mt-1 mb-2">{data.title || data.headline}</h3><div className="aspect-square bg-white flex items-center justify-center mb-4">{userImage ? <img src={userImage} className="max-w-full max-h-full object-contain" /> : <ImageIcon className="w-16 h-16 text-slate-200"/>}</div><div className="text-2xl font-normal text-slate-900">R$ {data.price}</div><div className="text-xs font-bold text-[#00A650] mb-1">Frete Grátis</div><button className="w-full bg-[#3483FA] text-white font-bold py-3 rounded-lg text-sm mt-4">Comprar agora</button></div></div>
+            </>
+        ) : (
+            <>
+             <div className="w-[50%] flex gap-4"><div className="flex-1 bg-white flex items-center justify-center border border-slate-100 rounded">{userImage ? <img src={userImage} className="max-w-full max-h-full object-contain" /> : <ImageIcon className="w-20 h-20 text-slate-200"/>}</div></div>
+             <div className="w-[50%] pl-8 flex flex-col"><h1 className="text-xl font-bold text-slate-900 leading-snug mb-3">{data.title || data.headline}</h1><div className="text-4xl font-light text-slate-900 mb-2">R$ {data.price}</div><button className="w-full bg-[#3483FA] text-white font-bold py-3.5 rounded-md text-base transition-colors mb-2">Comprar agora</button></div>
+            </>
+        )}
+    </div>
+);
 
-const ShopeePreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
+const ShopeePreview = ({ data, userImage, device }: any) => (
     <div className={`bg-[#F5F5F5] text-black rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px] aspect-[9/18]' : 'max-w-[360px] aspect-[9/18]'}`}>
         <div className="bg-[#EE4D2D] text-white pt-2 pb-1 px-4"><MobileStatusBar /></div>
-        <div className="bg-[#EE4D2D] p-3 flex gap-2 items-center text-white shadow-sm">
-             <div className="bg-white/20 p-1 rounded"><ArrowLeftIcon className="w-4 h-4"/></div>
-             <div className="bg-white text-orange-500 px-2 py-1 text-xs rounded flex-1">Buscar na Shopee</div>
-             <ShoppingCart className="w-5 h-5"/>
-        </div>
+        <div className="bg-[#EE4D2D] p-3 flex gap-2 items-center text-white shadow-sm"><div className="bg-white text-orange-500 px-2 py-1 text-xs rounded flex-1">Buscar na Shopee</div><ShoppingCart className="w-5 h-5"/></div>
         <div className="bg-white h-full overflow-y-auto">
-             <div className="aspect-square bg-slate-100 relative flex items-center justify-center">
-                 {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <ImageIcon className="w-12 h-12 text-slate-300"/>}
-                 <div className="absolute bottom-0 left-0 bg-[#EE4D2D] text-white text-[10px] px-2 py-0.5">Mall</div>
-             </div>
-             <div className="p-3">
-                 <div className="text-lg font-bold text-[#EE4D2D]">R$ {data.price || "00,00"}</div>
-                 <h3 className="text-sm text-slate-800 line-clamp-2 leading-snug mb-2">{data.title}</h3>
-                 <div className="flex gap-1 mb-2">
-                     <span className="text-[10px] border border-[#EE4D2D] text-[#EE4D2D] px-1 rounded">Frete Grátis</span>
-                 </div>
-                 <div className="text-xs text-slate-500 mb-4 whitespace-pre-wrap">{data.description}</div>
-             </div>
+             <div className="aspect-square bg-slate-100 relative flex items-center justify-center">{userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <ImageIcon className="w-12 h-12 text-slate-300"/>}<div className="absolute bottom-0 left-0 bg-[#EE4D2D] text-white text-[10px] px-2 py-0.5">Mall</div></div>
+             <div className="p-3"><div className="text-lg font-bold text-[#EE4D2D]">R$ {data.price || "00,00"}</div><h3 className="text-sm text-slate-800 line-clamp-2 leading-snug mb-2">{data.title}</h3><div className="flex gap-1 mb-2"><span className="text-[10px] border border-[#EE4D2D] text-[#EE4D2D] px-1 rounded">Frete Grátis</span></div><div className="text-xs text-slate-500 mb-4 whitespace-pre-wrap">{data.description}</div></div>
         </div>
     </div>
 );
 
-const FacebookPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
+const FacebookPreview = ({ data, userImage, device }: any) => (
     <div className={`bg-[#242526] text-white rounded-xl border border-slate-700 overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[500px]'}`}>
-        <div className="p-3 flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs">SL</div>
-            <div className="flex-1">
-                <div className="font-bold text-sm">Sua Loja Oficial</div>
-                <div className="text-[10px] text-slate-400 flex items-center gap-1">Patrocinado <span className="text-[8px]">🌐</span></div>
-            </div>
-            <div className="text-slate-400">•••</div>
-        </div>
+        <div className="p-3 flex items-center gap-2"><div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs">SL</div><div className="flex-1"><div className="font-bold text-sm">Sua Loja Oficial</div><div className="text-[10px] text-slate-400 flex items-center gap-1">Patrocinado <span className="text-[8px]">🌐</span></div></div><div className="text-slate-400">•••</div></div>
         <div className="px-3 pb-2 text-sm text-slate-200 whitespace-pre-wrap">{data.body || data.description}</div>
-        <div className="bg-black w-full relative overflow-hidden flex items-center justify-center aspect-square">
-             {userImage ? (
-                <img src={userImage} className="w-full h-full object-cover" />
-             ) : <ImageIcon className="w-12 h-12 opacity-50" />}
-        </div>
-        <div className="bg-[#3A3B3C] p-3 flex items-center justify-between">
-            <div>
-                <div className="text-[10px] text-slate-400">LOJAOFICIAL.COM.BR</div>
-                <div className="font-bold text-sm leading-tight line-clamp-1">{data.headline || data.title}</div>
-            </div>
-            <button className="bg-[#4b4c4f] hover:bg-[#5e5f61] px-4 py-2 rounded text-sm font-bold transition-colors">{data.cta || "Saiba mais"}</button>
-        </div>
+        <div className="bg-black w-full relative overflow-hidden flex items-center justify-center aspect-square">{userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <ImageIcon className="w-12 h-12 opacity-50" />}</div>
+        <div className="bg-[#3A3B3C] p-3 flex items-center justify-between"><div><div className="text-[10px] text-slate-400">LOJAOFICIAL.COM.BR</div><div className="font-bold text-sm leading-tight line-clamp-1">{data.headline || data.title}</div></div><button className="bg-[#4b4c4f] hover:bg-[#5e5f61] px-4 py-2 rounded text-sm font-bold transition-colors">{data.cta || "Saiba mais"}</button></div>
     </div>
 );
 
-const InstagramPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
+const InstagramPreview = ({ data, userImage, device }: any) => (
     <div className={`bg-black text-white rounded-xl border border-slate-800 overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[400px]'}`}>
         {device === 'mobile' && <div className="bg-black text-white pt-1 px-4"><MobileStatusBar /></div>}
-        <div className="flex items-center justify-between p-3">
-            <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600 p-[2px]"><div className="w-full h-full bg-black rounded-full"></div></div>
-                <span className="text-xs font-bold">sua_loja_br</span>
-            </div>
-            <div className="text-xs text-slate-400">Patrocinado</div>
-        </div>
-        <div className="bg-slate-900 w-full relative overflow-hidden flex items-center justify-center aspect-square">
-             {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <ImageIcon className="w-12 h-12 opacity-20" />}
-        </div>
-        <div className="p-3 bg-black">
-            <div className="flex justify-between items-center mb-3">
-               <div className="flex gap-4">
-                   <Heart className="w-6 h-6"/> <MessageCircle className="w-6 h-6"/> <Share2 className="w-6 h-6"/>
-               </div>
-               <button className="bg-blue-600 text-white px-4 py-1.5 rounded font-bold text-xs">{data.cta || "Comprar"}</button>
-            </div>
-            <p className="text-sm leading-snug">
-                <span className="font-bold mr-2">sua_loja_br</span>
-                {data.headline || data.title}
-                <br/>
-                <span className="text-slate-300 text-xs font-normal whitespace-pre-wrap">{data.body || data.description}</span>
-            </p>
-        </div>
+        <div className="flex items-center justify-between p-3"><div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600 p-[2px]"><div className="w-full h-full bg-black rounded-full"></div></div><span className="text-xs font-bold">sua_loja_br</span></div><div className="text-xs text-slate-400">Patrocinado</div></div>
+        <div className="bg-slate-900 w-full relative overflow-hidden flex items-center justify-center aspect-square">{userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <ImageIcon className="w-12 h-12 opacity-20" />}</div>
+        <div className="p-3 bg-black"><div className="flex justify-between items-center mb-3"><div className="flex gap-4"><Heart className="w-6 h-6"/> <MessageCircle className="w-6 h-6"/> <Share2 className="w-6 h-6"/></div><button className="bg-blue-600 text-white px-4 py-1.5 rounded font-bold text-xs">{data.cta || "Comprar"}</button></div><p className="text-sm leading-snug"><span className="font-bold mr-2">sua_loja_br</span>{data.headline || data.title}<br/><span className="text-slate-300 text-xs font-normal whitespace-pre-wrap">{data.body || data.description}</span></p></div>
     </div>
 );
 
-const AmazonPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
+const AmazonPreview = ({ data, userImage, device }: any) => (
    <div className={`bg-white text-black rounded-xl border border-slate-200 overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[600px] flex'}`}>
         {device === 'mobile' && <div className="bg-[#232F3E] text-white pt-2 pb-1 px-4"><MobileStatusBar /></div>}
-        <div className={`${device === 'mobile' ? 'w-full' : 'w-1/2'} p-4 bg-white flex items-center justify-center`}>
-            {userImage ? <img src={userImage} className="max-w-full max-h-64 object-contain" /> : <ImageIcon className="w-16 h-16 text-slate-200"/>}
-        </div>
-        <div className={`${device === 'mobile' ? 'w-full' : 'w-1/2'} p-4 flex flex-col`}>
-             <h3 className="text-sm font-normal text-slate-900 leading-snug mb-2">{data.headline || data.title}</h3>
-             <div className="flex text-yellow-500 text-xs mb-2">★★★★★ <span className="text-slate-500 ml-1">1,234</span></div>
-             <div className="text-2xl font-medium text-slate-900 mb-1">R$ {data.price}</div>
-             <div className="text-xs text-slate-500 mb-4">Entrega GRÁTIS: <span className="font-bold text-slate-800">Segunda-feira</span></div>
-             <button className="bg-[#FFD814] hover:bg-[#F7CA00] text-black border border-[#FCD200] rounded-full py-2 px-4 text-sm font-normal shadow-sm mb-2">Adicionar ao carrinho</button>
-             <button className="bg-[#FFA41C] hover:bg-[#FA8900] text-black border border-[#FF8F00] rounded-full py-2 px-4 text-sm font-normal shadow-sm">Comprar agora</button>
-        </div>
+        <div className={`${device === 'mobile' ? 'w-full' : 'w-1/2'} p-4 bg-white flex items-center justify-center`}>{userImage ? <img src={userImage} className="max-w-full max-h-64 object-contain" /> : <ImageIcon className="w-16 h-16 text-slate-200"/>}</div>
+        <div className={`${device === 'mobile' ? 'w-full' : 'w-1/2'} p-4 flex flex-col`}><h3 className="text-sm font-normal text-slate-900 leading-snug mb-2">{data.headline || data.title}</h3><div className="flex text-yellow-500 text-xs mb-2">★★★★★ <span className="text-slate-500 ml-1">1,234</span></div><div className="text-2xl font-medium text-slate-900 mb-1">R$ {data.price}</div><div className="text-xs text-slate-500 mb-4">Entrega GRÁTIS: <span className="font-bold text-slate-800">Segunda-feira</span></div><button className="bg-[#FFD814] hover:bg-[#F7CA00] text-black border border-[#FCD200] rounded-full py-2 px-4 text-sm font-normal shadow-sm mb-2">Adicionar ao carrinho</button><button className="bg-[#FFA41C] hover:bg-[#FA8900] text-black border border-[#FF8F00] rounded-full py-2 px-4 text-sm font-normal shadow-sm">Comprar agora</button></div>
    </div>
 );
+
+const renderAdPreview = (result: any, platform: string, adImage: string | null, device: 'mobile' | 'desktop') => {
+    // Tenta extrair dados específicos da plataforma se disponível, senão usa o objeto raiz
+    const data = result && result[platform] ? result[platform] : (result || {});
+    
+    switch (platform) {
+        case 'olx': return <OLXPreview data={data} userImage={adImage} device={device} />;
+        case 'mercadolivre': return <MercadoLivrePreview data={data} userImage={adImage} device={device} />;
+        case 'shopee': return <ShopeePreview data={data} userImage={adImage} device={device} />;
+        case 'facebook': return <FacebookPreview data={data} userImage={adImage} device={device} />;
+        case 'instagram': return <InstagramPreview data={data} userImage={adImage} device={device} />;
+        case 'amazon': return <AmazonPreview data={data} userImage={adImage} device={device} />;
+        default: return <InstagramPreview data={data} userImage={adImage} device={device} />;
+    }
+};
 
 // --- COMPONENTES AUXILIARES ---
 const PlatformSelector = ({ selected, onToggle }: { selected: string[], onToggle: (id: string) => void }) => (
@@ -338,19 +204,10 @@ const PlatformSelector = ({ selected, onToggle }: { selected: string[], onToggle
                         key={platform.id}
                         onClick={() => onToggle(platform.id)}
                         disabled={!isSelected && selected.length >= MAX_PLATFORMS}
-                        className={`
-                            relative flex flex-col items-center justify-center gap-2 p-2 rounded-xl transition-all group aspect-square
-                            ${isSelected 
-                                ? 'bg-slate-800 border border-purple-500/50 shadow-lg shadow-purple-900/20' 
-                                : 'bg-slate-950 border border-slate-800 hover:bg-slate-900 disabled:opacity-30 disabled:cursor-not-allowed'}
-                        `}
+                        className={`relative flex flex-col items-center justify-center gap-2 p-2 rounded-xl transition-all group aspect-square ${isSelected ? 'bg-slate-800 border border-purple-500/50 shadow-lg shadow-purple-900/20' : 'bg-slate-950 border border-slate-800 hover:bg-slate-900 disabled:opacity-30 disabled:cursor-not-allowed'}`}
                     >
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white shadow-md transition-transform group-hover:scale-110 ${platform.bg}`}>
-                            <platform.icon className="w-5 h-5" />
-                        </div>
-                        <span className={`text-[9px] font-bold truncate w-full text-center ${isSelected ? 'text-white' : 'text-slate-500'}`}>
-                            {platform.label}
-                        </span>
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white shadow-md transition-transform group-hover:scale-110 ${platform.bg}`}><platform.icon className="w-5 h-5" /></div>
+                        <span className={`text-[9px] font-bold truncate w-full text-center ${isSelected ? 'text-white' : 'text-slate-500'}`}>{platform.label}</span>
                         {isSelected && <div className="absolute top-1 right-1 w-2 h-2 bg-purple-500 rounded-full border border-slate-900"></div>}
                     </button>
                 );
@@ -363,9 +220,7 @@ const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setA
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) setIsOpen(false);
-    };
+    const handleClickOutside = (event: MouseEvent) => { if (menuRef.current && !menuRef.current.contains(event.target as Node)) setIsOpen(false); };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -376,9 +231,7 @@ const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setA
         <div className="absolute top-12 right-0 w-[280px] bg-[#0f0f11] border border-slate-700 rounded-xl shadow-2xl p-4 animate-in fade-in zoom-in-95 duration-200">
            <div className="flex justify-between items-center mb-3 px-1"><div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Ambiente</div><button onClick={() => setIsOpen(false)} className="text-slate-500 hover:text-white"><X className="w-3 h-3" /></button></div>
           <div className="grid grid-cols-4 gap-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1">
-            {BACKGROUNDS.map((bg) => (
-                <button key={bg.id} onClick={() => setActiveTheme(bg)} className={`relative group aspect-square rounded-lg flex flex-col items-center justify-center transition-all ${activeTheme.id === bg.id ? 'bg-purple-600 text-white ring-2 ring-purple-400' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`} title={bg.name}><bg.icon className="w-5 h-5 mb-1" /></button>
-            ))}
+            {BACKGROUNDS.map((bg) => (<button key={bg.id} onClick={() => setActiveTheme(bg)} className={`relative group aspect-square rounded-lg flex flex-col items-center justify-center transition-all ${activeTheme.id === bg.id ? 'bg-purple-600 text-white ring-2 ring-purple-400' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`} title={bg.name}><bg.icon className="w-5 h-5 mb-1" /></button>))}
           </div>
         </div>
       )}
@@ -388,12 +241,8 @@ const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setA
 
 const DeviceToggle = ({ device, setDevice }: { device: 'mobile' | 'desktop', setDevice: (d: 'mobile' | 'desktop') => void }) => (
     <div className="bg-slate-900 border border-slate-800 rounded-lg p-1 flex gap-1">
-        <button onClick={() => setDevice('mobile')} className={`p-1.5 rounded transition-all ${device === 'mobile' ? 'bg-purple-600 text-white shadow' : 'text-slate-500 hover:text-white'}`} title="Mobile View">
-            <Smartphone className="w-4 h-4" />
-        </button>
-        <button onClick={() => setDevice('desktop')} className={`p-1.5 rounded transition-all ${device === 'desktop' ? 'bg-purple-600 text-white shadow' : 'text-slate-500 hover:text-white'}`} title="Desktop View">
-            <Laptop className="w-4 h-4" />
-        </button>
+        <button onClick={() => setDevice('mobile')} className={`p-1.5 rounded transition-all ${device === 'mobile' ? 'bg-purple-600 text-white shadow' : 'text-slate-500 hover:text-white'}`} title="Mobile View"><Smartphone className="w-4 h-4" /></button>
+        <button onClick={() => setDevice('desktop')} className={`p-1.5 rounded transition-all ${device === 'desktop' ? 'bg-purple-600 text-white shadow' : 'text-slate-500 hover:text-white'}`} title="Desktop View"><Laptop className="w-4 h-4" /></button>
     </div>
 );
 
@@ -424,9 +273,6 @@ const SidebarItem = ({ id, conf, active, onClick, userPlan }: any) => (
 
 const CategoryLabel = ({ label }: { label: string }) => (<div className="px-3 mt-4 mb-2 text-[10px] font-bold text-slate-600 uppercase tracking-widest">{label}</div>);
 
-// Auxiliares
-const ArrowLeftIcon = ({className}:{className?:string}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
-
 export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => {
   const [activeModule, setActiveModule] = useState<ModuleId>('home');
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -451,16 +297,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [showClearModal, setShowClearModal] = useState(false);
   
-  // --- NOVOS ESTADOS ---
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['instagram', 'facebook', 'shopee']);
   const [previewPlatform, setPreviewPlatform] = useState<string>('instagram');
   const [previewDevice, setPreviewDevice] = useState<'mobile' | 'desktop'>('mobile');
-
-  // --- ESTADOS PARA CALCULADORA E POLÍTICAS ---
   const [selectedPolicies, setSelectedPolicies] = useState<string[]>(['termos', 'privacidade']);
 
   const activeTabColor = PLATFORM_TABS.find(p => p.id === previewPlatform)?.neon || 'border-slate-700';
-
   const dynamicFormData = formDataByModule[activeModule] || {};
 
   useEffect(() => {
@@ -531,7 +373,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     }
   }, [selectedPlatforms]);
 
-
   const handleGenerate = async () => {
     if(isModuleLocked) return;
     const fields = Object.values(dynamicFormData);
@@ -543,47 +384,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
     try {
         let prompt = "";
         const data = dynamicFormData;
-        const antiMarkdown = "Retorne APENAS JSON válido.";
+        // Anti-markdown instruction to avoid ```json
+        const antiMarkdown = "Retorne APENAS o JSON puro, sem blocos de código markdown.";
         
         switch (activeModule) {
-            case 'generator':
-                prompt = `Produto: ${data.productName}. Preço: ${data.price || 'Não informado'}. ${antiMarkdown}`;
-                break;
-            case 'roas_analyzer':
-                prompt = `Analise a viabilidade financeira com estes dados:
-                Custo do Produto: R$ ${data.cost}
-                Preço de Venda: R$ ${data.salePrice}
-                Imposto: ${data.tax}%
-                Frete: R$ ${data.shipping}
-                Marketing (CPA Esperado): R$ ${data.cpa}
-                
-                Calcule: Margem Bruta, Margem Líquida, Break Even ROAS e Dê um veredito se o produto é escalável.
-                ${antiMarkdown}`;
-                break;
-            case 'policy_gen':
-                prompt = `Gere as seguintes páginas legais para a loja "${data.companyName}": ${selectedPolicies.join(', ')}. Use linguagem jurídica padrão e-commerce Brasil. ${antiMarkdown}`;
-                break;
-            case 'video_script':
-                prompt = `Crie um roteiro de vídeo para ${data.platform || 'TikTok'} de ${data.duration || '30s'} com tom ${data.tone || 'Viral'} sobre o produto: ${data.productName}. Estrutura: Gancho (0-3s), Desenvolvimento, CTA. ${antiMarkdown}`;
-                break;
-            case 'email_marketing':
-                prompt = `Crie uma sequência de e-mail marketing do tipo "${data.campaignType}" para o produto "${data.productName}" com a oferta "${data.offerDetails}". ${antiMarkdown}`;
-                break;
-            case 'influencer_dm':
-                prompt = `Escreva uma mensagem de abordagem para influenciador do nicho "${data.niche}" propondo uma parceria do tipo "${data.proposal}" para o produto "${data.productName}". ${antiMarkdown}`;
-                break;
-            case 'blog_post':
-                prompt = `Escreva um artigo de blog otimizado para SEO sobre "${data.topic}". Palavras-chave: ${data.keywords}. Tom: ${data.tone}. ${antiMarkdown}`;
-                break;
-            case 'product_desc':
-                prompt = `Crie uma descrição de produto altamente persuasiva usando o framework ${data.framework || 'AIDA'}. Produto: ${data.productName}. Características: ${data.features}. ${antiMarkdown}`;
-                break;
-            case 'persona':
-                prompt = `Crie uma persona (Avatar) detalhada para o nicho "${data.niche}" interessada no produto "${data.product}". Inclua dados demográficos, dores, desejos e objeções. ${antiMarkdown}`;
-                break;
-            case 'headline_optimizer':
-                prompt = `Otimize a headline "${data.originalHeadline}" para o objetivo "${data.goal}". Gere 5 variações virais. ${antiMarkdown}`;
-                break;
+            case 'generator': prompt = `Produto: ${data.productName}. Preço: ${data.price || 'Não informado'}. ${antiMarkdown}`; break;
+            case 'roas_analyzer': prompt = `Analise a viabilidade financeira com estes dados: Custo do Produto: R$ ${data.cost}, Preço de Venda: R$ ${data.salePrice}, Imposto: ${data.tax}%, Frete: R$ ${data.shipping}, Marketing (CPA Esperado): R$ ${data.cpa}. Calcule: Margem Bruta, Margem Líquida, Break Even ROAS e Dê um veredito se o produto é escalável. ${antiMarkdown}`; break;
+            case 'policy_gen': prompt = `Gere as seguintes páginas legais para a loja "${data.companyName}": ${selectedPolicies.join(', ')}. Use linguagem jurídica padrão e-commerce Brasil. ${antiMarkdown}`; break;
+            case 'video_script': prompt = `Crie um roteiro de vídeo para ${data.platform || 'TikTok'} de ${data.duration || '30s'} com tom ${data.tone || 'Viral'} sobre o produto: ${data.productName}. Estrutura: Gancho (0-3s), Desenvolvimento, CTA. ${antiMarkdown}`; break;
+            case 'email_marketing': prompt = `Crie uma sequência de e-mail marketing do tipo "${data.campaignType}" para o produto "${data.productName}" com a oferta "${data.offerDetails}". ${antiMarkdown}`; break;
+            case 'influencer_dm': prompt = `Escreva uma mensagem de abordagem para influenciador do nicho "${data.niche}" propondo uma parceria do tipo "${data.proposal}" para o produto "${data.productName}". ${antiMarkdown}`; break;
+            case 'blog_post': prompt = `Escreva um artigo de blog otimizado para SEO sobre "${data.topic}". Palavras-chave: ${data.keywords}. Tom: ${data.tone}. ${antiMarkdown}`; break;
+            case 'product_desc': prompt = `Crie uma descrição de produto altamente persuasiva usando o framework ${data.framework || 'AIDA'}. Produto: ${data.productName}. Características: ${data.features}. ${antiMarkdown}`; break;
+            case 'persona': prompt = `Crie uma persona (Avatar) detalhada para o nicho "${data.niche}" interessada no produto "${data.product}". Inclua dados demográficos, dores, desejos e objeções. ${antiMarkdown}`; break;
+            case 'headline_optimizer': prompt = `Otimize a headline "${data.originalHeadline}" para o objetivo "${data.goal}". Gere 5 variações virais. ${antiMarkdown}`; break;
             default: prompt = `Ajude com: ${JSON.stringify(data)}`;
         }
         
@@ -591,6 +405,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
             const text = await generateCopy(prompt, activeModule, selectedPlatforms);
             const textStr = typeof text === 'string' ? text : String(text || '');
             try {
+                // Tenta limpar o JSON se vier com markdown
                 const cleanText = textStr.replace(/```json/g, '').replace(/```/g, '').trim();
                 const parsed = JSON.parse(cleanText);
                 setResult(parsed);
@@ -604,205 +419,62 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
 
   const renderFormFields = () => {
     switch(activeModule) {
-        case 'generator': return ( <> 
-             <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none transition-all" placeholder="Ex: Corretor de Postura" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div>
-             <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Preço (R$)</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none transition-all" placeholder="97,90" value={dynamicFormData.price || ''} onChange={e => handleInputChange('price', e.target.value)} /></div>
-             <PlatformSelector selected={selectedPlatforms} onToggle={togglePlatform} />
-             <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase flex justify-between"><span>Foto (Simulador)</span> {adImage && <span className="text-green-400 text-[9px] font-bold bg-green-900/30 px-2 rounded">OK</span>}</label><div onClick={() => fileInputRef.current?.click()} className="w-full h-16 border-2 border-dashed border-slate-700 hover:border-purple-500 hover:bg-slate-800/50 rounded-xl flex items-center justify-center cursor-pointer gap-2 transition-all group"><Upload className="w-5 h-5 text-slate-500 group-hover:text-purple-400 transition-colors"/> <span className="text-xs font-bold text-slate-500 group-hover:text-white transition-colors">Carregar Imagem</span></div><input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" /></div> 
-             </> );
-        
-        case 'roas_analyzer': return ( <>
-             <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Quanto você pagou? (Custo)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="30,00" value={dynamicFormData.cost || ''} onChange={e => { if(Number(e.target.value) >= 0) handleInputChange('cost', e.target.value)}} /></div>
-                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Por quanto vai vender?</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="99,90" value={dynamicFormData.salePrice || ''} onChange={e => { if(Number(e.target.value) >= 0) handleInputChange('salePrice', e.target.value)}} /></div>
-             </div>
-             <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Imposto (%)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="6" value={dynamicFormData.tax || ''} onChange={e => { if(Number(e.target.value) >= 0) handleInputChange('tax', e.target.value)}} /></div>
-                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Frete Médio (R$)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="20,00" value={dynamicFormData.shipping || ''} onChange={e => { if(Number(e.target.value) >= 0) handleInputChange('shipping', e.target.value)}} /></div>
-             </div>
-             <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Custo Marketing (CPA)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-emerald-500 outline-none" placeholder="25,00" value={dynamicFormData.cpa || ''} onChange={e => { if(Number(e.target.value) >= 0) handleInputChange('cpa', e.target.value)}} /></div>
-             </> );
-
-        case 'policy_gen': return ( <>
-             <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Nome da Loja / Empresa</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none" placeholder="Minha Loja Ltda" value={dynamicFormData.companyName || ''} onChange={e => handleInputChange('companyName', e.target.value)} /></div>
-             <div className="space-y-3 mt-4">
-                <label className="text-[10px] font-bold text-slate-500 uppercase">Selecione as Páginas</label>
-                {[
-                    {id: 'termos', label: 'Termos de Uso'}, 
-                    {id: 'privacidade', label: 'Política de Privacidade'}, 
-                    {id: 'reembolso', label: 'Trocas e Devoluções'}, 
-                    {id: 'envio', label: 'Política de Frete'},
-                    {id: 'faq', label: 'Perguntas Frequentes (FAQ)'}
-                ].map(p => (
-                    <div key={p.id} onClick={() => togglePolicy(p.id)} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${selectedPolicies.includes(p.id) ? 'bg-purple-900/20 border-purple-500/50' : 'bg-[#0B0518] border-slate-700 hover:border-slate-500'}`}>
-                        <div className={`w-5 h-5 rounded flex items-center justify-center border ${selectedPolicies.includes(p.id) ? 'bg-purple-600 border-purple-600' : 'border-slate-500'}`}>{selectedPolicies.includes(p.id) && <CheckCircle className="w-3.5 h-3.5 text-white" />}</div>
-                        <span className="text-sm font-medium text-white">{p.label}</span>
-                    </div>
-                ))}
-             </div>
-             </> );
-
-        case 'video_script': return ( <>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Smartwatch Ultra" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div>
-            <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Plataforma</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.platform || 'TikTok'} onChange={e => handleInputChange('platform', e.target.value)}><option value="TikTok">TikTok</option><option value="Reels">Instagram Reels</option><option value="Shorts">YouTube Shorts</option></select></div>
-                <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Duração</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.duration || '30s'} onChange={e => handleInputChange('duration', e.target.value)}><option value="15s">15 Segundos</option><option value="30s">30 Segundos</option><option value="60s">60 Segundos</option></select></div>
-            </div>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Estilo / Tom</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.tone || 'Viral'} onChange={e => handleInputChange('tone', e.target.value)}><option value="Viral">Viral & Humor</option><option value="Storytelling">Storytelling (Emocional)</option><option value="Educational">Educativo / Tutorial</option><option value="Hard Sell">Venda Direta (Oferta)</option></select></div>
-            </> );
-
-        case 'email_marketing': return ( <>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Tipo de Campanha</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.campaignType || 'Abandoned Cart'} onChange={e => handleInputChange('campaignType', e.target.value)}><option value="Abandoned Cart">Recuperação de Carrinho</option><option value="Welcome Series">Boas Vindas</option><option value="Black Friday">Promoção Relâmpago</option><option value="Post Purchase">Pós-Venda (Upsell)</option></select></div>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Fone Bluetooth" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Oferta / Desconto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: 10% OFF + Frete Grátis" value={dynamicFormData.offerDetails || ''} onChange={e => handleInputChange('offerDetails', e.target.value)} /></div>
-            </> );
-
-        case 'influencer_dm': return ( <>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Nicho do Influencer</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Fitness, Moda, Tech" value={dynamicFormData.niche || ''} onChange={e => handleInputChange('niche', e.target.value)} /></div>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Legging Modeladora" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Tipo de Proposta</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.proposal || 'Barter'} onChange={e => handleInputChange('proposal', e.target.value)}><option value="Barter">Permuta (Envio de Produto)</option><option value="Paid Post">Publi Paga (Cachê)</option><option value="Commission">Afiliado (Comissão)</option></select></div>
-            </> );
-
-        case 'blog_post': return ( <>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Tópico Principal</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Como emagrecer rápido" value={dynamicFormData.topic || ''} onChange={e => handleInputChange('topic', e.target.value)} /></div>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Palavras-Chave (SEO)</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: dieta, exercícios, saúde" value={dynamicFormData.keywords || ''} onChange={e => handleInputChange('keywords', e.target.value)} /></div>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Tom de Voz</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.tone || 'Informative'} onChange={e => handleInputChange('tone', e.target.value)}><option value="Informative">Informativo & Sério</option><option value="Listicle">Lista (Top 10...)</option><option value="How-to">Tutorial (Passo a passo)</option><option value="Controversial">Polêmico / Opinião</option></select></div>
-            </> );
-
-        case 'product_desc': return ( <>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Nome do Produto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Tênis Ortopédico" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Características Chave</label><textarea className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none h-24 resize-none" placeholder="Ex: Solado macio, tecido respirável, anti-derrapante..." value={dynamicFormData.features || ''} onChange={e => handleInputChange('features', e.target.value)} /></div>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Framework de Copy</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.framework || 'AIDA'} onChange={e => handleInputChange('framework', e.target.value)}><option value="AIDA">AIDA (Atenção, Interesse, Desejo, Ação)</option><option value="PAS">PAS (Problema, Agitação, Solução)</option><option value="Storytelling">Storytelling (Narrativa)</option></select></div>
-            </> );
-
-        case 'persona': return ( <>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Nicho de Mercado</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Jardinagem Urbana" value={dynamicFormData.niche || ''} onChange={e => handleInputChange('niche', e.target.value)} /></div>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto Principal</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Kit de Ferramentas" value={dynamicFormData.product || ''} onChange={e => handleInputChange('product', e.target.value)} /></div>
-            </> );
-
-        case 'headline_optimizer': return ( <>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Headline Original</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Compre este tênis agora" value={dynamicFormData.originalHeadline || ''} onChange={e => handleInputChange('originalHeadline', e.target.value)} /></div>
-            <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Objetivo</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.goal || 'High CTR'} onChange={e => handleInputChange('goal', e.target.value)}><option value="High CTR">CTR Alto (Mais Cliques)</option><option value="SEO">SEO (Rankeamento)</option><option value="Curiosity">Curiosidade (Clickbait Ético)</option><option value="Urgency">Urgência & Escassez</option></select></div>
-            </> );
-
+        case 'generator': return ( <> <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none transition-all" placeholder="Ex: Corretor de Postura" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Preço (R$)</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none transition-all" placeholder="97,90" value={dynamicFormData.price || ''} onChange={e => handleInputChange('price', e.target.value)} /></div><PlatformSelector selected={selectedPlatforms} onToggle={togglePlatform} /><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase flex justify-between"><span>Foto (Simulador)</span> {adImage && <span className="text-green-400 text-[9px] font-bold bg-green-900/30 px-2 rounded">OK</span>}</label><div onClick={() => fileInputRef.current?.click()} className="w-full h-16 border-2 border-dashed border-slate-700 hover:border-purple-500 hover:bg-slate-800/50 rounded-xl flex items-center justify-center cursor-pointer gap-2 transition-all group"><Upload className="w-5 h-5 text-slate-500 group-hover:text-purple-400 transition-colors"/> <span className="text-xs font-bold text-slate-500 group-hover:text-white transition-colors">Carregar Imagem</span></div><input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" /></div> </> );
+        case 'roas_analyzer': return ( <> <div className="grid grid-cols-2 gap-3"><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Quanto você pagou? (Custo)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="30,00" value={dynamicFormData.cost || ''} onChange={e => { if(Number(e.target.value) >= 0) handleInputChange('cost', e.target.value)}} /></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Por quanto vai vender?</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="99,90" value={dynamicFormData.salePrice || ''} onChange={e => { if(Number(e.target.value) >= 0) handleInputChange('salePrice', e.target.value)}} /></div></div><div className="grid grid-cols-2 gap-3"><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Imposto (%)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="6" value={dynamicFormData.tax || ''} onChange={e => { if(Number(e.target.value) >= 0) handleInputChange('tax', e.target.value)}} /></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Frete Médio (R$)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-emerald-500 outline-none" placeholder="20,00" value={dynamicFormData.shipping || ''} onChange={e => { if(Number(e.target.value) >= 0) handleInputChange('shipping', e.target.value)}} /></div></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Custo Marketing (CPA)</label><input type="number" min="0" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-emerald-500 outline-none" placeholder="25,00" value={dynamicFormData.cpa || ''} onChange={e => { if(Number(e.target.value) >= 0) handleInputChange('cpa', e.target.value)}} /></div> </> );
+        case 'policy_gen': return ( <> <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Nome da Loja / Empresa</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none" placeholder="Minha Loja Ltda" value={dynamicFormData.companyName || ''} onChange={e => handleInputChange('companyName', e.target.value)} /></div><div className="space-y-3 mt-4"><label className="text-[10px] font-bold text-slate-500 uppercase">Selecione as Páginas</label>{[{id: 'termos', label: 'Termos de Uso'}, {id: 'privacidade', label: 'Política de Privacidade'}, {id: 'reembolso', label: 'Trocas e Devoluções'}, {id: 'envio', label: 'Política de Frete'},{id: 'faq', label: 'Perguntas Frequentes (FAQ)'}].map(p => (<div key={p.id} onClick={() => togglePolicy(p.id)} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${selectedPolicies.includes(p.id) ? 'bg-purple-900/20 border-purple-500/50' : 'bg-[#0B0518] border-slate-700 hover:border-slate-500'}`}><div className={`w-5 h-5 rounded flex items-center justify-center border ${selectedPolicies.includes(p.id) ? 'bg-purple-600 border-purple-600' : 'border-slate-500'}`}>{selectedPolicies.includes(p.id) && <CheckCircle className="w-3.5 h-3.5 text-white" />}</div><span className="text-sm font-medium text-white">{p.label}</span></div>))}</div> </> );
+        case 'video_script': return ( <> <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Smartwatch Ultra" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div><div className="grid grid-cols-2 gap-3"><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Plataforma</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.platform || 'TikTok'} onChange={e => handleInputChange('platform', e.target.value)}><option value="TikTok">TikTok</option><option value="Reels">Instagram Reels</option><option value="Shorts">YouTube Shorts</option></select></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Duração</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-3 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.duration || '30s'} onChange={e => handleInputChange('duration', e.target.value)}><option value="15s">15 Segundos</option><option value="30s">30 Segundos</option><option value="60s">60 Segundos</option></select></div></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Estilo / Tom</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.tone || 'Viral'} onChange={e => handleInputChange('tone', e.target.value)}><option value="Viral">Viral & Humor</option><option value="Storytelling">Storytelling (Emocional)</option><option value="Educational">Educativo / Tutorial</option><option value="Hard Sell">Venda Direta (Oferta)</option></select></div> </> );
+        case 'email_marketing': return ( <> <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Tipo de Campanha</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.campaignType || 'Abandoned Cart'} onChange={e => handleInputChange('campaignType', e.target.value)}><option value="Abandoned Cart">Recuperação de Carrinho</option><option value="Welcome Series">Boas Vindas</option><option value="Black Friday">Promoção Relâmpago</option><option value="Post Purchase">Pós-Venda (Upsell)</option></select></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Fone Bluetooth" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Oferta / Desconto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: 10% OFF + Frete Grátis" value={dynamicFormData.offerDetails || ''} onChange={e => handleInputChange('offerDetails', e.target.value)} /></div> </> );
+        case 'influencer_dm': return ( <> <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Nicho do Influencer</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Fitness, Moda, Tech" value={dynamicFormData.niche || ''} onChange={e => handleInputChange('niche', e.target.value)} /></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Legging Modeladora" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Tipo de Proposta</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.proposal || 'Barter'} onChange={e => handleInputChange('proposal', e.target.value)}><option value="Barter">Permuta (Envio de Produto)</option><option value="Paid Post">Publi Paga (Cachê)</option><option value="Commission">Afiliado (Comissão)</option></select></div> </> );
+        case 'blog_post': return ( <> <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Tópico Principal</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Como emagrecer rápido" value={dynamicFormData.topic || ''} onChange={e => handleInputChange('topic', e.target.value)} /></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Palavras-Chave (SEO)</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: dieta, exercícios, saúde" value={dynamicFormData.keywords || ''} onChange={e => handleInputChange('keywords', e.target.value)} /></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Tom de Voz</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.tone || 'Informative'} onChange={e => handleInputChange('tone', e.target.value)}><option value="Informative">Informativo & Sério</option><option value="Listicle">Lista (Top 10...)</option><option value="How-to">Tutorial (Passo a passo)</option><option value="Controversial">Polêmico / Opinião</option></select></div> </> );
+        case 'product_desc': return ( <> <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Nome do Produto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Tênis Ortopédico" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Características Chave</label><textarea className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none h-24 resize-none" placeholder="Ex: Solado macio, tecido respirável, anti-derrapante..." value={dynamicFormData.features || ''} onChange={e => handleInputChange('features', e.target.value)} /></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Framework de Copy</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.framework || 'AIDA'} onChange={e => handleInputChange('framework', e.target.value)}><option value="AIDA">AIDA (Atenção, Interesse, Desejo, Ação)</option><option value="PAS">PAS (Problema, Agitação, Solução)</option><option value="Storytelling">Storytelling (Narrativa)</option></select></div> </> );
+        case 'persona': return ( <> <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Nicho de Mercado</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Jardinagem Urbana" value={dynamicFormData.niche || ''} onChange={e => handleInputChange('niche', e.target.value)} /></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto Principal</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Kit de Ferramentas" value={dynamicFormData.product || ''} onChange={e => handleInputChange('product', e.target.value)} /></div> </> );
+        case 'headline_optimizer': return ( <> <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Headline Original</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Compre este tênis agora" value={dynamicFormData.originalHeadline || ''} onChange={e => handleInputChange('originalHeadline', e.target.value)} /></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Objetivo</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white focus:border-purple-500 outline-none appearance-none" value={dynamicFormData.goal || 'High CTR'} onChange={e => handleInputChange('goal', e.target.value)}><option value="High CTR">CTR Alto (Mais Cliques)</option><option value="SEO">SEO (Rankeamento)</option><option value="Curiosity">Curiosidade (Clickbait Ético)</option><option value="Urgency">Urgência & Escassez</option></select></div> </> );
         default: return <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Entrada</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div>;
     }
-  }
-
-  const renderGenericResult = (data: any) => (
-    <div className="space-y-4">
-      {Object.entries(data).map(([key, value]: any, idx) => (
-        <div key={idx} className="bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden shadow-xl animate-in slide-in-from-bottom-2 duration-500">
-          <div className="px-5 py-3 border-b border-white/5 bg-white/5 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-purple-500 shadow-[0_0_8px_#a855f7]"></div>
-            <h3 className="text-xs font-bold text-white uppercase tracking-widest">{key.replace(/_/g, ' ')}</h3>
-          </div>
-          <div className="p-5">
-            {typeof value === 'object' && value !== null && !Array.isArray(value) ? (
-               <div className="space-y-3">
-                  {Object.entries(value).map(([subKey, subValue]: any) => (
-                      <div key={subKey} className="bg-black/20 p-3 rounded border border-white/5">
-                          <span className="text-[10px] font-bold text-purple-400 uppercase block mb-1">{subKey.replace(/_/g, ' ')}</span>
-                          <p className="text-slate-300 text-sm whitespace-pre-wrap">{String(subValue)}</p>
-                      </div>
-                  ))}
-               </div>
-            ) : Array.isArray(value) ? (
-              <ul className="space-y-2">
-                {value.map((v, i) => (
-                  <li key={i} className="text-sm text-slate-300 bg-black/20 p-2.5 rounded border border-white/5 font-medium">
-                    {typeof v === 'object' ? JSON.stringify(v) : v}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap font-medium">{String(value)}</p>
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
-  const renderAdPreview = (data: any, platform: string, userImage: string | null, device: 'mobile' | 'desktop') => {
-      let platformData = data;
-      if (activeModule === 'generator' && data && typeof data === 'object') {
-          platformData = data[platform] || data['facebook'] || data; 
-      }
-      switch (platform) {
-          case 'instagram': return <InstagramPreview data={platformData} userImage={userImage} device={device} />;
-          case 'facebook': return <FacebookPreview data={platformData} userImage={userImage} device={device} />;
-          case 'shopee': return <ShopeePreview data={platformData} userImage={userImage} device={device} />;
-          case 'mercadolivre': return <MercadoLivrePreview data={platformData} userImage={userImage} device={device} />;
-          case 'olx': return <OLXPreview data={platformData} userImage={userImage} device={device} />;
-          case 'amazon': return <AmazonPreview data={platformData} userImage={userImage} device={device} />;
-          default: return <FacebookPreview data={platformData} userImage={userImage} device={device} />;
-      }
   };
 
-  const renderHistory = () => (
-      <div className="w-full max-w-5xl mx-auto pb-20">
-          <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-white flex items-center gap-2"><History className="w-5 h-5 text-purple-400"/> Minha Biblioteca</h2>
-              <div className="bg-slate-900 p-1 rounded-lg flex">
-                  <button onClick={() => setHistoryType('text')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${historyType === 'text' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'}`}>Textos</button>
-                  <button onClick={() => setHistoryType('image')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${historyType === 'image' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'}`}>Imagens</button>
-              </div>
-          </div>
-          
-          {isLoadingHistory ? (
-              <div className="flex justify-center p-10"><Loader2 className="w-8 h-8 animate-spin text-purple-500"/></div>
-          ) : historyItems.length === 0 ? (
-              <div className="text-center p-10 bg-slate-900/30 rounded-2xl border border-slate-800 border-dashed">
-                  <History className="w-12 h-12 text-slate-600 mx-auto mb-3"/>
-                  <p className="text-slate-500">Nenhum item salvo ainda.</p>
-              </div>
-          ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {historyItems.map((item) => (
-                      <div key={item.id} className="bg-[#130b24] border border-white/5 rounded-xl p-4 hover:border-purple-500/30 transition-all group relative">
-                          <div className="flex justify-between items-start mb-3">
-                              <span className="text-[10px] font-bold text-purple-400 bg-purple-900/20 px-2 py-1 rounded uppercase">{item.module || 'Geral'}</span>
-                              <button 
-                                onClick={() => { 
-                                    setItemToDelete(item.id); 
-                                    setShowDeleteModal(true); 
-                                }} 
-                                className="p-2 bg-slate-800 hover:bg-red-500/20 rounded-lg text-slate-400 hover:text-red-500 transition-all border border-transparent hover:border-red-500/50"
-                                title="Excluir item"
-                              >
-                                <Trash2 className="w-4 h-4"/>
-                              </button>
-                          </div>
-                          
-                          {item.type === 'image' ? (
-                              <div className="aspect-square bg-black rounded-lg overflow-hidden mb-3 border border-slate-800">
-                                  <img src={item.result?.url} className="w-full h-full object-cover" />
-                              </div>
-                          ) : (
-                              <div className="h-32 overflow-hidden text-xs text-slate-400 mb-3 bg-black/20 p-2 rounded relative">
-                                  <div className="absolute inset-0 bg-gradient-to-t from-[#130b24] to-transparent pointer-events-none"></div>
-                                  {JSON.stringify(item.result).slice(0, 200)}...
-                              </div>
-                          )}
-                          
-                          <div className="flex items-center justify-between pt-3 border-t border-white/5">
-                              <span className="text-[10px] text-slate-600">{new Date(item.created_at).toLocaleDateString()}</span>
-                              <button onClick={() => navigator.clipboard.writeText(JSON.stringify(item.result))} className="text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1"><Copy className="w-3 h-3"/> Copiar</button>
-                          </div>
-                      </div>
+  const renderGenericResult = (data: any) => {
+    return (
+      <div className="space-y-4">
+        {Object.entries(data).map(([key, value]: any, idx) => (
+          <div key={idx} className="bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden shadow-xl animate-in slide-in-from-bottom-2 duration-500">
+            <div className="px-5 py-3 border-b border-white/5 bg-white/5 flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-purple-500 shadow-[0_0_8px_#a855f7]"></div>
+              <h3 className="text-xs font-bold text-white uppercase tracking-widest">{key.replace(/_/g, ' ')}</h3>
+            </div>
+            <div className="p-5">
+              {typeof value === 'object' && value !== null && !Array.isArray(value) ? (
+                 <div className="space-y-3">
+                    {Object.entries(value).map(([subKey, subValue]: any) => (
+                        <div key={subKey} className="bg-black/20 p-3 rounded border border-white/5">
+                            <span className="text-[10px] font-bold text-purple-400 uppercase block mb-1">{subKey.replace(/_/g, ' ')}</span>
+                            <p className="text-slate-300 text-sm whitespace-pre-wrap">{String(subValue)}</p>
+                        </div>
+                    ))}
+                 </div>
+              ) : Array.isArray(value) ? (
+                <ul className="space-y-2">
+                  {value.map((v, i) => (
+                    <li key={i} className="text-sm text-slate-300 bg-black/20 p-2.5 rounded border border-white/5 font-medium">
+                      {typeof v === 'object' ? JSON.stringify(v) : v}
+                    </li>
                   ))}
-              </div>
-          )}
+                </ul>
+              ) : (
+                <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap font-medium">{String(value)}</p>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
-  );
+    );
+  };
 
   return (
     <div className="flex h-screen bg-[#0B0518] text-white font-sans overflow-hidden relative selection:bg-purple-500/30">
       <ConfirmModal isOpen={showDeleteModal} title="Excluir Item?" message="Tem certeza que deseja apagar este item permanentemente?" onConfirm={handleDeleteItemConfirm} onCancel={() => setShowDeleteModal(false)} />
       <ConfirmModal isOpen={showClearModal} title="Limpar Campos?" message="Deseja apagar tudo o que escreveu?" onConfirm={handleClearFormConfirm} onCancel={() => setShowClearModal(false)} />
       
-      {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 z-50 flex items-center justify-between px-4"><div className="flex items-center gap-2"><div className="p-1.5 bg-gradient-to-tr from-purple-600 to-indigo-600 rounded-lg"><Zap className="w-4 h-4 text-white" /></div><span className="font-bold text-white tracking-tight">DROP<span className="text-purple-400">HACKER</span></span></div><button onClick={() => setMobileMenuOpen(true)} className="p-2 text-slate-400 active:text-white transition-colors"><Menu className="w-6 h-6" /></button></div>
       
       <> {mobileMenuOpen && <div className="fixed inset-0 bg-black/80 z-40 lg:hidden backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}></div>}
@@ -821,7 +493,60 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
           ) : activeModule === 'history' ? (
               <div key="history" className={`flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 animate-in fade-in slide-in-from-bottom-8 duration-500 ease-out ${activeTheme.class}`}>
                   <div className="absolute top-4 right-4 z-50"><ThemeSelector activeTheme={activeTheme} setActiveTheme={handleThemeChange} /></div>
-                  {renderHistory()}
+                  <div className="w-full max-w-5xl mx-auto pb-20">
+                      <div className="flex items-center justify-between mb-6">
+                          <h2 className="text-xl font-bold text-white flex items-center gap-2"><History className="w-5 h-5 text-purple-400"/> Minha Biblioteca</h2>
+                          <div className="bg-slate-900 p-1 rounded-lg flex">
+                              <button onClick={() => setHistoryType('text')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${historyType === 'text' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'}`}>Textos</button>
+                              <button onClick={() => setHistoryType('image')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${historyType === 'image' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'}`}>Imagens</button>
+                          </div>
+                      </div>
+                      
+                      {isLoadingHistory ? (
+                          <div className="flex justify-center p-10"><Loader2 className="w-8 h-8 animate-spin text-purple-500"/></div>
+                      ) : historyItems.length === 0 ? (
+                          <div className="text-center p-10 bg-slate-900/30 rounded-2xl border border-slate-800 border-dashed">
+                              <History className="w-12 h-12 text-slate-600 mx-auto mb-3"/>
+                              <p className="text-slate-500">Nenhum item salvo ainda.</p>
+                          </div>
+                      ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {historyItems.map((item) => (
+                                  <div key={item.id} className="bg-[#130b24] border border-white/5 rounded-xl p-4 hover:border-purple-500/30 transition-all group relative">
+                                      <div className="flex justify-between items-start mb-3">
+                                          <span className="text-[10px] font-bold text-purple-400 bg-purple-900/20 px-2 py-1 rounded uppercase">{item.module || 'Geral'}</span>
+                                          <button 
+                                            onClick={() => { 
+                                                setItemToDelete(item.id); 
+                                                setShowDeleteModal(true); 
+                                            }} 
+                                            className="p-2 bg-slate-800 hover:bg-red-500/20 rounded-lg text-slate-400 hover:text-red-500 transition-all border border-transparent hover:border-red-500/50"
+                                            title="Excluir item"
+                                          >
+                                            <Trash2 className="w-4 h-4"/>
+                                          </button>
+                                      </div>
+                                      
+                                      {item.type === 'image' ? (
+                                          <div className="aspect-square bg-black rounded-lg overflow-hidden mb-3 border border-slate-800">
+                                              <img src={item.result?.url} className="w-full h-full object-cover" />
+                                          </div>
+                                      ) : (
+                                          <div className="h-32 overflow-hidden text-xs text-slate-400 mb-3 bg-black/20 p-2 rounded relative">
+                                              <div className="absolute inset-0 bg-gradient-to-t from-[#130b24] to-transparent pointer-events-none"></div>
+                                              {JSON.stringify(item.result).slice(0, 200)}...
+                                          </div>
+                                      )}
+                                      
+                                      <div className="flex items-center justify-between pt-3 border-t border-white/5">
+                                          <span className="text-[10px] text-slate-600">{new Date(item.created_at).toLocaleDateString()}</span>
+                                          <button onClick={() => navigator.clipboard.writeText(JSON.stringify(item.result))} className="text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1"><Copy className="w-3 h-3"/> Copiar</button>
+                                      </div>
+                                  </div>
+                              ))}
+                          </div>
+                      )}
+                  </div>
               </div>
           ) : activeModule === 'settings' ? (
               <div className="p-10 text-center text-slate-500">Em Manutenção</div>
