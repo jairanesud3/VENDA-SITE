@@ -10,7 +10,7 @@ import {
   Palette, Box, Moon, Sun, Grid3X3, Aperture, Leaf, Gem, Monitor,
   History, Trash2, Calendar, FileText, CheckCircle,
   Mail, UserPlus, FileEdit, Shield, Type,
-  ChevronDown
+  ChevronDown, Upload, Eraser, DollarSign, Tag, Text
 } from 'lucide-react';
 import { generateCopy } from '@/app/actions/generate-copy';
 import { getUserHistory, deleteHistoryItem } from '@/app/actions/history';
@@ -158,9 +158,9 @@ const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setA
 type ModuleId = 
   | 'home'
   | 'generator' | 'video_script' | 'studio'
-  | 'email_marketing' | 'influencer_dm' | 'blog_post' // NOVOS
+  | 'email_marketing' | 'influencer_dm' | 'blog_post' 
   | 'product_desc' | 'persona' | 'roas_analyzer' 
-  | 'policy_gen' | 'headline_optimizer' // NOVOS
+  | 'policy_gen' | 'headline_optimizer'
   | 'history' | 'settings';
 
 interface ModuleConfig {
@@ -181,7 +181,7 @@ const MODULES: Record<string, ModuleConfig> = {
   video_script: { label: 'Roteiros Virais', icon: Video, color: 'text-pink-400', desc: 'Scripts para TikTok e Reels', category: 'core', isPremium: true, placeholder: 'Ex: Escova Alisadora 3 em 1...' },
   studio: { label: 'Studio Product AI', icon: Camera, color: 'text-orange-400', desc: 'Fotos de produto 4K', category: 'core', isPremium: true },
   
-  // MARKETING (NOVOS)
+  // MARKETING 
   email_marketing: { label: 'E-mail Marketing', icon: Mail, color: 'text-yellow-400', desc: 'Recuperação e Boas-vindas', category: 'marketing', isPremium: true, placeholder: 'Ex: Cliente abandonou carrinho com um Smartwatch...' },
   influencer_dm: { label: 'Influencer Outreach', icon: UserPlus, color: 'text-rose-400', desc: 'Scripts para parcerias', category: 'marketing', placeholder: 'Ex: Parceria para loja de joias...' },
   blog_post: { label: 'SEO Blog Builder', icon: FileEdit, color: 'text-green-400', desc: 'Artigos para tráfego orgânico', category: 'marketing', isPremium: true, placeholder: 'Ex: 5 Benefícios de usar palmilhas ortopédicas...' },
@@ -220,25 +220,87 @@ const CustomSelect = ({ label, value, onChange, options }: any) => {
     )
 }
 
-// ... Previews mantidos (Instagram, Facebook etc) ...
-// Para brevidade, assumimos que as funções de Preview (InstagramPreview, etc) existem e são as mesmas do código anterior.
-const FacebookPreview = ({ data }: { data: any }) => (
-    <div className="bg-[#242526] text-white rounded-xl border border-slate-700 overflow-hidden max-w-sm mx-auto font-sans shadow-2xl">
+// --- PREVIEWS (SIMULADORES) ---
+
+const FacebookPreview = ({ data, userImage }: { data: any, userImage: string | null }) => (
+    <div className="bg-[#242526] text-white rounded-xl border border-slate-700 overflow-hidden max-w-sm mx-auto font-sans shadow-2xl animate-in fade-in zoom-in-95">
         <div className="p-3 flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-blue-600"></div>
-            <div>
-                <div className="font-bold text-sm">Sua Loja</div>
-                <div className="text-[10px] text-slate-400">Patrocinado</div>
+            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs">SL</div>
+            <div className="flex-1">
+                <div className="font-bold text-sm">Sua Loja Oficial</div>
+                <div className="text-[10px] text-slate-400 flex items-center gap-1">Patrocinado <span className="text-[8px]">🌐</span></div>
             </div>
+            <div className="text-slate-400">•••</div>
         </div>
-        <div className="px-3 pb-2 text-sm text-slate-200">{data.body || data.description}</div>
-        <div className="bg-slate-800 aspect-video w-full"></div>
+        
+        <div className="px-3 pb-2 text-sm text-slate-200 whitespace-pre-wrap">{data.body || data.description}</div>
+        
+        <div className="bg-black aspect-square w-full relative overflow-hidden flex items-center justify-center">
+             {userImage ? (
+                <img src={userImage} alt="Produto" className="w-full h-full object-cover" />
+             ) : (
+                <div className="text-slate-600 flex flex-col items-center">
+                    <ImageIcon className="w-12 h-12 mb-2 opacity-50" />
+                    <span className="text-xs">Imagem do Produto</span>
+                </div>
+             )}
+             <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur text-white text-xs font-bold px-3 py-1 rounded-full">
+                 {data.price ? `R$ ${data.price}` : 'Promoção'}
+             </div>
+        </div>
+        
         <div className="bg-[#3A3B3C] p-3 flex items-center justify-between">
-            <div className="font-bold text-sm">{data.headline || data.title}</div>
-            <button className="bg-slate-600 px-4 py-1.5 rounded text-sm font-bold">{data.cta || "Saiba mais"}</button>
+            <div>
+                <div className="text-[10px] text-slate-400">LOJAOFICIAL.COM.BR</div>
+                <div className="font-bold text-sm leading-tight">{data.headline || data.title}</div>
+            </div>
+            <button className="bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded text-sm font-bold transition-colors">{data.cta || "Saiba mais"}</button>
+        </div>
+        
+        <div className="p-3 border-t border-slate-700 flex justify-between text-slate-400 text-xs">
+             <span>👍 1.2 mil</span>
+             <span>45 comentários • 12 compartilhamentos</span>
         </div>
     </div>
 );
+
+const InstagramPreview = ({ data, userImage }: { data: any, userImage: string | null }) => (
+    <div className="bg-black text-white rounded-xl border border-slate-800 overflow-hidden max-w-sm mx-auto font-sans shadow-2xl animate-in fade-in zoom-in-95">
+        <div className="flex items-center justify-between p-3">
+            <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600 p-[2px]">
+                    <div className="w-full h-full bg-black rounded-full border border-black"></div>
+                </div>
+                <span className="text-xs font-bold">sua_loja_br</span>
+            </div>
+            <div className="text-xs text-slate-400">Patrocinado</div>
+        </div>
+
+        <div className="bg-slate-900 aspect-square w-full relative overflow-hidden flex items-center justify-center">
+             {userImage ? (
+                <img src={userImage} alt="Produto" className="w-full h-full object-cover" />
+             ) : (
+                <ImageIcon className="w-12 h-12 opacity-20" />
+             )}
+        </div>
+
+        <div className="p-3 bg-[#121212]">
+            <div className="flex justify-between items-center mb-3">
+               <button className="bg-blue-600 text-white w-full py-1.5 rounded font-bold text-xs">{data.cta || "Comprar Agora"}</button>
+            </div>
+            <p className="text-sm leading-snug">
+                <span className="font-bold mr-2">sua_loja_br</span>
+                {data.headline || data.title}
+                <br/><br/>
+                <span className="text-slate-300 text-xs font-normal whitespace-pre-wrap">{data.body || data.description}</span>
+            </p>
+             <div className="mt-2 text-[10px] text-slate-500 uppercase">HÁ 2 HORAS</div>
+        </div>
+    </div>
+);
+
+
+// COMPONENTES AUXILIARES
 
 const SidebarItem = ({ id, conf, active, onClick, userPlan }: any) => (
   <button 
@@ -275,19 +337,28 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const [historyItems, setHistoryItems] = useState<any[]>([]);
   const [historyType, setHistoryType] = useState<'text' | 'image'>('text');
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const [copySuccessId, setCopySuccessId] = useState<string | null>(null);
 
   const router = useRouter();
   const [userPlan, setUserPlan] = useState<'free' | 'pro'>('free'); 
   const [isLoadingPlan, setIsLoadingPlan] = useState(true);
 
-  // Form State
-  const [input, setInput] = useState('');
+  // --- STATE DO FORMULÁRIO (GERAL) ---
+  const [input, setInput] = useState(''); // Fallback para outros módulos
+  
+  // --- STATE ESTRUTURADO PARA O GERADOR DE ANÚNCIOS ---
+  const [adFormData, setAdFormData] = useState({
+      productName: '',
+      price: '',
+      details: '',
+      image: null as string | null // Base64 ou URL para preview
+  });
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
   
-  // Opções específicas
   const [platform, setPlatform] = useState('Facebook');
   const [videoDuration, setVideoDuration] = useState('30s');
 
@@ -313,7 +384,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
         const found = BACKGROUNDS.find(b => b.id === savedThemeId);
         if (found) setActiveTheme(found);
     } else {
-        // Tema padrão se nada salvo
         setActiveTheme(BACKGROUNDS[0]);
     }
   }, [activeModule, themePrefs]);
@@ -341,13 +411,44 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const handleUpgradeClick = () => { router.push('/plans'); };
   const isModuleLocked = MODULES[activeModule].isPremium && userPlan === 'free';
 
+  // --- LÓGICA DE UPLOAD SIMULADO (PARA PREVIEW) ---
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+              setAdFormData(prev => ({ ...prev, image: reader.result as string }));
+          };
+          reader.readAsDataURL(file);
+      }
+  };
+
+  const handleClearForm = () => {
+      setResult(null);
+      setError(null);
+      setInput('');
+      setAdFormData({
+          productName: '',
+          price: '',
+          details: '',
+          image: null
+      });
+  };
+
   const handleGenerate = async () => {
-    if (!input || isModuleLocked) return;
+    // Validação básica
+    if (activeModule === 'generator') {
+        if (!adFormData.productName) { setError("Por favor, informe o nome do produto."); return; }
+    } else {
+        if (!input && !isModuleLocked) return;
+    }
+
+    if(isModuleLocked) return;
+
     setIsGenerating(true);
     setResult(null);
     setError(null);
 
-    // Mobile scroll to result
     if (window.innerWidth < 1024) {
         setTimeout(() => document.getElementById('result-area')?.scrollIntoView({ behavior: 'smooth' }), 100);
     }
@@ -357,10 +458,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
         
         switch (activeModule) {
             case 'generator':
-                prompt = `Atue como Copywriter Brasileiro Especialista em ${platform}. Crie 1 variação de anúncio para: "${input}". 
+                // MONTA O PROMPT COM OS DADOS ESTRUTURADOS
+                const adContext = `
+                    Produto: ${adFormData.productName}
+                    Preço: ${adFormData.price || 'Não informado'}
+                    Detalhes/Benefícios: ${adFormData.details}
+                `;
+
+                prompt = `Atue como Copywriter Brasileiro Especialista em ${platform}. Crie 1 variação de anúncio baseada nestes dados:
+                ${adContext}
+                
                 Se for Marketplace (Shopee/Mercado Livre), foque em SEO e Preço. Se for Social (Insta/Face), foque em Emoção e CTA.
-                Retorne JSON: { "title": "...", "body": "...", "price": "...", "cta": "...", "tags": "..." }`;
+                Retorne JSON EXATAMENTE assim: { "title": "...", "body": "...", "price": "${adFormData.price || '97,90'}", "cta": "...", "tags": "..." }`;
                 break;
+
             case 'video_script':
                 prompt = `Roteiro viral de TikTok (${videoDuration}) para: "${input}". 
                 Retorne JSON: { "hook_visual": "...", "hook_audio": "...", "scenes": [{"seconds": "...", "visual": "...", "audio": "..."}] }`;
@@ -642,8 +753,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                   
                   {/* --- INPUT PANEL --- */}
                   <div className="w-full lg:w-[380px] bg-slate-950 border-r border-slate-800 flex flex-col h-auto lg:h-full z-20 shadow-2xl overflow-y-auto custom-scrollbar">
-                        <div className="p-6 sticky top-0 bg-slate-950 z-10 border-b border-slate-800/50">
-                            <button onClick={() => setActiveModule('home')} className="lg:hidden mb-4 flex items-center gap-1 text-xs text-slate-500"><ChevronRight className="rotate-180 w-3 h-3"/> Voltar</button>
+                        <div className="p-6 sticky top-0 bg-slate-950 z-10 border-b border-slate-800/50 flex flex-col gap-4">
+                            <div className="flex items-center justify-between">
+                                <button onClick={() => setActiveModule('home')} className="lg:hidden flex items-center gap-1 text-xs text-slate-500"><ChevronRight className="rotate-180 w-3 h-3"/> Voltar</button>
+                                <button onClick={handleClearForm} className="text-xs flex items-center gap-1 text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-900 border border-slate-800 hover:bg-slate-800 transition-colors ml-auto" title="Limpar Campos e Começar Novo">
+                                    <Eraser className="w-3 h-3" /> Limpar
+                                </button>
+                            </div>
+                            
                             <div className="flex items-center gap-3">
                                 <div className={`p-2 rounded-lg bg-slate-900 border border-slate-800`}>
                                     {React.createElement(MODULES[activeModule].icon, { className: `w-5 h-5 ${MODULES[activeModule].color}` })}
@@ -655,39 +772,95 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                             </div>
                         </div>
 
-                        <div className="p-6 space-y-6 flex-1">
+                        <div className="p-6 space-y-6 flex-1 relative">
                             {isModuleLocked && (
-                                <div className="p-4 bg-yellow-900/10 border border-yellow-500/20 rounded-xl flex flex-col items-center text-center">
-                                    <Lock className="w-6 h-6 text-yellow-500 mb-2" />
-                                    <h3 className="text-sm font-bold text-white">Recurso Premium</h3>
-                                    <button onClick={handleUpgradeClick} className="mt-3 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg text-xs font-bold text-white shadow-lg">Liberar Acesso</button>
+                                <div className="absolute inset-0 z-50 backdrop-blur-[4px] bg-slate-950/60 flex flex-col items-center justify-center p-6 text-center animate-in fade-in rounded-xl">
+                                    <div className="bg-slate-900/80 p-6 rounded-2xl border border-white/10 shadow-2xl">
+                                        <Lock className="w-8 h-8 text-yellow-500 mb-3 mx-auto" />
+                                        <h3 className="text-base font-bold text-white mb-1">Recurso Premium</h3>
+                                        <p className="text-xs text-slate-400 mb-4">Atualize para o plano PRO para desbloquear.</p>
+                                        <button onClick={handleUpgradeClick} className="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg text-xs font-bold text-white shadow-lg">Liberar Acesso</button>
+                                    </div>
                                 </div>
                             )}
 
-                            <div>
-                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">Entrada de Dados</label>
-                                <textarea 
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    placeholder={MODULES[activeModule].placeholder || "Descreva o que você precisa..."}
-                                    disabled={isModuleLocked}
-                                    className="w-full h-40 bg-slate-900 border border-slate-800 rounded-xl p-4 text-sm text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 outline-none resize-none transition-all placeholder:text-slate-600"
-                                />
-                            </div>
+                            {/* --- FORMULÁRIO ESPECÍFICO DO GERADOR DE ANÚNCIOS --- */}
+                            {activeModule === 'generator' ? (
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5"><Tag className="w-3 h-3"/> Nome do Produto</label>
+                                        <input 
+                                            type="text"
+                                            value={adFormData.productName}
+                                            onChange={(e) => setAdFormData({...adFormData, productName: e.target.value})}
+                                            placeholder="Ex: Fone Bluetooth Pro..."
+                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white focus:border-purple-500 outline-none transition-colors"
+                                        />
+                                    </div>
 
-                            {activeModule === 'generator' && (
-                                <CustomSelect label="Plataforma" value={platform} onChange={setPlatform} options={['Facebook', 'Instagram', 'Shopee', 'Mercado Livre', 'TikTok']} />
-                            )}
-                            
-                            {activeModule === 'video_script' && (
-                                <CustomSelect label="Duração" value={videoDuration} onChange={setVideoDuration} options={['15s', '30s', '60s']} />
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5"><DollarSign className="w-3 h-3"/> Preço (Opcional)</label>
+                                        <input 
+                                            type="text"
+                                            value={adFormData.price}
+                                            onChange={(e) => setAdFormData({...adFormData, price: e.target.value})}
+                                            placeholder="Ex: 97,90"
+                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white focus:border-purple-500 outline-none transition-colors"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 justify-between">
+                                            <span className="flex items-center gap-1.5"><ImageIcon className="w-3 h-3"/> Foto do Produto (Para Simulação)</span>
+                                            {adFormData.image && <span className="text-[9px] text-green-400 bg-green-900/20 px-1.5 rounded">Imagem OK</span>}
+                                        </label>
+                                        <div 
+                                            onClick={() => fileInputRef.current?.click()}
+                                            className="w-full h-20 border border-dashed border-slate-700 hover:border-purple-500/50 hover:bg-slate-900/50 rounded-lg flex items-center justify-center cursor-pointer transition-all gap-2"
+                                        >
+                                            <Upload className="w-4 h-4 text-slate-500" />
+                                            <span className="text-xs text-slate-500">Clique para enviar foto</span>
+                                        </div>
+                                        <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5"><Text className="w-3 h-3"/> Detalhes / Benefícios</label>
+                                        <textarea 
+                                            value={adFormData.details}
+                                            onChange={(e) => setAdFormData({...adFormData, details: e.target.value})}
+                                            placeholder="Descreva o produto, benefícios, dores que resolve..."
+                                            className="w-full h-24 bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-white focus:border-purple-500 outline-none resize-none transition-colors"
+                                        />
+                                    </div>
+                                    
+                                    <CustomSelect label="Plataforma" value={platform} onChange={setPlatform} options={['Facebook', 'Instagram', 'Shopee', 'Mercado Livre', 'TikTok']} />
+                                </div>
+                            ) : (
+                                /* --- FORMULÁRIO GENÉRICO PARA OUTROS MÓDULOS --- */
+                                <>
+                                    <div>
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">Entrada de Dados</label>
+                                        <textarea 
+                                            value={input}
+                                            onChange={(e) => setInput(e.target.value)}
+                                            placeholder={MODULES[activeModule].placeholder || "Descreva o que você precisa..."}
+                                            disabled={isModuleLocked}
+                                            className="w-full h-40 bg-slate-900 border border-slate-800 rounded-xl p-4 text-sm text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 outline-none resize-none transition-all placeholder:text-slate-600"
+                                        />
+                                    </div>
+                                    
+                                    {activeModule === 'video_script' && (
+                                        <CustomSelect label="Duração" value={videoDuration} onChange={setVideoDuration} options={['15s', '30s', '60s']} />
+                                    )}
+                                </>
                             )}
                         </div>
 
                         <div className="p-6 bg-slate-900/30 border-t border-slate-800 mt-auto">
                             <button 
                                 onClick={handleGenerate}
-                                disabled={isGenerating || !input || isModuleLocked}
+                                disabled={isGenerating || isModuleLocked}
                                 className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-purple-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 flex items-center justify-center gap-2"
                             >
                                 {isGenerating ? <Loader2 className="animate-spin w-5 h-5"/> : <Wand2 className="w-5 h-5"/>}
@@ -706,14 +879,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                              {!result && !isGenerating && (
                                  <div className="my-auto text-center opacity-30 flex flex-col items-center animate-in zoom-in-95 duration-700">
                                      <LayoutTemplate className="w-16 h-16 text-white mb-4" />
-                                     <p className="text-white font-medium">Aguardando instruções...</p>
+                                     <p className="text-white font-medium">Preencha os dados e gere sua copy.</p>
                                  </div>
                              )}
 
                              {isGenerating && (
                                  <div className="my-auto text-center">
                                      <div className="w-16 h-16 border-4 border-white/10 border-t-purple-500 rounded-full animate-spin mb-4 mx-auto"></div>
-                                     <p className="text-purple-300 text-sm font-bold animate-pulse">Consultando IA...</p>
+                                     <p className="text-purple-300 text-sm font-bold animate-pulse">IA Escrevendo...</p>
                                  </div>
                              )}
 
@@ -728,7 +901,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                          </button>
                                      </div>
                                      
-                                     {activeModule === 'generator' && platform === 'Facebook' ? <FacebookPreview data={result} /> : renderGenericResult(result)}
+                                     {/* SE FOR GENERATOR, USA A PREVIEW COM A IMAGEM DO USUÁRIO SE TIVER */}
+                                     {activeModule === 'generator' ? (
+                                         platform === 'Instagram' ? (
+                                            <InstagramPreview data={result} userImage={adFormData.image} />
+                                         ) : (
+                                            <FacebookPreview data={result} userImage={adFormData.image} />
+                                         )
+                                     ) : (
+                                         renderGenericResult(result)
+                                     )}
                                  </div>
                              )}
                         </div>
