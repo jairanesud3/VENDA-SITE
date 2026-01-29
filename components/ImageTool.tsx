@@ -43,15 +43,23 @@ const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setA
       </button>
 
       {isOpen && (
-        <div className="absolute top-12 right-0 w-[280px] bg-[#0f0f11] border border-slate-700 rounded-xl shadow-2xl p-3 animate-in fade-in zoom-in-95 duration-200">
-          <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 px-1">
-            Selecionar Ambiente
+        <div className="absolute top-12 right-0 w-[280px] bg-[#0f0f11] border border-slate-700 rounded-xl shadow-2xl p-4 animate-in fade-in zoom-in-95 duration-200">
+           <div className="flex justify-between items-center mb-3 px-1">
+            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              Selecionar Ambiente
+            </div>
+            <button 
+                onClick={() => setIsOpen(false)}
+                className="text-slate-500 hover:text-white p-1 rounded-md hover:bg-white/10 transition-colors"
+            >
+                <X className="w-3 h-3" />
+            </button>
           </div>
           <div className="grid grid-cols-4 gap-2">
             {BACKGROUNDS.map((bg) => (
               <button
                 key={bg.id}
-                onClick={() => { setActiveTheme(bg); setIsOpen(false); }}
+                onClick={() => setActiveTheme(bg)}
                 className={`
                   relative group aspect-square rounded-lg flex flex-col items-center justify-center transition-all
                   ${activeTheme.id === bg.id 
