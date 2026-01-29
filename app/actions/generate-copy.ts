@@ -5,7 +5,15 @@ import { createClient } from "@/utils/supabase/server";
 import { checkRateLimit } from "@/utils/rate-limit";
 
 // Módulos que EXIGEM pagamento (Server-Side Enforced)
-const PREMIUM_MODULES = ['video_script', 'studio', 'persona'];
+// Adicionados novos módulos premium: email_marketing, blog_post, persona
+const PREMIUM_MODULES = [
+    'video_script', 
+    'studio', 
+    'persona', 
+    'email_marketing', 
+    'blog_post', 
+    'headline_optimizer'
+];
 
 export async function generateCopy(prompt: string, moduleId?: string) {
   // --- CAMADA 1: CONEXÃO SEGURA ---
