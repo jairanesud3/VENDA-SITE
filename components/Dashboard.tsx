@@ -12,7 +12,8 @@ import {
   Mail, UserPlus, FileEdit, Shield, Type,
   ChevronDown, Upload, Eraser, DollarSign, Tag, Text,
   Clock, HelpCircle, Briefcase, GraduationCap, Globe, Heart,
-  Save, Smile, AlertTriangle, Music2, Share2, MessageCircle, MapPin, Star
+  Save, Smile, AlertTriangle, Music2, Share2, MessageCircle, MapPin, Star,
+  Linkedin, Youtube, Facebook, Instagram, ShoppingBag, ShoppingCart
 } from 'lucide-react';
 import { generateCopy } from '@/app/actions/generate-copy';
 import { getUserHistory, deleteHistoryItem } from '@/app/actions/history';
@@ -587,6 +588,18 @@ const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setA
   );
 };
 
+// Lista de Plataformas para as Abas de Visualização
+const PLATFORM_TABS = [
+    { id: 'instagram', label: 'Instagram', icon: Instagram, color: 'text-pink-500' },
+    { id: 'facebook', label: 'Facebook', icon: Facebook, color: 'text-blue-500' },
+    { id: 'tiktok', label: 'TikTok', icon: Music2, color: 'text-cyan-400' },
+    { id: 'google', label: 'Google', icon: Search, color: 'text-blue-400' },
+    { id: 'shopee', label: 'Shopee', icon: ShoppingBag, color: 'text-orange-500' },
+    { id: 'mercadolivre', label: 'Mercado Livre', icon: ShoppingCart, color: 'text-yellow-400' },
+    { id: 'olx', label: 'OLX', icon: MapPin, color: 'text-purple-400' },
+    { id: 'amazon', label: 'Amazon', icon: ShoppingCart, color: 'text-yellow-600' }
+];
+
 export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => {
   const [activeModule, setActiveModule] = useState<ModuleId>('home');
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -615,6 +628,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [showClearModal, setShowClearModal] = useState(false);
+
+  // NOVO: Estado para alternar visualização de plataforma
+  const [previewPlatform, setPreviewPlatform] = useState<string>('instagram');
 
   // --- Helper para pegar dados do módulo atual ---
   const dynamicFormData = formDataByModule[activeModule] || {};
@@ -719,7 +735,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const handleGenerate = async () => {
     if(isModuleLocked) return;
 
-    // Validação Relaxada: Deixa passar se for studio ou se tiver pelo menos 1 campo preenchido (exceto imagem)
+    // Validação Relaxada
     const fields = Object.values(dynamicFormData);
     if (activeModule !== 'studio' && activeModule !== 'settings' && activeModule !== 'history') {
          if (fields.length === 0 || fields.every(f => !String(f).trim())) {
@@ -745,26 +761,31 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
 
         switch (activeModule) {
             case 'generator':
-                // REGRAS ESPECÍFICAS DE PLATAFORMA
-                const platform = data.platform || 'Facebook';
-                let platformRules = "";
-                
-                if (platform === 'OLX' || platform === 'Google Ads') {
-                    platformRules = "REGRA CRÍTICA: NÃO use emojis no título. Seja direto e informativo.";
-                } else if (platform === 'TikTok Ads') {
-                    platformRules = "Estilo: Viral, dinâmico, gírias da internet aceitas, uso intensivo de emojis.";
-                } else if (platform === 'LinkedIn Ads') {
-                    platformRules = "Estilo: Profissional, B2B, focado em solução de problemas corporativos.";
-                }
-
-                prompt = `Atue como um Copywriter Sênior Agressivo e Especialista em ${platform}. ${antiMarkdown}
-                ${platformRules}
-                Crie 1 anúncio de alta conversão para:
+                // PROMPT MEGA INTELIGENTE MULTI-PLATAFORMA
+                prompt = `Atue como um Especialista em Tráfego Pago e Copywriting Sênior. ${antiMarkdown}
                 Produto: ${data.productName}
                 Preço: ${data.price || 'Não informado'}
-                Público: ${data.audience || 'Geral'}
-                Oferta: ${data.offer || 'Normal'}
-                Retorne JSON: { "title": "...", "body": "...", "price": "${data.price || '99,90'}", "cta": "...", "tags": "..." }`;
+                
+                Gere anúncios OTIMIZADOS para CADA uma das seguintes plataformas. Respeite o tom de voz e regras de cada uma:
+                
+                1. Facebook/Instagram: Estilo AIDA, foco em desejo.
+                2. TikTok: Viral, gírias da internet, uso de emojis, texto curto.
+                3. Google Ads: Formal, direto, sem emojis no título, foco em urgência.
+                4. Shopee/Mercado Livre: Foco em benefícios, frete grátis, prova social.
+                5. OLX: Direto, informativo, sem emojis no título, foco em negociação local.
+                6. Amazon: Profissional, focado em features e review.
+
+                Retorne um ÚNICO JSON com a seguinte estrutura EXATA (preencha os valores):
+                {
+                  "instagram": { "headline": "...", "body": "...", "cta": "...", "price": "${data.price}" },
+                  "facebook": { "headline": "...", "body": "...", "cta": "...", "price": "${data.price}" },
+                  "tiktok": { "description": "...", "cta": "...", "price": "${data.price}" },
+                  "google": { "headline": "...", "description": "...", "price": "${data.price}" },
+                  "shopee": { "title": "...", "description": "...", "price": "${data.price}" },
+                  "mercadolivre": { "title": "...", "headline": "...", "price": "${data.price}" },
+                  "olx": { "title": "...", "body": "...", "price": "${data.price}" },
+                  "amazon": { "headline": "...", "title": "...", "price": "${data.price}" }
+                }`;
                 break;
 
             case 'video_script':
@@ -888,28 +909,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                         <label className="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1">Nome do Produto</label>
                         <input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none transition-all placeholder:text-slate-600" placeholder="Ex: Corretor de Postura" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} />
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-bold text-slate-500 uppercase">Preço (R$)</label>
-                            <input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none transition-all placeholder:text-slate-600" placeholder="97,90" value={dynamicFormData.price || ''} onChange={e => handleInputChange('price', e.target.value)} />
-                        </div>
-                         <div className="space-y-2">
-                             <label className="text-[10px] font-bold text-slate-500 uppercase">Plataforma</label>
-                             <select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none transition-all" value={dynamicFormData.platform || 'Facebook'} onChange={e => handleInputChange('platform', e.target.value)}>
-                                 <option value="Facebook">Facebook Ads</option>
-                                 <option value="Instagram">Instagram Ads</option>
-                                 <option value="TikTok">TikTok Ads</option>
-                                 <option value="Shopee">Shopee</option>
-                                 <option value="Amazon">Amazon</option>
-                                 <option value="Mercado Livre">Mercado Livre</option>
-                                 <option value="OLX">OLX</option>
-                                 <option value="Google Ads">Google Ads (Search)</option>
-                                 <option value="Pinterest">Pinterest Ads</option>
-                                 <option value="YouTube">YouTube Shorts</option>
-                                 <option value="LinkedIn">LinkedIn Ads</option>
-                                 <option value="Twitter">X (Twitter) Ads</option>
-                             </select>
-                        </div>
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase">Preço (R$)</label>
+                        <input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none transition-all placeholder:text-slate-600" placeholder="97,90" value={dynamicFormData.price || ''} onChange={e => handleInputChange('price', e.target.value)} />
+                    </div>
+                    {/* SELETOR DE PLATAFORMA REMOVIDO - AGORA É MULTI-PLATAFORMA AUTOMÁTICO */}
+                    <div className="p-3 bg-purple-900/20 border border-purple-500/20 rounded-lg">
+                        <p className="text-[10px] text-purple-300 font-medium flex items-center gap-2">
+                            <Sparkles className="w-3 h-3" />
+                            Gera para todas as redes de uma vez!
+                        </p>
                     </div>
                     <div className="space-y-2">
                         <label className="text-[10px] font-bold text-slate-500 uppercase flex justify-between">
@@ -1134,15 +1143,37 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   );
 
   const renderAdPreview = (data: any, platform: string, userImage: string | null) => {
+      // SE o result for multi-plataforma (Generator), pegamos os dados especificos da chave
+      // Se for outro módulo (que retorna estrutura genérica), não tentamos acessar a chave
+      let platformData = data;
+      
+      if (activeModule === 'generator' && data && typeof data === 'object') {
+          // Mapeia o ID da aba para a chave no JSON retornado pela IA
+          const keyMap: Record<string, string> = {
+              'instagram': 'instagram',
+              'facebook': 'facebook',
+              'tiktok': 'tiktok',
+              'google': 'google',
+              'shopee': 'shopee',
+              'mercadolivre': 'mercadolivre',
+              'olx': 'olx',
+              'amazon': 'amazon'
+          };
+          
+          const dataKey = keyMap[platform] || 'facebook';
+          // Fallback: se a chave nao existir, usa o data inteiro (caso de erro na estrutura) ou objeto vazio
+          platformData = data[dataKey] || data['facebook'] || data; 
+      }
+
       switch (platform) {
-          case 'Instagram Ads': return <InstagramPreview data={data} userImage={userImage} />;
-          case 'TikTok Ads': return <TikTokPreview data={data} userImage={userImage} />;
-          case 'Shopee': return <ShopeePreview data={data} userImage={userImage} />;
-          case 'Amazon': return <AmazonPreview data={data} userImage={userImage} />;
-          case 'Mercado Livre': return <MercadoLivrePreview data={data} userImage={userImage} />;
-          case 'OLX': return <OLXPreview data={data} userImage={userImage} />;
-          case 'Google Ads': return <GoogleAdsPreview data={data} />;
-          default: return <FacebookPreview data={data} userImage={userImage} />;
+          case 'instagram': return <InstagramPreview data={platformData} userImage={userImage} />;
+          case 'tiktok': return <TikTokPreview data={platformData} userImage={userImage} />;
+          case 'shopee': return <ShopeePreview data={platformData} userImage={userImage} />;
+          case 'amazon': return <AmazonPreview data={platformData} userImage={userImage} />;
+          case 'mercadolivre': return <MercadoLivrePreview data={platformData} userImage={userImage} />;
+          case 'olx': return <OLXPreview data={platformData} userImage={userImage} />;
+          case 'google': return <GoogleAdsPreview data={platformData} />;
+          default: return <FacebookPreview data={platformData} userImage={userImage} />;
       }
   };
 
@@ -1532,9 +1563,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                                              <Copy className="w-3 h-3" /> Copiar JSON
                                          </button>
                                      </div>
+
+                                     {/* NOVO: SELETOR DE PLATAFORMA (ABAS) APENAS PARA GENERATOR */}
+                                     {activeModule === 'generator' && (
+                                         <div className="mb-6 flex gap-2 overflow-x-auto custom-scrollbar pb-2">
+                                             {PLATFORM_TABS.map(tab => (
+                                                 <button
+                                                     key={tab.id}
+                                                     onClick={() => setPreviewPlatform(tab.id)}
+                                                     className={`
+                                                         flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all border
+                                                         ${previewPlatform === tab.id 
+                                                             ? `bg-white text-black border-white shadow-lg shadow-white/10 scale-105` 
+                                                             : `bg-slate-900/50 text-slate-400 border-slate-700 hover:bg-slate-800 hover:text-white`}
+                                                     `}
+                                                 >
+                                                     <tab.icon className={`w-3.5 h-3.5 ${previewPlatform === tab.id ? 'text-black' : tab.color}`} />
+                                                     {tab.label}
+                                                 </button>
+                                             ))}
+                                         </div>
+                                     )}
                                      
                                      {activeModule === 'generator' ? (
-                                         renderAdPreview(result, dynamicFormData.platform, adImage)
+                                         renderAdPreview(result, previewPlatform, adImage)
                                      ) : (
                                          renderGenericResult(result)
                                      )}
