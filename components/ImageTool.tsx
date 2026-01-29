@@ -13,6 +13,56 @@ interface ImageToolProps {
   setActiveTheme: (theme: any) => void;
 }
 
+// Helper para comprimir imagem no browser (Sem libs externas pesadas)
+const compressImage = (file: File): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        
+        // Redimensionar para max 1024px (suficiente para IA)
+        const MAX_SIZE = 1024;
+        if (width > height) {
+          if (width > MAX_SIZE) {
+            height *= MAX_SIZE / width;
+            width = MAX_SIZE;
+          }
+        } else {
+          if (height > MAX_SIZE) {
+            width *= MAX_SIZE / height;
+            height = MAX_SIZE;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return reject(new Error("Canvas context falhou"));
+        
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Exportar como JPEG com 70% de qualidade
+        canvas.toBlob((blob) => {
+          if (!blob) return reject(new Error("Falha na compressão"));
+          const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
+            type: 'image/jpeg',
+            lastModified: Date.now(),
+          });
+          resolve(compressedFile);
+        }, 'image/jpeg', 0.7);
+      };
+      img.onerror = (error) => reject(error);
+    };
+    reader.onerror = (error) => reject(error);
+  });
+};
+
 // Replicando o Seletor Grid aqui para manter funcionalidade isolada visualmente mas com estado global
 const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setActiveTheme: (t: any) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -86,6 +136,7 @@ const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setA
 export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade, activeTheme, setActiveTheme }) => {
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false); // Novo estado
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   
@@ -96,20 +147,30 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade, activ
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 9 * 1024 * 1024) { 
-        setError("A imagem deve ter no máximo 9MB.");
-        return;
+      setIsCompressing(true);
+      setError(null);
+      
+      try {
+        // Preview Imediato (antes de comprimir, para UX rápida)
+        const objectUrl = URL.createObjectURL(file);
+        setReferenceImagePreview(objectUrl);
+
+        // Compressão
+        console.log(`Original: ${(file.size / 1024 / 1024).toFixed(2)} MB`);
+        const compressed = await compressImage(file);
+        console.log(`Comprimido: ${(compressed.size / 1024 / 1024).toFixed(2)} MB`);
+        
+        setSelectedFile(compressed);
+      } catch (err) {
+        console.error(err);
+        setError("Erro ao processar imagem. Tente outra.");
+        setReferenceImagePreview(null);
+      } finally {
+        setIsCompressing(false);
       }
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setReferenceImagePreview(reader.result as string);
-        setError(null);
-      };
-      reader.readAsDataURL(file);
     }
   };
 
@@ -141,7 +202,11 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade, activ
       setImageUrl(url);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Falha ao gerar imagem.");
+      if (err.message.includes("Payload")) {
+         setError("Imagem ainda muito grande. Tente uma menor.");
+      } else {
+         setError(err.message || "Falha ao gerar imagem.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -170,31 +235,33 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade, activ
           <div>
             <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block flex justify-between">
               <span>1. Foto do Produto (Opcional)</span>
-              {referenceImagePreview && <span className="text-green-400">Imagem carregada</span>}
+              {isCompressing && <span className="text-orange-400 animate-pulse text-[10px]">Otimizando...</span>}
+              {!isCompressing && referenceImagePreview && <span className="text-green-400 text-[10px]">Pronto para envio</span>}
             </label>
             
             {!referenceImagePreview ? (
                 <div 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full h-32 border-2 border-dashed border-slate-700 hover:border-orange-500/50 hover:bg-slate-900/50 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all group"
+                    onClick={() => !isCompressing && fileInputRef.current?.click()}
+                    className={`w-full h-32 border-2 border-dashed border-slate-700 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all group ${isCompressing ? 'opacity-50 cursor-not-allowed' : 'hover:border-orange-500/50 hover:bg-slate-900/50'}`}
                 >
                     <div className="p-3 bg-slate-900 rounded-full mb-2 group-hover:scale-110 transition-transform">
-                        <Upload className="w-5 h-5 text-slate-400 group-hover:text-orange-400" />
+                        {isCompressing ? <Loader2 className="w-5 h-5 text-orange-400 animate-spin"/> : <Upload className="w-5 h-5 text-slate-400 group-hover:text-orange-400" />}
                     </div>
-                    <span className="text-xs text-slate-400 group-hover:text-white font-medium">Clique para enviar foto</span>
-                    <span className="text-[10px] text-slate-600 mt-1">PNG ou JPG (Max 9MB)</span>
+                    <span className="text-xs text-slate-400 group-hover:text-white font-medium">{isCompressing ? 'Processando imagem...' : 'Clique para enviar foto'}</span>
+                    <span className="text-[10px] text-slate-600 mt-1">Otimização automática ativada</span>
                 </div>
             ) : (
                 <div className="relative w-full h-32 rounded-xl overflow-hidden border border-slate-700 group">
-                    <img src={referenceImagePreview} alt="Referência" className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" />
+                    <img src={referenceImagePreview} alt="Referência" className={`w-full h-full object-cover transition-opacity ${isCompressing ? 'opacity-50 grayscale' : 'opacity-70 group-hover:opacity-100'}`} />
                     <button 
                         onClick={handleRemoveImage}
-                        className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500/80 text-white rounded-full transition-colors backdrop-blur-sm"
+                        disabled={isCompressing || isLoading}
+                        className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500/80 text-white rounded-full transition-colors backdrop-blur-sm disabled:opacity-0"
                     >
                         <X className="w-4 h-4" />
                     </button>
                     <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent text-[10px] text-white font-bold text-center">
-                        Usando como referência
+                        {isCompressing ? 'Comprimindo para upload...' : 'Referência Otimizada'}
                     </div>
                 </div>
             )}
@@ -233,7 +300,7 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade, activ
 
           <Button
             onClick={handleGenerate}
-            disabled={isLoading || !prompt}
+            disabled={isLoading || isCompressing || !prompt}
             className="w-full py-6 text-sm font-bold bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 shadow-lg shadow-orange-900/20"
           >
             {isLoading ? (
@@ -254,7 +321,7 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade, activ
       {/* RIGHT PANEL: PREVIEW */}
       <div className={`flex-1 relative flex items-center justify-center p-8 overflow-hidden transition-all duration-700 ease-in-out ${activeTheme.class}`}>
          
-         {/* THEME SELECTOR GRID (Novo, fixo e sem bugs) */}
+         {/* THEME SELECTOR GRID */}
          <div className="absolute top-4 right-4 z-50">
             <ThemeSelector activeTheme={activeTheme} setActiveTheme={setActiveTheme} />
          </div>
