@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
 // Configuração de Rota para Vercel (Timeout aumentado para 60s)
+// Isso permite que a geração de imagens (que é lenta) não dê timeout
 export const maxDuration = 60;
 
 export default function DashboardPage() {
