@@ -4,7 +4,6 @@ import { GoogleGenAI } from "@google/genai";
 import { createClient } from "@/utils/supabase/server";
 import { checkRateLimit } from "@/utils/rate-limit";
 
-// Módulos que EXIGEM pagamento (Server-Side Enforced)
 const PREMIUM_MODULES = [
     'video_script', 
     'studio', 
@@ -14,106 +13,88 @@ const PREMIUM_MODULES = [
     'headline_optimizer'
 ];
 
-export async function generateCopy(prompt: string, moduleId?: string) {
-  // --- CAMADA 1: CONEXÃO SEGURA ---
+// Mapeamento de instruções específicas por plataforma
+const PLATFORM_PROMPTS: Record<string, string> = {
+    facebook: '"facebook": { "headline": "Título chamativo (max 40 chars)", "body": "Texto persuasivo com emojis (AIDA)", "cta": "Botão (ex: Saiba Mais)" }',
+    instagram: '"instagram": { "headline": "Primeira linha (Gancho)", "body": "Legenda engajadora com hashtags", "cta": "Chamada para Bio/Direct" }',
+    tiktok: '"tiktok": { "description": "Legenda curta viral (max 150 chars)", "cta": "CTA rápido" }',
+    shopee: '"shopee": { "title": "Título SEO (Palavras-chave)", "description": "Descrição técnica e benefícios", "price": "Preço sugerido atraente" }',
+    mercadolivre: '"mercadolivre": { "title": "Título Técnico (Max 60 chars)", "headline": "Frase de destaque", "price": "Preço competitivo" }',
+    olx: '"olx": { "title": "Título direto (O que é)", "body": "Descrição detalhada do estado/uso", "price": "Preço para negociação" }',
+    amazon: '"amazon": { "headline": "Título Longo SEO", "title": "Bullets de benefícios", "price": "Preço psicológico" }',
+    pinterest: '"pinterest": { "title": "Título Inspiracional", "description": "Descrição com keywords" }',
+    linkedin: '"linkedin": { "headline": "Título Profissional", "body": "Texto B2B formal" }',
+    twitter: '"twitter": { "text": "Tweet curto e polêmico/viral (max 280 chars)" }',
+    youtube: '"youtube": { "title": "Título Clickbait (Alta conversão)", "description": "Descrição para SEO e Links" }'
+};
+
+export async function generateCopy(prompt: string, moduleId?: string, selectedPlatforms: string[] = []) {
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  if (authError || !user) {
-    console.error("Tentativa de acesso não autorizado detectada.");
-    throw new Error("⛔ Acesso Negado: Sessão inválida ou expirada.");
-  }
+  if (authError || !user) throw new Error("⛔ Acesso Negado: Sessão inválida.");
+  if (!checkRateLimit(user.id)) throw new Error("⏳ Calma aí! Aguarde 1 minuto.");
 
-  // --- CAMADA 2: RATE LIMITING (Anti-Abuso) ---
-  const isAllowed = checkRateLimit(user.id);
-  if (!isAllowed) {
-    throw new Error("⏳ Calma aí! Você fez muitas requisições. Aguarde 1 minuto.");
-  }
-
-  // --- CAMADA 3: VERIFICAÇÃO DE PLANO (Database Truth) ---
   const userPlan = user.user_metadata?.plan || 'free'; 
-
-  if (moduleId && PREMIUM_MODULES.includes(moduleId)) {
-    if (userPlan !== 'pro') {
-      throw new Error("🔒 BLOQUEADO: Este recurso exige o Plano PRO. O servidor recusou sua solicitação.");
-    }
+  if (moduleId && PREMIUM_MODULES.includes(moduleId) && userPlan !== 'pro') {
+    throw new Error("🔒 BLOQUEADO: Recurso PRO.");
   }
 
-  // --- CAMADA 4: SEGURANÇA DA API KEY ---
   const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error("Erro de Configuração do Servidor (API Key ausente).");
-  }
+  if (!apiKey) throw new Error("Erro de API Key.");
 
   const ai = new GoogleGenAI({ apiKey });
 
   try {
     let finalPrompt = prompt;
 
-    // Se for o gerador de anúncios, injetamos o prompt MESTRE para todas as plataformas
+    // Lógica Dinâmica para Gerador de Anúncios
     if (moduleId === 'generator') {
-        const antiMarkdown = "IMPORTANTE: Retorne APENAS texto puro dentro dos valores JSON. NÃO use formatação markdown.";
+        // Se nenhuma plataforma for enviada (fallback), usa as 3 principais
+        const targets = selectedPlatforms.length > 0 ? selectedPlatforms : ['instagram', 'facebook', 'tiktok'];
         
-        // Extrai dados básicos do prompt original (que vem formatado como string)
-        // Isso é uma simplificação, idealmente o prompt já viria estruturado, mas aqui garantimos a injeção.
-        finalPrompt = `
-          ${prompt}
-          
-          ${antiMarkdown}
-          TAREFA: Gere variações de anúncio ALTAMENTE PERSUASIVAS para AS 12 PLATAFORMAS ABAIXO.
-          Adapte a linguagem (gírias, formalidade, emojis, tamanho) para cada rede.
+        // Constrói o schema JSON baseado APENAS nas selecionadas
+        const jsonSchemaParts = targets.map(p => PLATFORM_PROMPTS[p] || "").filter(Boolean);
+        const jsonSchema = `{ ${jsonSchemaParts.join(',\n')} }`;
 
-          Retorne um JSON ÚNICO com esta estrutura exata:
-          {
-            "facebook": { "headline": "...", "body": "...", "cta": "..." },
-            "instagram": { "headline": "...", "body": "...", "cta": "..." },
-            "tiktok": { "description": "...", "cta": "..." },
-            "google": { "headline": "...", "description": "..." },
-            "shopee": { "title": "...", "description": "..." },
-            "mercadolivre": { "title": "...", "headline": "..." },
-            "olx": { "title": "...", "body": "..." },
-            "amazon": { "headline": "...", "title": "..." },
-            "pinterest": { "title": "...", "description": "..." },
-            "linkedin": { "headline": "...", "body": "..." },
-            "twitter": { "text": "..." },
-            "youtube": { "title": "...", "description": "..." }
-          }
+        finalPrompt = `
+          ATUE COMO O MAIOR COPYWRITER DO MUNDO (Estilo Ogilvy/Schwartz).
+          Produto/Serviço: ${prompt}
+          
+          TAREFA: Crie anúncios ALTAMENTE PERSUASIVOS apenas para as plataformas abaixo.
+          Use gatilhos mentais (Escassez, Urgência, Autoridade).
+          Adapte a linguagem para cada rede (ex: TikTok = informal/gírias, LinkedIn = formal).
+
+          IMPORTANTE: Retorne APENAS um JSON válido. Sem markdown, sem explicações.
+          ESTRUTURA OBRIGATÓRIA DO JSON:
+          ${jsonSchema}
         `;
     }
 
     const response = await ai.models.generateContent({
       model: 'gemini-flash-lite-latest', 
       contents: finalPrompt,
-      config: {
-        responseMimeType: 'application/json'
-      }
+      config: { responseMimeType: 'application/json' }
     });
 
-    if (!response.text) throw new Error("A IA não retornou texto.");
-    
-    // --- CAMADA 5: SALVAR NO HISTÓRICO ---
-    try {
-        let resultToSave = response.text;
-        try {
-            const parsed = JSON.parse(response.text);
-            resultToSave = parsed;
-        } catch(e) {}
+    if (!response.text) throw new Error("A IA falhou ao gerar texto.");
 
+    // Salvar no histórico
+    try {
+        let resultToSave = JSON.parse(response.text);
         await supabase.from('user_history').insert({
             user_id: user.id,
             type: 'text',
             module: moduleId || 'generator',
-            prompt: prompt.substring(0, 200) + '...',
-            result: typeof resultToSave === 'object' ? resultToSave : { text: resultToSave }
+            prompt: prompt.substring(0, 100),
+            result: resultToSave
         });
-    } catch (dbError) {
-        console.error("Erro db:", dbError);
-    }
+    } catch(e) {}
 
     return response.text;
 
   } catch (error: any) {
-    console.error("Erro na Geração IA:", error);
-    throw new Error(`Erro no processamento da IA: ${error.message}`);
+    console.error("Erro IA:", error);
+    throw new Error(`Erro na IA: ${error.message}`);
   }
 }

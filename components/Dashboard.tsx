@@ -13,7 +13,8 @@ import {
   ChevronDown, Upload, Eraser, DollarSign, Tag, Text,
   Clock, HelpCircle, Briefcase, GraduationCap, Globe, Heart,
   Save, Smile, AlertTriangle, Music2, Share2, MessageCircle, MapPin, Star,
-  Linkedin, Youtube, Facebook, Instagram, ShoppingBag, ShoppingCart, Twitter, Smartphone, Laptop
+  Linkedin, Youtube, Facebook, Instagram, ShoppingBag, ShoppingCart, Twitter, Smartphone, Laptop,
+  Battery, Wifi, Signal, ThumbsUp
 } from 'lucide-react';
 import { generateCopy } from '@/app/actions/generate-copy';
 import { getUserHistory, deleteHistoryItem } from '@/app/actions/history';
@@ -26,7 +27,29 @@ interface DashboardProps {
   userEmail?: string | null;
 }
 
-// --- MODAL DE CONFIRMAÇÃO ---
+// --- CONFIGURAÇÃO GLOBAL ---
+const MAX_PLATFORMS = 3; // Limite de seleção
+
+const PLATFORM_TABS = [
+    { id: 'instagram', label: 'Instagram', icon: Instagram, color: 'text-pink-500', neon: 'shadow-[0_0_30px_rgba(236,72,153,0.3)] border-pink-500/30' },
+    { id: 'facebook', label: 'Facebook', icon: Facebook, color: 'text-blue-500', neon: 'shadow-[0_0_30px_rgba(59,130,246,0.3)] border-blue-500/30' },
+    { id: 'tiktok', label: 'TikTok', icon: Music2, color: 'text-cyan-400', neon: 'shadow-[0_0_30px_rgba(34,211,238,0.3)] border-cyan-400/30' },
+    { id: 'shopee', label: 'Shopee', icon: ShoppingBag, color: 'text-orange-500', neon: 'shadow-[0_0_30px_rgba(249,115,22,0.3)] border-orange-500/30' },
+    { id: 'mercadolivre', label: 'M. Livre', icon: ShoppingCart, color: 'text-yellow-400', neon: 'shadow-[0_0_30px_rgba(250,204,21,0.3)] border-yellow-400/30' },
+    { id: 'olx', label: 'OLX', icon: MapPin, color: 'text-purple-500', neon: 'shadow-[0_0_30px_rgba(168,85,247,0.3)] border-purple-500/30' }, // CORRIGIDO COR
+    { id: 'amazon', label: 'Amazon', icon: ShoppingCart, color: 'text-yellow-600', neon: 'shadow-[0_0_30px_rgba(202,138,4,0.3)] border-yellow-600/30' },
+    { id: 'pinterest', label: 'Pinterest', icon: PinIcon, color: 'text-red-500', neon: 'shadow-[0_0_30px_rgba(239,68,68,0.3)] border-red-500/30' },
+    { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: 'text-blue-700', neon: 'shadow-[0_0_30px_rgba(29,78,216,0.3)] border-blue-700/30' },
+    { id: 'twitter', label: 'Twitter', icon: Twitter, color: 'text-white', neon: 'shadow-[0_0_30px_rgba(255,255,255,0.2)] border-white/30' },
+    { id: 'youtube', label: 'YouTube', icon: Youtube, color: 'text-red-600', neon: 'shadow-[0_0_30px_rgba(220,38,38,0.3)] border-red-600/30' }
+];
+
+// Helper icon wrapper 
+function PinIcon(props: any) {
+    return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>; 
+}
+
+// --- MODAL & THEMES (Mantidos iguais) ---
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel }: { isOpen: boolean, title: string, message: string, onConfirm: () => void, onCancel: () => void }) => {
   if (!isOpen) return null;
   return (
@@ -46,7 +69,6 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel }: { isOpen:
   );
 };
 
-// --- BACKGROUNDS ---
 export const BACKGROUNDS = [
   { id: 'studio', name: 'Estúdio Dark', icon: Moon, class: 'bg-[#050505] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-800/20 via-[#050505] to-[#000000]' },
   { id: 'purple_haze', name: 'Roxo Profundo', icon: Zap, class: 'bg-[#0f0518] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/40 via-[#0f0518] to-black' },
@@ -56,10 +78,155 @@ export const BACKGROUNDS = [
   { id: 'clean_dark', name: 'Preto Puro', icon: Palette, class: 'bg-black' },
 ];
 
-// --- SIMULADORES DE ANÚNCIO (PREVIEWS) ---
+// --- COMPONENTE DE STATUS BAR (MOBILE REALISM) ---
+const MobileStatusBar = () => (
+    <div className="w-full h-6 bg-transparent flex justify-between items-center px-4 text-[10px] font-semibold select-none text-current opacity-80 mb-1">
+        <span>14:30</span>
+        <div className="flex items-center gap-1.5">
+            <Signal className="w-3 h-3" />
+            <Wifi className="w-3 h-3" />
+            <Battery className="w-4 h-4" />
+        </div>
+    </div>
+);
 
+// --- PREVIEWS REFATORADOS (100% REALISTAS) ---
+
+// 1. OLX (Híbrido: Mobile Vertical / PC Horizontal)
+const OLXPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => {
+    if (device === 'mobile') {
+        return (
+            <div className="bg-[#F4F5F7] text-[#4A4A4A] rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl mx-auto max-w-[320px] aspect-[9/18] relative flex flex-col">
+                <div className="bg-white text-slate-800 pt-2 pb-1"><MobileStatusBar /></div>
+                <div className="bg-[#6E0AD6] text-white p-3 flex justify-between items-center shadow-md z-10">
+                    <div className="flex gap-4"><Menu className="w-5 h-5"/> <span className="font-bold text-lg">OLX</span></div>
+                    <Search className="w-5 h-5"/>
+                </div>
+                <div className="flex-1 overflow-y-auto bg-white">
+                    <div className="relative aspect-[4/3] bg-slate-200">
+                         {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <div className="flex items-center justify-center h-full"><ImageIcon className="text-slate-300 w-10 h-10"/></div>}
+                         <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded">1/4</div>
+                    </div>
+                    <div className="p-4">
+                        <div className="flex justify-between items-start mb-2">
+                             <h3 className="text-base text-slate-800 font-normal leading-snug w-3/4">{data.title || "Título do Produto"}</h3>
+                             <Heart className="w-6 h-6 text-[#6E0AD6]"/>
+                        </div>
+                        <div className="text-2xl font-bold text-slate-900 mb-2">R$ {data.price || "00,00"}</div>
+                        <p className="text-xs text-slate-500 mb-4">Publicado em 12/10 às 14:30</p>
+                        
+                        <div className="border-t border-slate-100 py-4">
+                             <h4 className="font-bold text-sm mb-2 text-slate-900">Descrição</h4>
+                             <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{data.body || data.description}</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="p-3 bg-white border-t border-slate-200 flex gap-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+                    <button className="flex-1 bg-[#F28000] active:bg-[#d97300] text-white font-bold py-3 rounded-full text-sm">Chat</button>
+                    <button className="w-12 h-12 rounded-full border border-[#F28000] flex items-center justify-center text-[#F28000]"><Share2 className="w-5 h-5"/></button>
+                </div>
+            </div>
+        );
+    }
+    // Desktop Version
+    return (
+        <div className="bg-white text-[#4A4A4A] rounded-lg border border-slate-200 overflow-hidden font-sans shadow-xl mx-auto max-w-[700px] flex">
+             <div className="w-[55%] bg-slate-100 relative">
+                 {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <div className="h-full flex items-center justify-center"><ImageIcon className="w-16 h-16 text-slate-300"/></div>}
+                 <div className="absolute top-4 left-4 bg-[#6E0AD6] text-white text-xs font-bold px-2 py-1 rounded">Destaque</div>
+             </div>
+             <div className="w-[45%] p-6 flex flex-col">
+                 <div className="flex justify-between items-start mb-4">
+                      <h2 className="text-xl text-slate-800 font-light leading-snug">{data.title}</h2>
+                      <Heart className="w-6 h-6 text-slate-300 hover:text-[#6E0AD6] cursor-pointer"/>
+                 </div>
+                 <div className="text-3xl font-bold text-slate-900 mb-1">R$ {data.price}</div>
+                 <div className="text-xs text-slate-400 mb-6">Em 12x de R$ {(parseFloat((data.price || "0").replace('.','').replace(',','.'))/12).toFixed(2)} sem juros</div>
+                 
+                 <button className="w-full bg-[#F28000] hover:bg-[#d97300] text-white font-bold py-3 rounded-full mb-3 shadow-lg shadow-orange-200 transition-all">Chat</button>
+                 <div className="flex gap-2 mb-6">
+                    <button className="flex-1 border border-[#6E0AD6] text-[#6E0AD6] font-bold py-2 rounded-full text-sm hover:bg-purple-50">Ver telefone</button>
+                 </div>
+
+                 <div className="mt-auto">
+                    <h4 className="font-bold text-sm text-slate-900 mb-1">Localização</h4>
+                    <div className="text-xs text-slate-500 flex items-center gap-1"><MapPin className="w-3 h-3"/> São Paulo, Centro</div>
+                 </div>
+             </div>
+        </div>
+    );
+};
+
+// 2. Mercado Livre (Mobile vs Desktop)
+const MercadoLivrePreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => {
+    if (device === 'mobile') {
+        return (
+            <div className="bg-[#ebebeb] text-slate-900 rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl mx-auto max-w-[320px] aspect-[9/18] relative flex flex-col">
+                <div className="bg-[#FFE600] text-slate-800 pt-2 pb-1"><MobileStatusBar /></div>
+                <div className="bg-[#FFE600] p-2 flex items-center gap-2 shadow-sm z-10">
+                    <ArrowLeftIcon className="w-5 h-5 text-slate-700"/>
+                    <div className="flex-1 bg-white h-8 rounded-full flex items-center px-3 text-xs text-slate-400 gap-2"><Search className="w-3 h-3"/> Buscar no Mercado Livre</div>
+                    <ShoppingCart className="w-5 h-5 text-slate-700"/>
+                </div>
+                <div className="flex-1 overflow-y-auto bg-white">
+                    <div className="p-3">
+                        <span className="text-[10px] text-slate-400">Novo  |  +1000 vendidos</span>
+                        <h3 className="text-sm font-normal text-slate-900 leading-snug mt-1 mb-2">{data.title || data.headline}</h3>
+                        <div className="aspect-square bg-white flex items-center justify-center mb-4">
+                            {userImage ? <img src={userImage} className="max-w-full max-h-full object-contain" /> : <ImageIcon className="w-16 h-16 text-slate-200"/>}
+                        </div>
+                        <div className="text-2xl font-normal text-slate-900">R$ {data.price}</div>
+                        <div className="text-xs text-slate-500 mb-2">em 10x R$ {(parseFloat((data.price || "0").replace('.','').replace(',','.'))/10).toFixed(2)} sem juros</div>
+                        <div className="text-xs font-bold text-[#00A650] mb-1">Frete Grátis</div>
+                        <div className="text-xs text-slate-500">Saiba os prazos de entrega e as formas de envio.</div>
+                        
+                        <div className="mt-4 flex flex-col gap-2">
+                            <button className="w-full bg-[#3483FA] text-white font-bold py-3 rounded-lg text-sm">Comprar agora</button>
+                            <button className="w-full bg-[#E3EDFB] text-[#3483FA] font-bold py-3 rounded-lg text-sm">Adicionar ao carrinho</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    // Desktop
+    return (
+        <div className="bg-white text-slate-900 rounded-lg border border-slate-200 overflow-hidden font-sans shadow-lg mx-auto max-w-[800px] flex p-6">
+             <div className="w-[50%] flex gap-4">
+                 <div className="w-12 flex flex-col gap-2">
+                     {[1,2,3].map(i => <div key={i} className="w-12 h-12 border border-slate-300 rounded hover:border-[#3483FA] cursor-pointer"></div>)}
+                 </div>
+                 <div className="flex-1 bg-white flex items-center justify-center border border-slate-100 rounded hover:scale-105 transition-transform">
+                     {userImage ? <img src={userImage} className="max-w-full max-h-full object-contain" /> : <ImageIcon className="w-20 h-20 text-slate-200"/>}
+                 </div>
+             </div>
+             <div className="w-[50%] pl-8 flex flex-col">
+                 <span className="text-xs text-slate-400 mb-1">Novo | 452 vendidos</span>
+                 <h1 className="text-xl font-bold text-slate-900 leading-snug mb-3">{data.title || data.headline}</h1>
+                 
+                 <div className="flex gap-1 mb-4">
+                    {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 text-[#3483FA] fill-[#3483FA]"/>)}
+                    <span className="text-xs text-slate-400 ml-1">(120 opiniões)</span>
+                 </div>
+
+                 <div className="text-4xl font-light text-slate-900 mb-2">R$ {data.price}</div>
+                 <div className="text-sm text-slate-500 mb-4">em <span className="text-[#00A650]">12x sem juros</span></div>
+
+                 <div className="flex items-center gap-2 mb-6">
+                    <Truck className="w-5 h-5 text-[#00A650]"/>
+                    <div className="text-sm text-[#00A650] font-normal">Chegará grátis amanhã<br/><span className="text-xs text-slate-400">Comprando dentro das próximas 2h</span></div>
+                 </div>
+
+                 <button className="w-full bg-[#3483FA] hover:bg-[#2968c8] text-white font-bold py-3.5 rounded-md text-base transition-colors mb-2">Comprar agora</button>
+                 <button className="w-full bg-[#E3EDFB] hover:bg-[#d0e4fc] text-[#3483FA] font-bold py-3.5 rounded-md text-base transition-colors">Adicionar ao carrinho</button>
+             </div>
+        </div>
+    );
+};
+
+// --- RESTO DOS PREVIEWS PADRÃO (Simplificados mas responsivos) ---
 const FacebookPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-[#242526] text-white rounded-xl border border-slate-700 overflow-hidden font-sans shadow-2xl animate-in fade-in zoom-in-95 duration-500 mx-auto ${device === 'mobile' ? 'max-w-[360px]' : 'max-w-[500px]'}`}>
+    <div className={`bg-[#242526] text-white rounded-xl border border-slate-700 overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[500px]'}`}>
         <div className="p-3 flex items-center gap-2">
             <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-xs">SL</div>
             <div className="flex-1">
@@ -81,15 +248,12 @@ const FacebookPreview = ({ data, userImage, device }: { data: any, userImage: st
             </div>
             <button className="bg-[#4b4c4f] hover:bg-[#5e5f61] px-4 py-2 rounded text-sm font-bold transition-colors">{data.cta || "Saiba mais"}</button>
         </div>
-        <div className="p-3 border-t border-slate-700 flex justify-between text-slate-400 text-xs">
-             <span>👍 1.2 mil</span>
-             <span>45 comentários • 12 compartilhamentos</span>
-        </div>
     </div>
 );
 
 const InstagramPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-black text-white rounded-xl border border-slate-800 overflow-hidden font-sans shadow-2xl animate-in fade-in zoom-in-95 duration-500 mx-auto ${device === 'mobile' ? 'max-w-[360px]' : 'max-w-[400px]'}`}>
+    <div className={`bg-black text-white rounded-xl border border-slate-800 overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[400px]'}`}>
+        {device === 'mobile' && <div className="bg-black text-white pt-1 px-4"><MobileStatusBar /></div>}
         <div className="flex items-center justify-between p-3">
             <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-purple-600 p-[2px]"><div className="w-full h-full bg-black rounded-full"></div></div>
@@ -110,7 +274,7 @@ const InstagramPreview = ({ data, userImage, device }: { data: any, userImage: s
             <p className="text-sm leading-snug">
                 <span className="font-bold mr-2">sua_loja_br</span>
                 {data.headline || data.title}
-                <br/><br/>
+                <br/>
                 <span className="text-slate-300 text-xs font-normal whitespace-pre-wrap">{data.body || data.description}</span>
             </p>
         </div>
@@ -118,10 +282,11 @@ const InstagramPreview = ({ data, userImage, device }: { data: any, userImage: s
 );
 
 const TikTokPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-black text-white rounded-3xl border border-slate-800 overflow-hidden font-sans shadow-2xl animate-in fade-in zoom-in-95 duration-500 relative mx-auto ${device === 'mobile' ? 'max-w-[320px] aspect-[9/16]' : 'max-w-[360px] aspect-[9/16]'}`}>
+    <div className={`bg-black text-white rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl relative mx-auto ${device === 'mobile' ? 'max-w-[320px] aspect-[9/18]' : 'max-w-[360px] aspect-[9/18]'}`}>
         <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">
              {userImage ? <img src={userImage} className="w-full h-full object-cover opacity-80" /> : <div className="flex flex-col items-center opacity-30"><Video className="w-16 h-16 mb-2"/><span className="text-xs">Vídeo</span></div>}
         </div>
+        <div className="absolute top-2 w-full px-4"><MobileStatusBar /></div>
         <div className="absolute inset-0 flex flex-col justify-end p-4 bg-gradient-to-t from-black/90 via-transparent to-transparent">
             <div className="absolute right-2 bottom-20 flex flex-col items-center gap-4">
                 <div className="flex flex-col items-center gap-1"><div className="w-10 h-10 rounded-full bg-slate-800 border border-white/20"></div></div>
@@ -141,205 +306,183 @@ const TikTokPreview = ({ data, userImage, device }: { data: any, userImage: stri
 );
 
 const ShopeePreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-[#f5f5f5] text-slate-900 rounded-xl border border-slate-300 overflow-hidden font-sans shadow-2xl animate-in fade-in zoom-in-95 duration-500 mx-auto ${device === 'mobile' ? 'max-w-[360px]' : 'max-w-[500px]'}`}>
-        <div className="bg-[#ee4d2d] text-white p-3 flex items-center justify-between"><span className="font-bold text-sm">Shopee</span><span className="text-xs bg-white/20 px-2 py-0.5 rounded">Patrocinado</span></div>
-        <div className="bg-white p-2">
-            <div className="flex gap-3">
-                <div className="w-24 h-24 bg-slate-100 shrink-0 relative border border-slate-100 rounded">
-                    {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-slate-300"><ImageIcon className="w-8 h-8"/></div>}
-                    <div className="absolute top-0 left-0 bg-[#ee4d2d] text-white text-[8px] font-bold px-1">Mall</div>
-                </div>
-                <div className="flex-1 flex flex-col justify-between">
-                    <div>
-                        <h4 className="text-sm font-medium line-clamp-2 leading-tight mb-1">{data.title || data.headline}</h4>
-                        <div className="flex items-center gap-1">
-                            <span className="bg-[#ee4d2d]/10 text-[#ee4d2d] text-[10px] px-1 border border-[#ee4d2d]">Frete Grátis</span>
-                            <span className="text-[10px] text-slate-500 border border-[#ee4d2d] text-[#ee4d2d] px-1">10.10</span>
-                        </div>
-                    </div>
-                    <div className="flex justify-between items-end">
-                        <div>
-                            <span className="text-[#ee4d2d] text-sm font-bold">R$ {data.price || "99,90"}</span>
-                            <div className="text-[10px] text-slate-500">2,4mil vendidos</div>
-                        </div>
-                        <div className="flex gap-0.5">{[1,2,3,4,5].map(i => <Star key={i} className="w-2.5 h-2.5 text-[#ee4d2d] fill-[#ee4d2d]" />)}</div>
-                    </div>
-                </div>
-            </div>
+    <div className={`bg-[#F5F5F5] text-black rounded-[30px] border-[6px] border-[#1a1a1a] overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px] aspect-[9/18]' : 'max-w-[360px] aspect-[9/18]'}`}>
+        <div className="bg-[#EE4D2D] text-white pt-2 pb-1 px-4"><MobileStatusBar /></div>
+        <div className="bg-[#EE4D2D] p-3 flex gap-2 items-center text-white shadow-sm">
+             <div className="bg-white/20 p-1 rounded"><ArrowLeftIcon className="w-4 h-4"/></div>
+             <div className="bg-white text-orange-500 px-2 py-1 text-xs rounded flex-1">Buscar na Shopee</div>
+             <ShoppingCart className="w-5 h-5"/>
         </div>
-    </div>
-);
-
-const MercadoLivrePreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-white text-slate-900 rounded-lg border border-slate-200 overflow-hidden font-sans shadow-lg animate-in fade-in zoom-in-95 duration-500 mx-auto ${device === 'mobile' ? 'max-w-[360px]' : 'max-w-[500px]'}`}>
-        <div className="p-4 border-b border-slate-100 flex gap-4">
-            <div className="w-32 h-32 bg-slate-100 shrink-0 relative flex items-center justify-center rounded-md overflow-hidden">
-                 {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <ImageIcon className="w-8 h-8 text-slate-300"/>}
-            </div>
-            <div className="flex-1">
-                <h3 className="text-sm text-slate-800 font-normal leading-snug mb-1">{data.title || data.headline}</h3>
-                <div className="flex items-center gap-1 mb-2">
-                    <span className="text-[10px] bg-black text-white font-bold px-1.5 py-0.5 rounded-sm uppercase">MAIS VENDIDO</span>
-                </div>
-                <div className="text-2xl font-light text-slate-800 mb-1">R$ {data.price}</div>
-                <div className="text-xs text-[#00a650] font-bold flex items-center gap-1">Chegará grátis amanhã <Zap className="w-3 h-3 fill-[#00a650] text-[#00a650]" /><span className="italic font-black">FULL</span></div>
-                <div className="mt-2 text-xs text-slate-500">Vendido por <span className="text-slate-700 font-medium">Loja Oficial</span></div>
-            </div>
+        <div className="bg-white h-full overflow-y-auto">
+             <div className="aspect-square bg-slate-100 relative flex items-center justify-center">
+                 {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <ImageIcon className="w-12 h-12 text-slate-300"/>}
+                 <div className="absolute bottom-0 left-0 bg-[#EE4D2D] text-white text-[10px] px-2 py-0.5">Mall</div>
+             </div>
+             <div className="p-3">
+                 <div className="text-lg font-bold text-[#EE4D2D]">R$ {data.price || "00,00"}</div>
+                 <h3 className="text-sm text-slate-800 line-clamp-2 leading-snug mb-2">{data.title}</h3>
+                 <div className="flex gap-1 mb-2">
+                     <span className="text-[10px] border border-[#EE4D2D] text-[#EE4D2D] px-1 rounded">Frete Grátis</span>
+                 </div>
+                 <div className="text-xs text-slate-500 mb-4 whitespace-pre-wrap">{data.description}</div>
+             </div>
         </div>
-        <div className="bg-slate-50 p-3 text-xs text-slate-500 text-center">Promocionado</div>
     </div>
 );
 
 const AmazonPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-white text-black rounded-lg border border-slate-200 overflow-hidden font-sans shadow-lg animate-in fade-in zoom-in-95 duration-500 p-4 mx-auto ${device === 'mobile' ? 'max-w-[360px]' : 'max-w-[500px]'}`}>
-        <div className="flex gap-4">
-             <div className="w-24 h-32 bg-slate-100 shrink-0 flex items-center justify-center rounded overflow-hidden">
-                 {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <ImageIcon className="w-8 h-8 text-slate-300"/>}
-             </div>
-             <div className="flex-1">
-                 <h3 className="text-sm font-medium leading-snug mb-1 text-[#007185] hover:text-[#C7511F] cursor-pointer line-clamp-3">{data.headline || data.title}</h3>
-                 <div className="flex items-center gap-1 mb-1">
-                     <div className="flex text-[#F4A41C]">{[1,2,3,4].map(i => <Star key={i} className="w-3 h-3 fill-current" />)}<Star className="w-3 h-3 fill-current text-[#F4A41C]/50" /></div>
-                     <span className="text-xs text-[#007185]">1.204</span>
-                 </div>
-                 <div className="flex items-baseline gap-1 mb-1">
-                     <span className="text-xs align-top mt-1">R$</span><span className="text-xl font-medium">{data.price ? data.price.split(',')[0] : "99"}</span><span className="text-xs align-top mt-1">{data.price ? data.price.split(',')[1] : "90"}</span>
-                 </div>
-                 <div className="text-xs text-slate-500 mb-2">Receba até <span className="font-bold text-slate-800">Sexta-feira</span></div>
-                 <button className="bg-[#FFD814] hover:bg-[#F7CA00] border border-[#FCD200] rounded-full w-full py-1.5 text-xs text-black shadow-sm transition-colors">Adicionar ao Carrinho</button>
-             </div>
+   <div className={`bg-white text-black rounded-xl border border-slate-200 overflow-hidden font-sans shadow-2xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[600px] flex'}`}>
+        {device === 'mobile' && <div className="bg-[#232F3E] text-white pt-2 pb-1 px-4"><MobileStatusBar /></div>}
+        <div className={`${device === 'mobile' ? 'w-full' : 'w-1/2'} p-4 bg-white flex items-center justify-center`}>
+            {userImage ? <img src={userImage} className="max-w-full max-h-64 object-contain" /> : <ImageIcon className="w-16 h-16 text-slate-200"/>}
         </div>
-    </div>
-);
-
-const OLXPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-white text-slate-900 rounded-lg border border-slate-200 overflow-hidden font-sans shadow-lg animate-in fade-in zoom-in-95 duration-500 mx-auto ${device === 'mobile' ? 'max-w-[360px]' : 'max-w-[500px]'}`}>
-        <div className="relative aspect-[4/3] bg-slate-100 flex items-center justify-center overflow-hidden">
-             {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <ImageIcon className="w-12 h-12 text-slate-300"/>}
-             <div className="absolute bottom-2 left-2 bg-[#6e0ad6] text-white text-xs font-bold px-2 py-1 rounded">DESTAQUE</div>
+        <div className={`${device === 'mobile' ? 'w-full' : 'w-1/2'} p-4 flex flex-col`}>
+             <h3 className="text-sm font-normal text-slate-900 leading-snug mb-2">{data.headline || data.title}</h3>
+             <div className="flex text-yellow-500 text-xs mb-2">★★★★★ <span className="text-slate-500 ml-1">1,234</span></div>
+             <div className="text-2xl font-medium text-slate-900 mb-1">R$ {data.price}</div>
+             <div className="text-xs text-slate-500 mb-4">Entrega GRÁTIS: <span className="font-bold text-slate-800">Segunda-feira</span></div>
+             <button className="bg-[#FFD814] hover:bg-[#F7CA00] text-black border border-[#FCD200] rounded-full py-2 px-4 text-sm font-normal shadow-sm mb-2">Adicionar ao carrinho</button>
+             <button className="bg-[#FFA41C] hover:bg-[#FA8900] text-black border border-[#FF8F00] rounded-full py-2 px-4 text-sm font-normal shadow-sm">Comprar agora</button>
         </div>
-        <div className="p-4">
-            <h3 className="text-base text-slate-800 font-normal mb-1 truncate">{data.title || data.headline}</h3>
-            <div className="text-xl font-bold text-slate-900 mb-2">R$ {data.price}</div>
-            <p className="text-xs text-slate-500 mb-3 line-clamp-2">{data.body || data.description}</p>
-            <div className="flex items-center justify-between text-xs text-slate-400 mb-4"><span className="flex items-center gap-1"><MapPin className="w-3 h-3"/> SP</span><span>Hoje, 10:30</span></div>
-            <button className="w-full bg-[#f28000] hover:bg-[#d97300] text-white py-2 rounded-full font-bold text-sm transition-colors">Chat</button>
-        </div>
-    </div>
-);
-
-const GoogleAdsPreview = ({ data, device }: { data: any, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-white text-slate-900 rounded-xl border border-slate-200 overflow-hidden font-sans shadow-lg animate-in fade-in zoom-in-95 duration-500 p-4 mx-auto ${device === 'mobile' ? 'max-w-[360px]' : 'max-w-[600px]'}`}>
-        <div className="flex items-center gap-1 mb-1"><span className="font-bold text-black text-xs">Patrocinado</span><span className="text-slate-500 text-xs">lojaoficial.com.br</span></div>
-        <div className="text-[#1a0dab] text-xl font-medium hover:underline cursor-pointer mb-1 leading-tight">{data.headline || data.title}</div>
-        <div className="text-sm text-[#4d5156] leading-relaxed">{data.body || data.description}<br/><span className="text-slate-800 font-medium">Compre agora: R$ {data.price}</span>. Frete Grátis.</div>
-    </div>
+   </div>
 );
 
 const PinterestPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-white text-slate-900 rounded-2xl overflow-hidden font-sans shadow-lg animate-in fade-in zoom-in-95 duration-500 mx-auto ${device === 'mobile' ? 'max-w-[300px]' : 'max-w-[340px]'}`}>
-        <div className="relative">
-             {userImage ? <img src={userImage} className="w-full h-auto object-cover rounded-2xl" /> : <div className="w-full h-64 bg-slate-200 flex items-center justify-center rounded-2xl"><ImageIcon className="w-12 h-12 text-slate-400"/></div>}
-             <div className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">Salvar</div>
-        </div>
-        <div className="p-2">
-            <h3 className="text-sm font-bold text-slate-900 leading-tight mb-1">{data.title}</h3>
-            <p className="text-xs text-slate-600 line-clamp-2">{data.description}</p>
-        </div>
+    <div className={`bg-white text-black rounded-2xl overflow-hidden font-sans shadow-xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[300px]'}`}>
+         <div className="relative aspect-[3/4] bg-slate-100">
+             {userImage ? <img src={userImage} className="w-full h-full object-cover" /> : <div className="flex items-center justify-center h-full"><ImageIcon className="w-12 h-12 text-slate-300"/></div>}
+             <button className="absolute top-4 right-4 bg-[#E60023] text-white px-4 py-2 rounded-full font-bold text-sm hover:bg-[#ad081b]">Salvar</button>
+         </div>
+         <div className="p-3">
+             <h3 className="font-bold text-slate-900 text-sm mb-1">{data.title}</h3>
+             <p className="text-xs text-slate-600 line-clamp-3">{data.description}</p>
+             <div className="flex items-center gap-2 mt-3">
+                 <div className="w-6 h-6 rounded-full bg-slate-200"></div>
+                 <span className="text-xs font-semibold text-slate-800">Sua Loja</span>
+             </div>
+         </div>
     </div>
 );
 
 const LinkedinPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-white text-slate-900 rounded-lg border border-slate-300 overflow-hidden font-sans shadow-lg animate-in fade-in zoom-in-95 duration-500 mx-auto ${device === 'mobile' ? 'max-w-[360px]' : 'max-w-[500px]'}`}>
-        <div className="p-3 flex gap-2 border-b border-slate-100">
-            <div className="w-10 h-10 bg-slate-200 rounded"></div>
-            <div>
-                <div className="text-sm font-bold text-slate-800">Sua Empresa</div>
-                <div className="text-xs text-slate-500">Promovido</div>
-            </div>
+    <div className={`bg-white text-black rounded-lg border border-slate-200 overflow-hidden font-sans shadow-lg mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[500px]'}`}>
+        <div className="p-3 flex gap-2">
+             <div className="w-10 h-10 bg-slate-200 rounded"></div>
+             <div>
+                 <div className="text-sm font-bold text-slate-900 flex items-center gap-1">Sua Empresa <span className="text-slate-500 font-normal">• 1º</span></div>
+                 <div className="text-xs text-slate-500">Promovido</div>
+             </div>
         </div>
-        <div className="p-3 text-sm text-slate-700 whitespace-pre-wrap">{data.body || data.headline}</div>
-        {userImage && <div className="w-full bg-slate-100 aspect-video overflow-hidden"><img src={userImage} className="w-full h-full object-cover"/></div>}
-        <div className="bg-slate-50 p-3 flex justify-between items-center border-t border-slate-200">
-            <span className="text-xs font-bold text-slate-600">SABER MAIS</span>
-            <ChevronRight className="w-4 h-4 text-slate-600"/>
+        <div className="px-3 pb-2 text-sm text-slate-800 whitespace-pre-wrap">{data.body || data.headline}</div>
+        {userImage ? <img src={userImage} className="w-full aspect-video object-cover" /> : <div className="w-full aspect-video bg-slate-100 flex items-center justify-center"><ImageIcon className="w-12 h-12 text-slate-300"/></div>}
+        <div className="bg-[#F3F6F8] p-3 flex justify-between items-center cursor-pointer hover:bg-[#EBEFF3]">
+            <div>
+                <div className="text-sm font-semibold text-slate-900">{data.headline || data.title || "Título do Anúncio"}</div>
+                <div className="text-xs text-slate-500">sualoja.com.br</div>
+            </div>
+            <button className="border border-slate-600 rounded-full px-4 py-1 text-slate-600 font-bold text-sm hover:border-[2px]">Saiba mais</button>
+        </div>
+        <div className="p-2 border-t border-slate-100 flex justify-between text-slate-500">
+             <div className="flex gap-4 px-2">
+                 <span className="flex items-center gap-1 text-sm"><ThumbsUp className="w-4 h-4"/> Gostei</span>
+                 <span className="flex items-center gap-1 text-sm"><MessageSquare className="w-4 h-4"/> Comentar</span>
+             </div>
         </div>
     </div>
 );
 
 const TwitterPreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-black text-white rounded-xl border border-slate-800 overflow-hidden font-sans shadow-lg animate-in fade-in zoom-in-95 duration-500 mx-auto ${device === 'mobile' ? 'max-w-[360px]' : 'max-w-[500px]'}`}>
-        <div className="p-4">
-            <div className="flex gap-3">
-                <div className="w-10 h-10 rounded-full bg-slate-700 shrink-0"></div>
-                <div className="flex-1">
-                    <div className="flex items-center gap-1 mb-1">
-                        <span className="font-bold text-sm">Sua Loja</span>
-                        <span className="text-slate-500 text-sm">@sualoja</span>
-                        <span className="text-xs bg-slate-800 text-slate-400 px-1 rounded ml-auto">Ad</span>
-                    </div>
-                    <div className="text-sm text-white mb-3 whitespace-pre-wrap">{data.text || data.headline}</div>
-                    {userImage && <div className="w-full rounded-xl overflow-hidden border border-slate-800 aspect-video mb-2"><img src={userImage} className="w-full h-full object-cover"/></div>}
-                    <div className="flex justify-between text-slate-500 text-xs mt-2">
-                        <MessageCircle className="w-4 h-4"/> <Share2 className="w-4 h-4"/> <Heart className="w-4 h-4"/> <Upload className="w-4 h-4"/>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div className={`bg-black text-white rounded-xl border border-slate-800 overflow-hidden font-sans shadow-xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[500px]'}`}>
+         <div className="p-3 flex gap-3">
+             <div className="w-10 h-10 rounded-full bg-slate-700"></div>
+             <div className="flex-1">
+                 <div className="flex items-center gap-1 mb-0.5">
+                     <span className="font-bold text-sm">Sua Loja</span>
+                     <span className="text-slate-500 text-sm">@sualoja</span>
+                     <span className="text-slate-500 text-sm">· Promovido</span>
+                 </div>
+                 <div className="text-sm text-slate-100 mb-2 whitespace-pre-wrap">{data.text || data.body}</div>
+                 {userImage ? <img src={userImage} className="w-full rounded-xl border border-slate-800 mb-2" /> : null}
+                 <div className="flex justify-between text-slate-500 text-xs pr-8">
+                     <MessageCircle className="w-4 h-4"/>
+                     <RefreshCw className="w-4 h-4"/>
+                     <Heart className="w-4 h-4"/>
+                     <Share2 className="w-4 h-4"/>
+                 </div>
+             </div>
+         </div>
     </div>
 );
 
 const YoutubePreview = ({ data, userImage, device }: { data: any, userImage: string | null, device: 'mobile' | 'desktop' }) => (
-    <div className={`bg-black text-white rounded-xl border border-slate-800 overflow-hidden font-sans shadow-lg animate-in fade-in zoom-in-95 duration-500 mx-auto relative ${device === 'mobile' ? 'max-w-[320px] aspect-[9/16]' : 'max-w-[360px] aspect-[9/16]'}`}>
-        {userImage ? <img src={userImage} className="w-full h-full object-cover opacity-90" /> : <div className="absolute inset-0 bg-slate-800 flex items-center justify-center"><Video className="w-12 h-12 text-red-600"/></div>}
-        <div className="absolute inset-0 flex flex-col justify-between p-4 bg-gradient-to-b from-transparent via-transparent to-black/90">
-            <div className="flex justify-between items-start">
-               <div className="px-2 py-1 bg-black/60 rounded text-[10px] font-bold">Shorts</div>
-               <Camera className="w-5 h-5"/>
-            </div>
-            <div>
-                <h3 className="font-bold text-sm mb-2">{data.title}</h3>
-                <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-[10px] font-bold">SL</div>
-                    <span className="text-xs">@sualoja</span>
-                    <button className="bg-white text-black text-[10px] font-bold px-3 py-1 rounded-full">Inscrever-se</button>
-                </div>
-                <p className="text-xs text-slate-300 line-clamp-2">{data.description}</p>
-            </div>
-        </div>
-        <div className="absolute right-2 bottom-16 flex flex-col gap-4 items-center">
-            <div className="flex flex-col items-center gap-1"><div className="p-2 bg-slate-800/50 rounded-full"><Heart className="w-6 h-6 fill-white"/></div><span className="text-[10px] font-bold">Like</span></div>
-            <div className="flex flex-col items-center gap-1"><div className="p-2 bg-slate-800/50 rounded-full"><MessageCircle className="w-6 h-6"/></div><span className="text-[10px] font-bold">Coment</span></div>
-            <div className="flex flex-col items-center gap-1"><div className="p-2 bg-slate-800/50 rounded-full"><Share2 className="w-6 h-6"/></div><span className="text-[10px] font-bold">Share</span></div>
+    <div className={`bg-white text-black rounded-none md:rounded-xl overflow-hidden font-sans shadow-xl mx-auto ${device === 'mobile' ? 'max-w-[320px]' : 'max-w-[600px]'}`}>
+        {userImage ? <img src={userImage} className="w-full aspect-video object-cover" /> : <div className="w-full aspect-video bg-black flex items-center justify-center"><Video className="w-16 h-16 text-white"/></div>}
+        <div className="p-3 flex gap-3">
+             <div className="w-9 h-9 rounded-full bg-purple-600 flex-shrink-0"></div>
+             <div className="flex-1">
+                 <h3 className="text-sm font-medium text-slate-900 line-clamp-2 leading-snug mb-1">{data.title}</h3>
+                 <div className="text-xs text-slate-500 flex flex-wrap items-center gap-1">
+                     <span>Sua Loja</span> • <span>120 mil visualizações</span> • <span>há 2 horas</span>
+                 </div>
+                 <div className="mt-2 bg-blue-50 text-blue-700 text-xs font-bold px-2 py-1 inline-block rounded border border-blue-100 uppercase tracking-wide">Saiba Mais</div>
+             </div>
+             <div className="text-slate-400">⋮</div>
         </div>
     </div>
 );
 
-// --- PLATAFORMAS & CONFIG ---
-const PLATFORM_TABS = [
-    { id: 'instagram', label: 'Instagram', icon: Instagram, color: 'text-pink-500', neon: 'shadow-[0_0_30px_rgba(236,72,153,0.3)] border-pink-500/30' },
-    { id: 'facebook', label: 'Facebook', icon: Facebook, color: 'text-blue-500', neon: 'shadow-[0_0_30px_rgba(59,130,246,0.3)] border-blue-500/30' },
-    { id: 'tiktok', label: 'TikTok', icon: Music2, color: 'text-cyan-400', neon: 'shadow-[0_0_30px_rgba(34,211,238,0.3)] border-cyan-400/30' },
-    { id: 'google', label: 'Google', icon: Search, color: 'text-blue-400', neon: 'shadow-[0_0_30px_rgba(96,165,250,0.3)] border-blue-400/30' },
-    { id: 'shopee', label: 'Shopee', icon: ShoppingBag, color: 'text-orange-500', neon: 'shadow-[0_0_30px_rgba(249,115,22,0.3)] border-orange-500/30' },
-    { id: 'mercadolivre', label: 'Mercado Livre', icon: ShoppingCart, color: 'text-yellow-400', neon: 'shadow-[0_0_30px_rgba(250,204,21,0.3)] border-yellow-400/30' },
-    { id: 'olx', label: 'OLX', icon: MapPin, color: 'text-purple-400', neon: 'shadow-[0_0_30px_rgba(168,85,247,0.3)] border-purple-400/30' },
-    { id: 'amazon', label: 'Amazon', icon: ShoppingCart, color: 'text-yellow-600', neon: 'shadow-[0_0_30px_rgba(202,138,4,0.3)] border-yellow-600/30' },
-    { id: 'pinterest', label: 'Pinterest', icon: PinIcon, color: 'text-red-500', neon: 'shadow-[0_0_30px_rgba(239,68,68,0.3)] border-red-500/30' },
-    { id: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: 'text-blue-700', neon: 'shadow-[0_0_30px_rgba(29,78,216,0.3)] border-blue-700/30' },
-    { id: 'twitter', label: 'Twitter (X)', icon: Twitter, color: 'text-white', neon: 'shadow-[0_0_30px_rgba(255,255,255,0.2)] border-white/30' },
-    { id: 'youtube', label: 'YouTube', icon: Youtube, color: 'text-red-600', neon: 'shadow-[0_0_30px_rgba(220,38,38,0.3)] border-red-600/30' }
-];
+const DeviceToggle = ({ device, setDevice }: { device: 'mobile' | 'desktop', setDevice: (d: 'mobile' | 'desktop') => void }) => (
+    <div className="bg-slate-900 border border-slate-800 rounded-lg p-1 flex gap-1">
+        <button onClick={() => setDevice('mobile')} className={`p-1.5 rounded transition-all ${device === 'mobile' ? 'bg-purple-600 text-white shadow' : 'text-slate-500 hover:text-white'}`} title="Mobile View">
+            <Smartphone className="w-4 h-4" />
+        </button>
+        <button onClick={() => setDevice('desktop')} className={`p-1.5 rounded transition-all ${device === 'desktop' ? 'bg-purple-600 text-white shadow' : 'text-slate-500 hover:text-white'}`} title="Desktop View">
+            <Laptop className="w-4 h-4" />
+        </button>
+    </div>
+);
 
-// Helper icon wrapper since Lucide might not export 'PinIcon' directly as Pinterest
-function PinIcon(props: any) {
-    return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>; 
-}
+// Auxiliares
+const ArrowLeftIcon = ({className}:{className?:string}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>;
+const Truck = ({className}:{className?:string}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>;
+
+// --- COMPONENTE SELETOR DE PLATAFORMAS (MAX 3) ---
+const PlatformSelector = ({ selected, onToggle }: { selected: string[], onToggle: (id: string) => void }) => (
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 mb-6">
+        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center justify-between">
+            Selecione as Redes ({selected.length}/{MAX_PLATFORMS})
+            {selected.length === MAX_PLATFORMS && <span className="text-purple-400 text-[10px]">Máximo atingido</span>}
+        </h4>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2">
+            {PLATFORM_TABS.map((platform) => {
+                const isSelected = selected.includes(platform.id);
+                return (
+                    <button
+                        key={platform.id}
+                        onClick={() => onToggle(platform.id)}
+                        disabled={!isSelected && selected.length >= MAX_PLATFORMS}
+                        className={`
+                            flex items-center gap-2 p-2 rounded-lg border text-xs font-bold transition-all relative overflow-hidden group
+                            ${isSelected 
+                                ? `bg-white/10 ${platform.color} border-white/20 shadow-lg` 
+                                : 'bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-600 hover:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed'}
+                        `}
+                    >
+                        <platform.icon className={`w-4 h-4 ${isSelected ? platform.color : 'grayscale opacity-50'}`} />
+                        <span>{platform.label}</span>
+                        {isSelected && <div className="absolute inset-0 bg-white/5 animate-pulse"></div>}
+                    </button>
+                );
+            })}
+        </div>
+    </div>
+);
+
+// ... (Rest of SidebarItem and CategoryLabel remains the same)
 
 const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setActiveTheme: (t: any) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) setIsOpen(false);
@@ -347,7 +490,6 @@ const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setA
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
   return (
     <div className="relative z-50" ref={menuRef}>
       <button onClick={() => setIsOpen(!isOpen)} className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-lg border ${isOpen ? 'bg-purple-600 border-purple-400 text-white' : 'bg-black/40 border-white/10 text-slate-300 hover:text-white hover:bg-white/10'}`}><Palette className="w-5 h-5" /></button>
@@ -361,18 +503,12 @@ const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setA
   );
 };
 
-const DeviceToggle = ({ device, setDevice }: { device: 'mobile' | 'desktop', setDevice: (d: 'mobile' | 'desktop') => void }) => (
-    <div className="bg-slate-900 p-1 rounded-lg border border-slate-800 flex gap-1 shadow-lg backdrop-blur-md">
-        <button onClick={() => setDevice('mobile')} className={`p-2 rounded-md transition-all duration-300 ${device === 'mobile' ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/30 scale-105' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}><Smartphone className="w-4 h-4" /></button>
-        <button onClick={() => setDevice('desktop')} className={`p-2 rounded-md transition-all duration-300 ${device === 'desktop' ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/30 scale-105' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}><Laptop className="w-4 h-4" /></button>
-    </div>
-);
-
+// ... (Rest of Module Configs)
 type ModuleId = 'home' | 'generator' | 'video_script' | 'studio' | 'email_marketing' | 'influencer_dm' | 'blog_post' | 'product_desc' | 'persona' | 'roas_analyzer' | 'policy_gen' | 'headline_optimizer' | 'history' | 'settings';
 
 const MODULES: Record<ModuleId, { label: string; icon: any; color?: string; desc?: string; isPremium?: boolean; explanation?: string; }> = {
   home: { label: 'Início', icon: Home },
-  generator: { label: 'Gerador de Anúncios', icon: Megaphone, color: 'text-purple-400', desc: 'Crie anúncios para TODAS as redes.', explanation: 'Gera copy otimizada para 12 plataformas simultaneamente.' },
+  generator: { label: 'Gerador de Anúncios', icon: Megaphone, color: 'text-purple-400', desc: 'Crie anúncios para redes específicas.', explanation: 'Gera copy otimizada para suas redes escolhidas.' },
   video_script: { label: 'Roteiros de Vídeo', icon: Video, color: 'text-pink-400', desc: 'Roteiros virais TikTok/Reels.', isPremium: true, explanation: 'Roteiros minuto-a-minuto.' },
   studio: { label: 'Studio Product AI', icon: Camera, color: 'text-orange-400', desc: 'Fotos de estúdio 4K.', isPremium: true, explanation: 'IA Generativa de Imagem.' },
   email_marketing: { label: 'E-mail Marketing', icon: Mail, color: 'text-blue-400', desc: 'Sequências de e-mail.', isPremium: true, explanation: 'Fluxos de recuperação.' },
@@ -418,6 +554,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [showClearModal, setShowClearModal] = useState(false);
+  
+  // --- NOVOS ESTADOS ---
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['instagram', 'facebook', 'tiktok']);
   const [previewPlatform, setPreviewPlatform] = useState<string>('instagram');
   const [previewDevice, setPreviewDevice] = useState<'mobile' | 'desktop'>('mobile');
 
@@ -448,12 +587,36 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const handleClearFormConfirm = () => { setResult(null); setError(null); setFormDataByModule(prev => ({ ...prev, [activeModule]: {} })); setAdImage(null); setShowClearModal(false); };
   const handleDeleteItemConfirm = async () => { if (!itemToDelete) return; try { await deleteHistoryItem(itemToDelete); fetchHistory(); } catch(e) { console.error(e); } finally { setShowDeleteModal(false); setItemToDelete(null); } };
 
+  // --- LÓGICA DE SELEÇÃO DE PLATAFORMA ---
+  const togglePlatform = (id: string) => {
+    setSelectedPlatforms(prev => {
+        if (prev.includes(id)) {
+             // Não deixar remover se for a última (UX)
+             if(prev.length === 1) return prev;
+             return prev.filter(p => p !== id);
+        } else {
+             if (prev.length >= MAX_PLATFORMS) return prev; // Limite
+             return [...prev, id];
+        }
+    });
+  };
+
+  // Sincronizar o preview com a primeira seleção disponível se a atual for removida
+  useEffect(() => {
+    if (!selectedPlatforms.includes(previewPlatform) && selectedPlatforms.length > 0) {
+        setPreviewPlatform(selectedPlatforms[0]);
+    }
+  }, [selectedPlatforms]);
+
+
   const handleGenerate = async () => {
     if(isModuleLocked) return;
     const fields = Object.values(dynamicFormData);
     if (activeModule !== 'studio' && activeModule !== 'settings' && activeModule !== 'history') { if (fields.length === 0 || fields.every(f => !String(f).trim())) { setError("Preencha pelo menos um campo."); return; } }
+    
     setIsGenerating(true); setResult(null); setError(null);
     if (window.innerWidth < 1024) { setTimeout(() => document.getElementById('result-area')?.scrollIntoView({ behavior: 'smooth' }), 100); }
+    
     try {
         let prompt = "";
         const data = dynamicFormData;
@@ -463,37 +626,34 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
             case 'generator':
                 prompt = `Produto: ${data.productName}. Preço: ${data.price || 'Não informado'}. ${antiMarkdown}`;
                 break;
-            case 'video_script': prompt = `Roteiro TikTok viral para ${data.productName}, estilo ${data.style || 'Engraçado'}. ${antiMarkdown}`; break;
-            case 'email_marketing': prompt = `Email ${data.goal || 'Recuperação'} para ${data.productName}. ${antiMarkdown}`; break;
-            case 'influencer_dm': prompt = `DM Influencer nicho ${data.niche || 'Beleza'} para ${data.productName}. ${antiMarkdown}`; break;
-            case 'blog_post': prompt = `Artigo SEO sobre ${data.topic}, palavra-chave ${data.keyword}. ${antiMarkdown}`; break;
-            case 'product_desc': prompt = `Descrição persuasiva para ${data.productName}. ${antiMarkdown}`; break;
-            case 'persona': prompt = `Persona detalhada para ${data.productName}. ${antiMarkdown}`; break;
-            case 'roas_analyzer': prompt = `Análise ROAS custo ${data.cost} venda ${data.salePrice}. ${antiMarkdown}`; break;
-            case 'policy_gen': prompt = `Políticas para loja ${data.storeName}. ${antiMarkdown}`; break;
-            case 'headline_optimizer': prompt = `Headlines para ${data.productName}, promessa ${data.promise}. ${antiMarkdown}`; break;
             default: prompt = `Ajude com: ${JSON.stringify(data)}`;
         }
         
         if (activeModule !== 'studio') {
-            const text = await generateCopy(prompt, activeModule);
+            // Passa as plataformas selecionadas para o backend
+            const text = await generateCopy(prompt, activeModule, selectedPlatforms);
             const textStr = typeof text === 'string' ? text : String(text || '');
             try {
                 const cleanText = textStr.replace(/```json/g, '').replace(/```/g, '').trim();
                 const parsed = JSON.parse(cleanText);
                 setResult(parsed);
+                // Auto-seleciona a primeira plataforma gerada no preview
+                if(selectedPlatforms.length > 0) setPreviewPlatform(selectedPlatforms[0]);
             } catch (e) { setResult({ "Resposta": textStr.replace(/\*\*/g, '') }); }
         }
     } catch (err: any) {
-        if (err.message.includes("Upgrade required")) setError("🔒 ACESSO NEGADO: Recurso PRO."); else setError("Erro na geração. Tente novamente.");
+        if (err.message.includes("Upgrade required")) setError("🔒 ACESSO NEGADO: Recurso PRO."); else setError("Erro na geração: " + err.message);
     } finally { setIsGenerating(false); }
   };
 
   const renderFormFields = () => {
     switch(activeModule) {
-        case 'generator': return ( <> <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none transition-all" placeholder="Ex: Corretor de Postura" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Preço (R$)</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none transition-all" placeholder="97,90" value={dynamicFormData.price || ''} onChange={e => handleInputChange('price', e.target.value)} /></div><div className="p-3 bg-purple-900/20 border border-purple-500/20 rounded-lg"><p className="text-[10px] text-purple-300 font-medium flex items-center gap-2"><Sparkles className="w-3 h-3" />Gera para todas as 12 redes!</p></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase flex justify-between"><span>Foto (Simulador)</span> {adImage && <span className="text-green-400 text-[9px] font-bold bg-green-900/30 px-2 rounded">OK</span>}</label><div onClick={() => fileInputRef.current?.click()} className="w-full h-16 border-2 border-dashed border-slate-700 hover:border-purple-500 hover:bg-slate-800/50 rounded-xl flex items-center justify-center cursor-pointer gap-2 transition-all group"><Upload className="w-5 h-5 text-slate-500 group-hover:text-purple-400 transition-colors"/> <span className="text-xs font-bold text-slate-500 group-hover:text-white transition-colors">Carregar Imagem</span></div><input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" /></div> </> );
-        case 'video_script': return (<> <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto / Tema</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" placeholder="Ex: Escova Alisadora" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div><div className="grid grid-cols-2 gap-3"><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Duração</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" value={dynamicFormData.duration || '30s'} onChange={e => handleInputChange('duration', e.target.value)}><option value="15s">15s</option><option value="30s">30s</option><option value="60s">60s</option></select></div><div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Estilo</label><select className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none" value={dynamicFormData.style || 'Engraçado'} onChange={e => handleInputChange('style', e.target.value)}><option value="Engraçado">Viral</option><option value="UGC">UGC</option><option value="Problema-Solução">Problema-Solução</option></select></div></div></>);
-        // ... (Outros casos simplificados para caber, a lógica permanece a mesma)
+        case 'generator': return ( <> 
+             <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Produto</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none transition-all" placeholder="Ex: Corretor de Postura" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div>
+             <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Preço (R$)</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm font-medium text-white focus:border-purple-500 outline-none transition-all" placeholder="97,90" value={dynamicFormData.price || ''} onChange={e => handleInputChange('price', e.target.value)} /></div>
+             <PlatformSelector selected={selectedPlatforms} onToggle={togglePlatform} />
+             <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase flex justify-between"><span>Foto (Simulador)</span> {adImage && <span className="text-green-400 text-[9px] font-bold bg-green-900/30 px-2 rounded">OK</span>}</label><div onClick={() => fileInputRef.current?.click()} className="w-full h-16 border-2 border-dashed border-slate-700 hover:border-purple-500 hover:bg-slate-800/50 rounded-xl flex items-center justify-center cursor-pointer gap-2 transition-all group"><Upload className="w-5 h-5 text-slate-500 group-hover:text-purple-400 transition-colors"/> <span className="text-xs font-bold text-slate-500 group-hover:text-white transition-colors">Carregar Imagem</span></div><input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/*" /></div> 
+             </> );
         default: return <div className="space-y-2"><label className="text-[10px] font-bold text-slate-500 uppercase">Entrada</label><input type="text" className="w-full bg-[#0B0518] border-2 border-slate-700 rounded-xl p-4 text-sm text-white" value={dynamicFormData.productName || ''} onChange={e => handleInputChange('productName', e.target.value)} /></div>;
     }
   }
@@ -503,9 +663,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const renderAdPreview = (data: any, platform: string, userImage: string | null, device: 'mobile' | 'desktop') => {
       let platformData = data;
       if (activeModule === 'generator' && data && typeof data === 'object') {
-          // Mapeamento Robusto
-          const keyMap: any = { instagram: 'instagram', facebook: 'facebook', tiktok: 'tiktok', google: 'google', shopee: 'shopee', mercadolivre: 'mercadolivre', olx: 'olx', amazon: 'amazon', pinterest: 'pinterest', linkedin: 'linkedin', twitter: 'twitter', youtube: 'youtube' };
-          platformData = data[keyMap[platform]] || data['facebook'] || data; 
+          // Fallback robusto
+          platformData = data[platform] || data['facebook'] || data; 
       }
       switch (platform) {
           case 'instagram': return <InstagramPreview data={platformData} userImage={userImage} device={device} />;
@@ -514,7 +673,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
           case 'amazon': return <AmazonPreview data={platformData} userImage={userImage} device={device} />;
           case 'mercadolivre': return <MercadoLivrePreview data={platformData} userImage={userImage} device={device} />;
           case 'olx': return <OLXPreview data={platformData} userImage={userImage} device={device} />;
-          case 'google': return <GoogleAdsPreview data={platformData} device={device} />;
           case 'pinterest': return <PinterestPreview data={platformData} userImage={userImage} device={device} />;
           case 'linkedin': return <LinkedinPreview data={platformData} userImage={userImage} device={device} />;
           case 'twitter': return <TwitterPreview data={platformData} userImage={userImage} device={device} />;
@@ -523,7 +681,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
       }
   };
 
-  // Cor do Neon baseada na plataforma selecionada
   const activeTabColor = PLATFORM_TABS.find(t => t.id === previewPlatform)?.neon || 'shadow-[0_0_30px_rgba(168,85,247,0.3)] border-purple-500/30';
 
   return (
@@ -563,14 +720,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                              {isGenerating && (<div className="my-auto text-center"><div className="w-16 h-16 border-4 border-white/10 border-t-purple-500 rounded-full animate-spin mb-4 mx-auto"></div><p className="text-purple-300 text-sm font-bold animate-pulse">IA Escrevendo...</p></div>)}
                              {result && !isGenerating && (
                                  <div className="w-full max-w-4xl pb-20">
-                                     <div className="flex justify-between items-center mb-6"><h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2"><Sparkles className="w-4 h-4 text-purple-500" /> Resultado Gerado</h3><div className="flex gap-2"><DeviceToggle device={previewDevice} setDevice={setPreviewDevice} /><button onClick={() => navigator.clipboard.writeText(JSON.stringify(result, null, 2))} className="text-xs text-slate-400 hover:text-white flex items-center gap-1"><Copy className="w-3 h-3" /> Copiar JSON</button></div></div>
+                                     <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                                        <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2"><Sparkles className="w-4 h-4 text-purple-500" /> Resultado Gerado</h3>
+                                        <div className="flex gap-2">
+                                            <DeviceToggle device={previewDevice} setDevice={setPreviewDevice} />
+                                            <button onClick={() => navigator.clipboard.writeText(JSON.stringify(result, null, 2))} className="text-xs text-slate-400 hover:text-white flex items-center gap-1 p-2 rounded hover:bg-white/10"><Copy className="w-3 h-3" /> JSON</button>
+                                        </div>
+                                     </div>
+                                     
                                      {activeModule === 'generator' && (
                                          <div className="mb-8 flex gap-2 overflow-x-auto custom-scrollbar pb-2 px-1">
-                                             {PLATFORM_TABS.map(tab => (
+                                             {/* Exibe APENAS as plataformas selecionadas nas abas de resultado */}
+                                             {PLATFORM_TABS.filter(t => selectedPlatforms.includes(t.id)).map(tab => (
                                                  <button key={tab.id} onClick={() => setPreviewPlatform(tab.id)} className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-300 border ${previewPlatform === tab.id ? `bg-white text-black border-white shadow-lg scale-105 ${tab.color.replace('text-', 'shadow-')}` : `bg-slate-900/50 text-slate-400 border-slate-700 hover:bg-slate-800 hover:text-white`}`}><tab.icon className={`w-3.5 h-3.5 ${previewPlatform === tab.id ? 'text-black' : tab.color}`} />{tab.label}</button>
                                              ))}
                                          </div>
                                      )}
+                                     
                                      {activeModule === 'generator' ? (
                                          <div className={`relative transition-all duration-500 ${activeTabColor} border-2 rounded-3xl p-6 bg-black/20 backdrop-blur-sm animate-in zoom-in-95`}>
                                             {renderAdPreview(result, previewPlatform, adImage, previewDevice)}
