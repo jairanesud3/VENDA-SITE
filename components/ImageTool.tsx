@@ -1,85 +1,85 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { Camera, Download, Loader2, Sparkles, AlertTriangle, Lock, Upload, ImagePlus, X, RefreshCw, Palette, Grid3X3, Sun, Moon, Monitor, Leaf, Gem, Box, Aperture } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Camera, Download, Loader2, Sparkles, AlertTriangle, Lock, Upload, ImagePlus, X, RefreshCw, Palette } from 'lucide-react';
 import { generateProductImage } from '@/app/actions/generate-image';
 import { Button } from '@/components/ui/button';
+import { BACKGROUNDS } from './Dashboard'; // Importa a lista global
 
 interface ImageToolProps {
   userPlan: 'free' | 'pro';
   onUpgrade: () => void;
+  activeTheme: any;
+  setActiveTheme: (theme: any) => void;
 }
 
-// --- ESTILOS DE FUNDO (BACKGROUNDS) ---
-const BACKGROUNDS = [
-  { 
-    id: 'studio', 
-    name: 'Estúdio Dark', 
-    icon: Moon,
-    class: 'bg-[#050505] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-800/20 via-[#050505] to-[#000000]' 
-  },
-  { 
-    id: 'concrete', 
-    name: 'Concreto Minimal', 
-    icon: Box,
-    class: 'bg-[#1c1c1c] bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-[#333] via-[#1c1c1c] to-[#111]' 
-  },
-  { 
-    id: 'softbox', 
-    name: 'Soft Studio', 
-    icon: Aperture,
-    class: 'bg-[#2a2a2a] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#404040] via-[#2a2a2a] to-[#1a1a1a]' 
-  },
-  { 
-    id: 'emerald', 
-    name: 'Emerald Jungle', 
-    icon: Leaf,
-    class: 'bg-[#0a1f0a] bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-green-900/40 via-[#0a1f0a] to-black' 
-  },
-  { 
-    id: 'velvet', 
-    name: 'Red Velvet', 
-    icon: Gem,
-    class: 'bg-[#1a0505] bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-red-900/30 via-[#1a0505] to-black' 
-  },
-  { 
-    id: 'golden', 
-    name: 'Golden Hour', 
-    icon: Sun,
-    class: 'bg-[#1a0b00] bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-orange-900/20 via-[#1a0b00] to-black' 
-  },
-  { 
-    id: 'cyber', 
-    name: 'Cyber Grid', 
-    icon: Grid3X3,
-    class: 'bg-[#09090b] bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]' 
-  },
-  { 
-    id: 'aurora', 
-    name: 'Neon Aurora', 
-    icon: Sparkles,
-    class: 'bg-[#0F0520] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-900/40 via-[#0F0520] to-black' 
-  },
-  { 
-    id: 'blueprint', 
-    name: 'Tech Blue', 
-    icon: Monitor,
-    class: 'bg-slate-950 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:20px_20px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-slate-950 to-slate-950' 
-  },
-  { 
-    id: 'pure', 
-    name: 'OLED Black', 
-    icon: Palette,
-    class: 'bg-black' 
-  }
-];
+// Replicando o Seletor Grid aqui para manter funcionalidade isolada visualmente mas com estado global
+const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setActiveTheme: (t: any) => void }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => {
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative z-50" ref={menuRef}>
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-lg border ${
+          isOpen 
+            ? 'bg-purple-600 border-purple-400 text-white' 
+            : 'bg-black/40 border-white/10 text-slate-300 hover:text-white hover:bg-white/10'
+        }`}
+        title="Alterar Cenário/Tema"
+      >
+        <Palette className="w-5 h-5" />
+      </button>
+
+      {isOpen && (
+        <div className="absolute top-12 right-0 w-[280px] bg-[#0f0f11] border border-slate-700 rounded-xl shadow-2xl p-3 animate-in fade-in zoom-in-95 duration-200">
+          <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 px-1">
+            Selecionar Ambiente
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {BACKGROUNDS.map((bg) => (
+              <button
+                key={bg.id}
+                onClick={() => { setActiveTheme(bg); setIsOpen(false); }}
+                className={`
+                  relative group aspect-square rounded-lg flex flex-col items-center justify-center transition-all
+                  ${activeTheme.id === bg.id 
+                    ? 'bg-purple-600 text-white ring-2 ring-purple-400 ring-offset-2 ring-offset-black' 
+                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'}
+                `}
+                title={bg.name}
+              >
+                <bg.icon className="w-5 h-5 mb-1" />
+              </button>
+            ))}
+          </div>
+          <div className="mt-3 pt-2 border-t border-slate-800 text-center">
+            <span className="text-[10px] text-slate-400">
+              Tema Atual: <span className="text-white font-bold">{activeTheme.name}</span>
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade, activeTheme, setActiveTheme }) => {
   const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [activeBg, setActiveBg] = useState(BACKGROUNDS[0]);
   
   // Estado para Visualização (Preview)
   const [referenceImagePreview, setReferenceImagePreview] = useState<string | null>(null);
@@ -91,15 +91,11 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 9 * 1024 * 1024) { // 9MB limit (segurança antes do server)
+      if (file.size > 9 * 1024 * 1024) { 
         setError("A imagem deve ter no máximo 9MB.");
         return;
       }
-      
-      // Armazena o arquivo real para envio
       setSelectedFile(file);
-
-      // Cria preview para UI
       const reader = new FileReader();
       reader.onloadend = () => {
         setReferenceImagePreview(reader.result as string);
@@ -126,7 +122,6 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
     setImageUrl(null);
 
     try {
-      // Cria FormData para enviar arquivo e texto
       const formData = new FormData();
       formData.append('prompt', prompt);
       
@@ -134,7 +129,6 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
         formData.append('image', selectedFile);
       }
 
-      // Chama a Server Action
       const url = await generateProductImage(formData);
       setImageUrl(url);
     } catch (err: any) {
@@ -164,7 +158,6 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
         </div>
 
         <div className="space-y-6 flex-1">
-          
           {/* AREA DE UPLOAD DE IMAGEM */}
           <div>
             <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block flex justify-between">
@@ -251,44 +244,17 @@ export const ImageTool: React.FC<ImageToolProps> = ({ userPlan, onUpgrade }) => 
       </div>
 
       {/* RIGHT PANEL: PREVIEW */}
-      <div className={`flex-1 relative flex items-center justify-center p-8 overflow-hidden transition-all duration-700 ease-in-out ${activeBg.class}`}>
+      <div className={`flex-1 relative flex items-center justify-center p-8 overflow-hidden transition-all duration-700 ease-in-out ${activeTheme.class}`}>
          
-         {/* BACKGROUND SELECTOR (STABLE & MODERN) */}
-         <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 w-full max-w-[95%] md:max-w-2xl">
-            <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-full p-2 flex items-center gap-2 shadow-2xl overflow-x-auto custom-scrollbar no-scrollbar mx-auto">
-                {BACKGROUNDS.map((bg) => (
-                    <button
-                        key={bg.id}
-                        onClick={() => setActiveBg(bg)}
-                        className={`
-                            relative group flex-shrink-0 p-2.5 rounded-full transition-all duration-300
-                            ${activeBg.id === bg.id 
-                                ? 'bg-white/15 text-white ring-1 ring-white/30 shadow-[0_0_15px_rgba(255,255,255,0.1)]' 
-                                : 'text-slate-400 hover:text-white hover:bg-white/5'}
-                        `}
-                        title={bg.name}
-                    >
-                        <bg.icon className="w-5 h-5" />
-                        
-                        {/* Tooltip Stable - Fade Only */}
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 px-2 py-1 bg-black/90 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap border border-white/10 z-50">
-                            {bg.name}
-                        </div>
-                    </button>
-                ))}
-            </div>
-            {/* Active Label (Stable) */}
-            <div className="text-center mt-2">
-                <span className="text-[10px] font-medium text-white/50 tracking-widest uppercase bg-black/20 px-3 py-1 rounded-full backdrop-blur-sm border border-white/5">
-                    Ambiente: <span className="text-white">{activeBg.name}</span>
-                </span>
-            </div>
+         {/* THEME SELECTOR GRID (Novo, fixo e sem bugs) */}
+         <div className="absolute top-4 right-4 z-50">
+            <ThemeSelector activeTheme={activeTheme} setActiveTheme={setActiveTheme} />
          </div>
 
          {!imageUrl && !isLoading && (
             <div className="text-center opacity-40 flex flex-col items-center">
                <div className="relative">
-                  <div className={`absolute inset-0 blur-xl rounded-full ${activeBg.id === 'golden' ? 'bg-orange-500/20' : 'bg-purple-500/20'}`}></div>
+                  <div className={`absolute inset-0 blur-xl rounded-full ${activeTheme.id === 'golden' ? 'bg-orange-500/20' : 'bg-purple-500/20'}`}></div>
                   <ImagePlus className="w-20 h-20 mb-4 text-white/50 relative z-10" />
                </div>
                <p className="text-lg text-white/50 font-medium max-w-xs">

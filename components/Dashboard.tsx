@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Settings, LogOut, Sparkles, Copy, 
   Image as ImageIcon, Zap, Loader2, Video, 
@@ -8,7 +8,8 @@ import {
   Menu, MousePointerClick, 
   Camera, Home, ChevronRight, Wand2, LucideIcon, Download,
   Lock, AlertTriangle, X, LayoutTemplate,
-  Heart, MessageCircle, Send, Bookmark, MoreHorizontal, Star, ShoppingCart, Truck, MapPin
+  Heart, MessageCircle, Send, Bookmark, MoreHorizontal, Star, ShoppingCart, Truck, MapPin,
+  Palette, Box, Moon, Sun, Grid3X3, Aperture, Leaf, Gem, Monitor
 } from 'lucide-react';
 import { generateCopy } from '@/app/actions/generate-copy';
 import { createClient } from '@/utils/supabase/client';
@@ -20,7 +21,136 @@ interface DashboardProps {
   userEmail?: string | null;
 }
 
-// --- CONFIGURAÇÃO ---
+// --- TEMAS GLOBAIS (BACKGROUNDS) ---
+// Definidos aqui para serem usados em TODO o dashboard
+export const BACKGROUNDS = [
+  { 
+    id: 'studio', 
+    name: 'Estúdio Dark', 
+    icon: Moon,
+    class: 'bg-[#050505] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-slate-800/20 via-[#050505] to-[#000000]' 
+  },
+  { 
+    id: 'concrete', 
+    name: 'Concreto Minimal', 
+    icon: Box,
+    class: 'bg-[#1c1c1c] bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-[#333] via-[#1c1c1c] to-[#111]' 
+  },
+  { 
+    id: 'softbox', 
+    name: 'Soft Studio', 
+    icon: Aperture,
+    class: 'bg-[#2a2a2a] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#404040] via-[#2a2a2a] to-[#1a1a1a]' 
+  },
+  { 
+    id: 'emerald', 
+    name: 'Emerald Jungle', 
+    icon: Leaf,
+    class: 'bg-[#0a1f0a] bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-green-900/40 via-[#0a1f0a] to-black' 
+  },
+  { 
+    id: 'velvet', 
+    name: 'Red Velvet', 
+    icon: Gem,
+    class: 'bg-[#1a0505] bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-red-900/30 via-[#1a0505] to-black' 
+  },
+  { 
+    id: 'golden', 
+    name: 'Golden Hour', 
+    icon: Sun,
+    class: 'bg-[#1a0b00] bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-orange-900/20 via-[#1a0b00] to-black' 
+  },
+  { 
+    id: 'cyber', 
+    name: 'Cyber Grid', 
+    icon: Grid3X3,
+    class: 'bg-[#09090b] bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]' 
+  },
+  { 
+    id: 'aurora', 
+    name: 'Neon Aurora', 
+    icon: Sparkles,
+    class: 'bg-[#0F0520] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-900/40 via-[#0F0520] to-black' 
+  },
+  { 
+    id: 'blueprint', 
+    name: 'Tech Blue', 
+    icon: Monitor,
+    class: 'bg-slate-950 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:20px_20px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/10 via-slate-950 to-slate-950' 
+  },
+  { 
+    id: 'pure', 
+    name: 'OLED Black', 
+    icon: Palette,
+    class: 'bg-black' 
+  }
+];
+
+// --- COMPONENTE SELETOR DE TEMA (NOVO) ---
+const ThemeSelector = ({ activeTheme, setActiveTheme }: { activeTheme: any, setActiveTheme: (t: any) => void }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Fecha ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative z-50" ref={menuRef}>
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-lg border ${
+          isOpen 
+            ? 'bg-purple-600 border-purple-400 text-white' 
+            : 'bg-black/40 border-white/10 text-slate-300 hover:text-white hover:bg-white/10'
+        }`}
+        title="Alterar Cenário/Tema"
+      >
+        <Palette className="w-5 h-5" />
+      </button>
+
+      {isOpen && (
+        <div className="absolute top-12 right-0 w-[280px] bg-[#0f0f11] border border-slate-700 rounded-xl shadow-2xl p-3 animate-in fade-in zoom-in-95 duration-200">
+          <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 px-1">
+            Selecionar Ambiente
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {BACKGROUNDS.map((bg) => (
+              <button
+                key={bg.id}
+                onClick={() => { setActiveTheme(bg); setIsOpen(false); }}
+                className={`
+                  relative group aspect-square rounded-lg flex flex-col items-center justify-center transition-all
+                  ${activeTheme.id === bg.id 
+                    ? 'bg-purple-600 text-white ring-2 ring-purple-400 ring-offset-2 ring-offset-black' 
+                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'}
+                `}
+                title={bg.name}
+              >
+                <bg.icon className="w-5 h-5 mb-1" />
+              </button>
+            ))}
+          </div>
+          <div className="mt-3 pt-2 border-t border-slate-800 text-center">
+            <span className="text-[10px] text-slate-400">
+              Tema Atual: <span className="text-white font-bold">{activeTheme.name}</span>
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+
+// --- CONFIGURAÇÃO MÓDULOS ---
 type ModuleId = 
   | 'home'
   | 'generator' | 'video_script' | 'product_desc' 
@@ -333,6 +463,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
   const [activeModule, setActiveModule] = useState<ModuleId>('home');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // --- ESTADO GLOBAL DO TEMA ---
+  // O tema selecionado persiste ao trocar de ferramenta
+  const [activeTheme, setActiveTheme] = useState(BACKGROUNDS[0]);
+
   const router = useRouter();
   
   const [userPlan, setUserPlan] = useState<'free' | 'pro'>('free'); 
@@ -648,8 +783,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                   </div>
               </div>
           ) : activeModule === 'studio' ? (
-              // --- NOVO: STUDIO VIEW (LEONARDO AI) ---
-              <ImageTool userPlan={userPlan} onUpgrade={handleUpgradeClick} />
+              // --- STUDIO VIEW (LEONARDO AI) ---
+              // AGORA RECEBE O TEMA GLOBAL COMO PROP
+              <ImageTool 
+                userPlan={userPlan} 
+                onUpgrade={handleUpgradeClick} 
+                activeTheme={activeTheme}
+                setActiveTheme={setActiveTheme}
+                // Passamos o componente de Seletor para reutilizar ou renderizamos internamente lá
+                // Optamos por renderizar lá passando as props necessárias
+              />
           ) : (
               // --- TOOL VIEW (GEMINI TEXTS) ---
               <div className="flex flex-col lg:flex-row h-full overflow-hidden relative z-10">
@@ -720,11 +863,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                      </div>
                   </div>
 
-                  {/* RIGHT: PREVIEW AREA */}
-                  <div id="result-area" className="flex-1 bg-[#09090b] relative overflow-hidden flex flex-col min-h-[50vh]">
-                      {/* Modern Background Pattern */}
-                      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-                      <div className="absolute top-0 left-0 right-0 h-[500px] w-full bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent pointer-events-none"></div>
+                  {/* RIGHT: PREVIEW AREA - AGORA COM TEMA DINÂMICO */}
+                  <div id="result-area" className={`flex-1 relative overflow-hidden flex flex-col min-h-[50vh] transition-all duration-700 ease-in-out ${activeTheme.class}`}>
+                      
+                      {/* NEW THEME SELECTOR - AGORA FLUTUANTE NA DIREITA */}
+                      <div className="absolute top-4 right-4 z-50">
+                        <ThemeSelector activeTheme={activeTheme} setActiveTheme={setActiveTheme} />
+                      </div>
 
                       <div className="h-12 md:h-16 border-b border-white/5 flex items-center justify-between px-4 md:px-8 bg-black/20 backdrop-blur-sm sticky top-0 z-10">
                           <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
@@ -733,7 +878,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, userEmail }) => 
                           {result && (
                               <button 
                                 onClick={() => navigator.clipboard.writeText(JSON.stringify(result, null, 2))}
-                                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[10px] md:text-xs flex items-center gap-2 text-slate-300 transition-colors border border-white/5"
+                                className="mr-12 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[10px] md:text-xs flex items-center gap-2 text-slate-300 transition-colors border border-white/5"
                               >
                                   <Copy className="w-3 h-3"/> Copiar Tudo
                               </button>
